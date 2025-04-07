@@ -4,7 +4,7 @@
 	<artifactId>spring-content-mongo</artifactId>
 
 	<parent>
-		<groupId>com.github.paulcwarren</groupId>
+		<groupId>it.intesys.sc</groupId>
 		<artifactId>spring-content</artifactId>
 		<version>3.0.17-SNAPSHOT</version>
 	</parent>
@@ -19,7 +19,7 @@
 			<artifactId>spring-context</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.paulcwarren</groupId>
+			<groupId>it.intesys.sc</groupId>
 			<artifactId>spring-content-commons</artifactId>
 			<version>3.0.17-SNAPSHOT</version>
 		</dependency>

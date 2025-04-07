@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-content-commons</artifactId>
 	<parent>
-		<groupId>com.github.paulcwarren</groupId>
+		<groupId>it.intesys.sc</groupId>
 		<artifactId>spring-content</artifactId>
 		<version>3.0.17-SNAPSHOT</version>
 	</parent>
@@ -18,7 +18,7 @@
 			<version>${commonsio-version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.paulcwarren</groupId>
+			<groupId>it.intesys.sc</groupId>
 			<artifactId>spring-versions-commons</artifactId>
 			<version>3.0.17-SNAPSHOT</version>
 		</dependency>
