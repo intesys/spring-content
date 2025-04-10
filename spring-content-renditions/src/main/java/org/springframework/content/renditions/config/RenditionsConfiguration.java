@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.content.commons.renditions.RenditionProvider;
 import org.springframework.content.commons.renditions.RenditionService;
 import org.springframework.content.renditions.loader.ExternalRenditionProviderLoader;
@@ -16,15 +17,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MapPropertySource;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Configuration
 @ComponentScan(basePackageClasses = PdfToJpegRenderer.class)
@@ -34,44 +26,23 @@ public class RenditionsConfiguration {
 
     @Bean
     @Order(1)
-    public List<ExternalRenditionProviderLoader> alfrescoTransformCoreRenditionProviderLoaders(Environment environment,
+    @ConditionalOnProperty(name = "alfresco.transform.core.url")
+    public ExternalRenditionProviderLoader alfrescoTransformCoreRenditionProviderLoader(
+        @Value("${alfresco.transform.core.url}") String alfrescoTransformCoreUrl,
         @Value("${spring.content.renditions.loaders.maxRetries:5}") Integer maxRetries,
-        @Value("${spring.content.renditions.loaders.timeoutSeconds:5}") Integer timeoutSeconds,
-        DefaultListableBeanFactory registry) {
+        @Value("${spring.content.renditions.loaders.timeoutSeconds:5}") Integer timeoutSeconds, DefaultListableBeanFactory registry) {
 
-        List<ExternalRenditionProviderLoader> loaders = new ArrayList<>();
-
-        Map<String, Object> dynamicProperties = ((AbstractEnvironment) environment).getPropertySources().stream()
-                                                                                   .filter(MapPropertySource.class::isInstance)
-                                                                                   .map(ps -> ((MapPropertySource) ps).getSource())
-                                                                                   .flatMap(map -> map.entrySet().stream())
-                                                                                   .filter(entry -> entry.getKey().matches("^[^.]+\\.transform\\.core\\.url$"))
-                                                                                   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        if (dynamicProperties.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        for (Map.Entry<String, Object> entry : dynamicProperties.entrySet()) {
-            String key = entry.getKey();
-            String url = entry.getValue().toString();
-            String name = key.substring(0, key.indexOf(".transform.core.url"));
-
-            AlfrescoTransformCoreRenditionProviderLoader loader = new AlfrescoTransformCoreRenditionProviderLoader(url, name + "TransformCore", maxRetries,
-                                                                                                                   timeoutSeconds, registry);
-            loaders.add(loader);
-        }
-
-        LOGGER.debug("Found {} alfresco transform core loaders", loaders.size());
-        return loaders;
+        LOGGER.debug("Registering AlfrescoTransformCoreRenditionProviderLoader...");
+        return new AlfrescoTransformCoreRenditionProviderLoader(alfrescoTransformCoreUrl, "AlfrescoTransformCore", maxRetries, timeoutSeconds, registry);
     }
 
     @Bean
-    @DependsOn("alfrescoTransformCoreRenditionProviderLoaders")
-    public ExternalRenditionProviderLoaderExecutor externalRenditionProviderLoaderExecutor(List<ExternalRenditionProviderLoader> loaders,
-        @Value("${spring.content.renditions.loaders.active:true}") Boolean renditionsLoaderActive) {
+    @Order(2)
+    public ExternalRenditionProviderLoaderExecutor externalRenditionProviderLoaderExecutor(
+        @Value("${spring.content.renditions.loaders.active:true}") Boolean renditionsLoaderActive, ExternalRenditionProviderLoader... loaders) {
 
-        return new ExternalRenditionProviderLoaderExecutor(loaders, renditionsLoaderActive);
+        LOGGER.debug("Registering ExternalRenditionProviderLoaderExecutor...");
+        return new ExternalRenditionProviderLoaderExecutor(renditionsLoaderActive, loaders);
     }
 
     @Bean

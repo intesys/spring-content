@@ -18,7 +18,10 @@ package org.springframework.content.renditions.loader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,19 +41,20 @@ public class ExternalRenditionProviderLoaderExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalRenditionProviderLoaderExecutor.class);
 
-    private final List<ExternalRenditionProviderLoader> loaders;
+    private final List<ExternalRenditionProviderLoader> loaders = new ArrayList<>();
     private final Boolean renditionsLoaderActive;
 
-    public ExternalRenditionProviderLoaderExecutor(List<ExternalRenditionProviderLoader> loaders, Boolean renditionsLoaderActive) {
+    @Autowired(required = false)
+    public ExternalRenditionProviderLoaderExecutor(Boolean renditionsLoaderActive, ExternalRenditionProviderLoader... loaders) {
 
-        this.loaders = loaders;
         this.renditionsLoaderActive = renditionsLoaderActive;
+        this.loaders.addAll(Arrays.asList(loaders));
         loadExternalRenditionProviders();
     }
 
     public void loadExternalRenditionProviders() {
 
-        if (Boolean.TRUE.equals(renditionsLoaderActive) && loaders != null) {
+        if (Boolean.TRUE.equals(renditionsLoaderActive)) {
             for (var loader : loaders) {
                 try {
                     LOGGER.debug("Loading beans for loader {}...", loader.getLoaderName());

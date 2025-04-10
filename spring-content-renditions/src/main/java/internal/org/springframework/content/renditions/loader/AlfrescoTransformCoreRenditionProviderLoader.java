@@ -142,7 +142,7 @@ public class AlfrescoTransformCoreRenditionProviderLoader implements ExternalRen
                 }
                 catch (InvalidMimeTypeException invalidMimeTypeException) {
                     LOGGER.debug("Skipping transformer {} because source or target mime type is not valid: {}", transformer.getTransformerName(),
-                                invalidMimeTypeException.getMessage());
+                                 invalidMimeTypeException.getMessage());
                 }
             }
         }
