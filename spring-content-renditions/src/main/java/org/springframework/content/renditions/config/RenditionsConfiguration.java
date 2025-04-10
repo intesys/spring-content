@@ -16,10 +16,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 
 @Configuration
 @ComponentScan(basePackageClasses = PdfToJpegRenderer.class)
+@PropertySource("classpath:renditions.properties")
 public class RenditionsConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RenditionsConfiguration.class);
@@ -29,8 +31,8 @@ public class RenditionsConfiguration {
     @ConditionalOnProperty(name = "alfresco.transform.core.url")
     public ExternalRenditionProviderLoader alfrescoTransformCoreRenditionProviderLoader(
         @Value("${alfresco.transform.core.url}") String alfrescoTransformCoreUrl,
-        @Value("${spring.content.renditions.loaders.maxRetries:5}") Integer maxRetries,
-        @Value("${spring.content.renditions.loaders.timeoutSeconds:5}") Integer timeoutSeconds, DefaultListableBeanFactory registry) {
+        @Value("${spring.content.renditions.loaders.maxRetries}") Integer maxRetries,
+        @Value("${spring.content.renditions.loaders.timeoutSeconds}") Integer timeoutSeconds, DefaultListableBeanFactory registry) {
 
         LOGGER.debug("Registering AlfrescoTransformCoreRenditionProviderLoader...");
         return new AlfrescoTransformCoreRenditionProviderLoader(alfrescoTransformCoreUrl, "AlfrescoTransformCore", maxRetries, timeoutSeconds, registry);
@@ -39,7 +41,7 @@ public class RenditionsConfiguration {
     @Bean
     @Order(2)
     public ExternalRenditionProviderLoaderExecutor externalRenditionProviderLoaderExecutor(
-        @Value("${spring.content.renditions.loaders.active:true}") Boolean renditionsLoaderActive, ExternalRenditionProviderLoader... loaders) {
+        @Value("${spring.content.renditions.loaders.active}") Boolean renditionsLoaderActive, ExternalRenditionProviderLoader... loaders) {
 
         LOGGER.debug("Registering ExternalRenditionProviderLoaderExecutor...");
         return new ExternalRenditionProviderLoaderExecutor(renditionsLoaderActive, loaders);
