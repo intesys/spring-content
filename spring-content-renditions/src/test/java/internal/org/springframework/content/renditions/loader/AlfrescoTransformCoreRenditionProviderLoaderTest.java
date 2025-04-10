@@ -41,8 +41,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AlfrescoTransformCoreRenditionProviderLoaderTest {
 
+    private static final int MAX_RETRIES = 2;
     private static final String TEST_URL = "http://test-alfresco.com";
     private static final String LOADER_NAME = "TestLoader";
+    private static final int TIMEOUT_SECONDS = 1;
 
     @Mock
     private RestTemplate restTemplate;
@@ -55,11 +57,8 @@ class AlfrescoTransformCoreRenditionProviderLoaderTest {
     @BeforeEach
     void setUp() {
 
-        loader = new AlfrescoTransformCoreRenditionProviderLoader(TEST_URL, LOADER_NAME);
-        ReflectionTestUtils.setField(loader, "maxRetries", 2);
-        ReflectionTestUtils.setField(loader, "timeoutSeconds", 1);
+        loader = new AlfrescoTransformCoreRenditionProviderLoader(TEST_URL, LOADER_NAME, MAX_RETRIES, TIMEOUT_SECONDS, registry);
         ReflectionTestUtils.setField(loader, "restTemplate", restTemplate);
-        ReflectionTestUtils.setField(loader, "registry", registry);
     }
 
     @Test

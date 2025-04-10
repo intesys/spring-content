@@ -18,8 +18,6 @@ package internal.org.springframework.content.renditions.loader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.content.renditions.loader.ExternalRenditionProviderLoader;
@@ -46,18 +44,19 @@ public class AlfrescoTransformCoreRenditionProviderLoader implements ExternalRen
     private final String transformerUrl;
     private final String name;
     private final RestTemplate restTemplate;
-    @Autowired
-    private DefaultListableBeanFactory registry;
-    @Value("${rendition.provider.loader.maxRetries:5}")
-    private Integer maxRetries;
-    @Value("${rendition.provider.loader.timeoutSeconds:5}")
-    private Integer timeoutSeconds;
+    private final Integer maxRetries;
+    private final Integer timeoutSeconds;
+    private final DefaultListableBeanFactory registry;
 
-    public AlfrescoTransformCoreRenditionProviderLoader(String transformerUrl, String name) {
+    public AlfrescoTransformCoreRenditionProviderLoader(String transformerUrl, String name, Integer maxRetries, Integer timeoutSeconds,
+        DefaultListableBeanFactory registry) {
 
         this.transformerUrl = transformerUrl;
         this.name = name;
         this.renditionProviderPrefix = name + "RenditionProviderImpl_";
+        this.maxRetries = maxRetries;
+        this.timeoutSeconds = timeoutSeconds;
+        this.registry = registry;
         this.restTemplate = new RestTemplate();
     }
 
@@ -107,7 +106,7 @@ public class AlfrescoTransformCoreRenditionProviderLoader implements ExternalRen
                 }
             }
             catch (RestClientException e) {
-                LOGGER.warn("Health check attempt {} failed: {}", i + 1, e.getMessage());
+                LOGGER.debug("Health check attempt {} failed: {}", i + 1, e.getMessage());
             }
             try {
                 Thread.sleep(timeoutSeconds * 1000L);
@@ -142,7 +141,7 @@ public class AlfrescoTransformCoreRenditionProviderLoader implements ExternalRen
                     sourceAndTargetMap.computeIfAbsent(beanName, k -> new HashSet<>()).add(targetMimeType.toString());
                 }
                 catch (InvalidMimeTypeException invalidMimeTypeException) {
-                    LOGGER.warn("Skipping transformer {} because source or target mime type is not valid: {}", transformer.getTransformerName(),
+                    LOGGER.debug("Skipping transformer {} because source or target mime type is not valid: {}", transformer.getTransformerName(),
                                 invalidMimeTypeException.getMessage());
                 }
             }
