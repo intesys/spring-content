@@ -112,3 +112,73 @@ public static class ApplicationConfig {
 2. Marked as an `@Service`
 3. Ensure the service is scanned by Spring and offered as a bean
 ====
+
+== RenditionProvider Extension Point for Alfresco ECM
+
+Spring Content supports the renditions integration with the https://docs.alfresco.com/transform-service/latest/[Alfresco Transform Core] service.
+When the `spring-content-renditions` (or `spring-content-renditions-boot-starter`) dependency is included, you can add the RenditionProvider list from Alfresco
+Transform Service simply adding the property `alfresco.transform.core.url` on your application.properties.
+
+This mechanism, allows the creation of `AlfrescoTransformCoreRenditionProviderLoader` bean that:
+
+1. Check if the service is up;
+2. If it's running, the `AlfrescoTransformCoreRenditionProviderLoader` register a bean of type RenditionProvider for each transformer found on the Alfresco Transform Service configuration.
+
+If you have more than one Alfresco Transform Core instance (for example a custom implementation), you can add it simply declaring a new bean of type `AlfrescoTransformCoreRenditionProviderLoader`:
+
+.Implementing the AlfrescoTransformCoreRenditionProviderLoader Extension Point
+====
+[source, java]
+----
+@Configuration
+public class MyAppBeansConfig {
+
+	@Bean
+	public ExternalRenditionProviderLoader customAlfrescoTransformCoreRenditionProviderLoader(
+		@Value("${custom.alfresco.transform.core.url}") String customAlfrescoTransformCoreUrl,
+		@Value("${spring.content.renditions.loaders.maxRetries}") Integer maxRetries,
+		@Value("${spring.content.renditions.loaders.timeoutSeconds}") Integer timeoutSeconds, DefaultListableBeanFactory registry) {
+
+		return new AlfrescoTransformCoreRenditionProviderLoader(customAlfrescoTransformCoreUrl, "CustomAlfrescoTransformCore", maxRetries, timeoutSeconds, registry);
+    }
+}
+----
+====
+
+The AlfrescoTransformCoreRenditionProviderLoader works with 4 parameters:
+
+1. the service url, used for API calls;
+2. the max retries, that is the max attempts number for check if the service is up (default 5, but it's simply overridable adding the property `spring.content.renditions.loaders.maxRetries` to your application.properties);
+3. the timeout seconds, that is the max seconds before the timeout in the service availability check (default 5, but it's simply overridable adding the property `spring.content.renditions.loaders.timeoutSeconds` to your application.properties);
+4. the DefaultListableBeanFactory for register `RenditionProvider` beans dynamically.
+
+You can also disable the automatic beans loading specifying the property `spring.content.renditions.loaders.active=false` in your application.yml (the default value is true);
+
+== ExternalRenditionProviderLoader Extension Point
+
+If you need to dynamically load beans of type `RenditionProvider` like the Alfresco Transform Core service, you can implement the `ExternalRenditionProviderLoader` interface, defining:
+
+1. the logic for register beans;
+2. the loader name;
+
+.Implementing the ExternalRenditionProviderLoader Extension Point
+====
+[source, java]
+----
+@Component
+public class CustomExternalRenditionProviderLoader implements ExternalRenditionProviderLoader {
+
+    @Override
+    public void loadBeans() {
+        LOGGER.info("Loading beans for loader {}", getLoaderName());
+        ...
+    }
+
+    @Override
+    public String getLoaderName() {
+
+        return "CustomExternalRenditionProviderLoader";
+    }
+}
+----
+====
