@@ -1,6 +1,5 @@
 [![Build](https://github.com/paulcwarren/spring-content/workflows/Branch%20Build/badge.svg?branch=1.2.x)](https://github.com/paulcwarren/spring-content/actions?query=workflow%3A%22Branch+Build%22)
 [![codecov](https://codecov.io/gh/paulcwarren/spring-content/branch/1.1.x/graph/badge.svg?token=Q7uPi3zXTB)](https://codecov.io/gh/paulcwarren/spring-content)
-[![Join the chat at https://gitter.im/spring-content/Lobby](https://badges.gitter.im/spring-content/Lobby.svg)](https://gitter.im/spring-content/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Spring Content
 
@@ -17,7 +16,6 @@ Having trouble with Spring Content? We'd like to help!
   you are just starting out with Spring, try one of the [spring.io guides](https://spring.io/guides).
 * If you are upgrading, read the [release notes](https://github.com/paulcwarren/spring-content/releases).
   for upgrade instructions and "new and noteworthy" features.
-* Ask a question - we monitor our [Gitter room](https://gitter.im/spring-content/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) for questions.
 * Report bugs with Spring Content at [github.com/paulcwarren/spring-content/issues](https://github.com/paulcwarren/spring-content/issues).
 
 ## Reporting Issues

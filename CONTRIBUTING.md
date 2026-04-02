@@ -9,8 +9,7 @@ conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this 
 unacceptable behavior to the Authors.
 
 ## Using GitHub Issues
-We use GitHub issues to track bugs and enhancements. If you have a general usage question
-please ask it in our [Gitter room](https://gitter.im/spring-content/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge). 
+We use GitHub issues to track bugs and enhancements.
 
 If you are reporting a bug, please help to speed up problem diagnosis by providing as much
 information as possible. Ideally, that would include a small sample project that reproduces the
