@@ -91,6 +91,11 @@ Integrates with Spring Data, Spring Data REST and Apache Solr</description>
                 <artifactId>testcontainers</artifactId>
                 <version>${test-containers.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.20.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
