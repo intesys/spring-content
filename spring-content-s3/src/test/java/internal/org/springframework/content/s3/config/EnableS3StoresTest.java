@@ -41,10 +41,6 @@ import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 
 import internal.org.springframework.content.s3.io.S3StoreResource;
 import lombok.Data;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @RunWith(Ginkgo4jRunner.class)
@@ -54,6 +50,7 @@ public class EnableS3StoresTest {
 
 	static {
 		System.setProperty("spring.content.s3.bucket", BUCKET);
+		System.setProperty("aws.region", "us-east-1");
 	}
 
 	private AnnotationConfigApplicationContext context;

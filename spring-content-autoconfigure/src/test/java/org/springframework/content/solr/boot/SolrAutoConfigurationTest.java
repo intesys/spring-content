@@ -3,6 +3,7 @@ package org.springframework.content.solr.boot;
 import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
 import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.elasticsearch.boot.autoconfigure.ElasticsearchAutoConfiguration;
+import internal.org.springframework.content.s3.boot.autoconfigure.S3ContentAutoConfiguration;
 import internal.org.springframework.content.solr.SolrFulltextIndexServiceImpl;
 import internal.org.springframework.content.solr.boot.autoconfigure.SolrAutoConfiguration;
 import org.apache.solr.client.solrj.SolrClient;
@@ -18,9 +19,6 @@ import org.springframework.content.solr.DeprecatedSolrIndexerStoreEventHandler;
 import org.springframework.content.solr.SolrIndexerStoreEventHandler;
 import org.springframework.content.solr.SolrProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.ConversionService;
 
 import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 
@@ -50,7 +48,7 @@ public class SolrAutoConfigurationTest {
    public void test() {
    }
 
-   @SpringBootApplication(exclude= ElasticsearchAutoConfiguration.class)
+   @SpringBootApplication(exclude = {ElasticsearchAutoConfiguration.class, S3ContentAutoConfiguration.class})
    public static class TestConfig {
 
       @Autowired
