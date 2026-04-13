@@ -43,7 +43,7 @@ public class AzureStorageConfiguration implements InitializingBean {
 		this.bucket = bucket;
 	}
 
-	@Bean
+	@Bean("azureStoragePlacementService")
 	public PlacementService azureStoragePlacementService() {
 		return conversion;
 	}

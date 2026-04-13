@@ -34,7 +34,7 @@ public class GCPStorageConfiguration implements InitializingBean {
 
 	private PlacementService conversion = new PlacementServiceImpl();
 
-	@Bean
+	@Bean("gcpStoragePlacementService")
 	public PlacementService gcpStoragePlacementService() {
 		return conversion;
 	}

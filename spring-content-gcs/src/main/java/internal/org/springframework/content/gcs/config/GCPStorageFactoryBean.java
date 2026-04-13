@@ -3,6 +3,7 @@ package internal.org.springframework.content.gcs.config;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.content.commons.mappingcontext.MappingContext;
 import org.springframework.content.commons.repository.Store;
@@ -24,7 +25,7 @@ public class GCPStorageFactoryBean extends AbstractStoreFactoryBean {
 
 	private Storage client;
 
-	private PlacementService s3StorePlacementService;
+	private PlacementService gcpStoragePlacementService;
 
 	private GoogleStorageProtocolResolver resolver;
 
@@ -42,10 +43,7 @@ public class GCPStorageFactoryBean extends AbstractStoreFactoryBean {
 
 	public GCPStorageFactoryBean(Class<? extends Store> storeInterface) {
 		super(storeInterface);
-	    this.context = context;
-		this.client = client;
-		this.s3StorePlacementService = s3StorePlacementService;
-	}
+    }
 
 	@Autowired
 	public void setContext(ApplicationContext context) {
@@ -58,8 +56,8 @@ public class GCPStorageFactoryBean extends AbstractStoreFactoryBean {
 	}
 
 	@Autowired
-	public void setS3StorePlacementService(PlacementService s3StorePlacementService) {
-		this.s3StorePlacementService = s3StorePlacementService;
+	public void setGcpStoragePlacementService(@Qualifier("gcpStoragePlacementService") PlacementService gcpStoragePlacementService) {
+		this.gcpStoragePlacementService = gcpStoragePlacementService;
 	}
 
 	@Autowired
@@ -84,6 +82,6 @@ public class GCPStorageFactoryBean extends AbstractStoreFactoryBean {
 		DefaultResourceLoader loader = new DefaultResourceLoader();
 		loader.addProtocolResolver(resolver);
 
-		return new DefaultGCPStorageImpl(context, loader, mappingContext, s3StorePlacementService, client/*, s3Provider*/);
+		return new DefaultGCPStorageImpl(context, loader, mappingContext, gcpStoragePlacementService, client/*, s3Provider*/);
 	}
 }

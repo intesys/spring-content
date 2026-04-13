@@ -32,7 +32,7 @@ public class S3StoreConfiguration implements InitializingBean {
 
     private PlacementService conversion =  new PlacementServiceImpl();
 
-    @Bean
+    @Bean("s3StorePlacementService")
 	public PlacementService s3StorePlacementService() {
 		return conversion;
 	}
