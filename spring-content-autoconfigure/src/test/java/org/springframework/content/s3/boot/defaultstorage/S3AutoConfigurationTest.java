@@ -31,8 +31,12 @@ public class S3AutoConfigurationTest {
     {
 		Describe("S3 auto configuration with default storage", () -> {
             BeforeEach(() -> {
+                System.setProperty("aws.region", "us-east-1");
                 contextRunner = new ApplicationContextRunner()
-                        .withConfiguration(AutoConfigurations.of(S3ContentAutoConfiguration.class));
+                        .withConfiguration(AutoConfigurations.of(S3ContentAutoConfiguration.class))
+                        .withPropertyValues(
+                            "spring.content.s3.bucket=test-bucket"
+                        );
             });
             Context("given a default storage type of s3", () -> {
                 BeforeEach(() -> {
@@ -68,6 +72,9 @@ public class S3AutoConfigurationTest {
                         Assertions.assertThat(context).hasSingleBean(S3Client.class);
                     });
                 });
+            });
+            AfterEach(() -> {
+                System.clearProperty("aws.region");
             });
 		});
 	}
