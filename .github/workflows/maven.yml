@@ -58,7 +58,7 @@ jobs:
         CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
         CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
         GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
-        GPG_PASSPHASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
     - name: Publish Docs
@@ -89,7 +89,7 @@ jobs:
         set -x
 
         mkdir -p /tmp/spring-content-gh-pages
-        git clone --branch gh-pages git@github.com:paulcwarren/spring-content.git /tmp/spring-content-gh-pages
+        git clone --branch gh-pages git@github.com:intesys/spring-content.git /tmp/spring-content-gh-pages
 
         cp -R target/generated-docs/refs/* /tmp/spring-content-gh-pages/refs/
 
