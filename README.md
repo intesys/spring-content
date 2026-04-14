@@ -1,4 +1,4 @@
-[![Build](https://github.com/paulcwarren/spring-content/workflows/Branch%20Build/badge.svg?branch=1.2.x)](https://github.com/paulcwarren/spring-content/actions?query=workflow%3A%22Branch+Build%22)
+[![Main Build](https://github.com/intesys/spring-content/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/intesys/spring-content/actions/workflows/maven.yml)
 [![codecov](https://codecov.io/gh/intesys/spring-content/graph/badge.svg?token=ZKB1PYE265)](https://codecov.io/gh/intesys/spring-content)
 
 # Spring Content
