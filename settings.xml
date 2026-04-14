@@ -14,8 +14,8 @@
    		</activation>
    		<properties>
      		<gpg.executable>gpg</gpg.executable>
-     		<gpg.keyname>${env.GPG_KEY_NAME}</gpg.keyname>
-     		<gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+     		<gpg.keyname>${env.MAVEN_GPG_KEY_NAME}</gpg.keyname>
+     		<gpg.passphrase>${env.MAVEN_GPG_PASSPHRASE}</gpg.passphrase>
    		</properties>
 	</profile>
   </profiles>

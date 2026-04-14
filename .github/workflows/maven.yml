@@ -55,10 +55,9 @@ jobs:
         MAVEN_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        MAVEN_GPG_KEY_NAME: ${{ secrets.MAVEN_GPG_KEY_NAME }}
         CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
         CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
-        GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
-        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
     - name: Publish Docs
