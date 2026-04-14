@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
 
 public class LocalStack extends LocalStackContainer implements Serializable {
 
-    private static final DockerImageName IMAGE_NAME = DockerImageName.parse("localstack/localstack");
+    private static final DockerImageName IMAGE_NAME = DockerImageName.parse("localstack/localstack:4.9.0");
 
     private LocalStack() {
         super(IMAGE_NAME);
