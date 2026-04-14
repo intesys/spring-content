@@ -49,28 +49,30 @@ public class FileSystemResourceLoaderTest {
 					}
 				});
 				Context("given well formed path (has a trailing slash)", () -> {
-					BeforeEach(() -> {
-						path = "/some/well-formed/path/";
-					});
+					BeforeEach(() -> path = Paths.get("some", "well-formed", "path") + File.separator);
 					It("succeeds", () -> {
 						assertThat(ex, is(nullValue()));
-						assertThat(loader.getResource("/something").getFile().getPath(),
-								is("/some/well-formed/path/something"));
+
+						File expected = Paths.get(path, "something").toFile();
+						File actual = loader.getResource("/something").getFile();
+
+						assertThat(actual.getAbsolutePath(), is(expected.getAbsolutePath()));
 						assertThat(loader.getResource("/something"),
-								instanceOf(DeletableResource.class));
+								   instanceOf(DeletableResource.class));
 					});
 				});
 
 				Context("given malformed path without a trailing slash)", () -> {
-					BeforeEach(() -> {
-						path = "/some/malformed/path";
-					});
+					BeforeEach(() -> path = Paths.get("some", "malformed", "path").toString());
 					It("succeeds", () -> {
 						assertThat(ex, is(nullValue()));
-						assertThat(loader.getResource("/something").getFile().getPath(),
-								is("/some/malformed/path/something"));
+
+						File expected = Paths.get(path, "something").toFile();
+						File actual = loader.getResource("/something").getFile();
+
+						assertThat(actual.getAbsolutePath(), is(expected.getAbsolutePath()));
 						assertThat(loader.getResource("/something"),
-								instanceOf(DeletableResource.class));
+								   instanceOf(DeletableResource.class));
 					});
 				});
 			});
@@ -85,7 +87,7 @@ public class FileSystemResourceLoaderTest {
 							.toAbsolutePath().toString());
 				});
 				JustBeforeEach(() -> {
-					loader = new FileSystemResourceLoader(parent.getPath() + "/");
+					loader = new FileSystemResourceLoader(parent.getPath() + File.separator);
 					Resource resource = loader.getResource(location);
 					assertThat(resource, instanceOf(DeletableResource.class));
 					((DeletableResource) resource).delete();
