@@ -1,5 +1,5 @@
 [![Build](https://github.com/paulcwarren/spring-content/workflows/Branch%20Build/badge.svg?branch=1.2.x)](https://github.com/paulcwarren/spring-content/actions?query=workflow%3A%22Branch+Build%22)
-[![codecov](https://codecov.io/gh/paulcwarren/spring-content/branch/1.1.x/graph/badge.svg?token=Q7uPi3zXTB)](https://codecov.io/gh/paulcwarren/spring-content)
+[![codecov](https://codecov.io/gh/intesys/spring-content/graph/badge.svg?token=ZKB1PYE265)](https://codecov.io/gh/intesys/spring-content)
 
 # Spring Content
 

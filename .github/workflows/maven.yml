@@ -30,11 +30,13 @@ jobs:
     - name: Build and Test
       run: |
         mvn -B -P tests -Dmaven.javadoc.skip=true install jacoco:report  --file pom.xml
-
-        # temporarily disabled as codecov not available
-        # bash <(curl -s https://codecov.io/bash)
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}
+
+    - name: Upload results to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Publish JARs
       run: |
