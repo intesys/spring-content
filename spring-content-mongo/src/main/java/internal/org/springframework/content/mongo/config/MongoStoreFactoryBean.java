@@ -3,6 +3,7 @@ package internal.org.springframework.content.mongo.config;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.content.commons.mappingcontext.MappingContext;
 import org.springframework.content.commons.repository.Store;
 import org.springframework.content.commons.store.factory.AbstractStoreFactoryBean;
@@ -18,6 +19,7 @@ public class MongoStoreFactoryBean extends AbstractStoreFactoryBean {
 	private GridFsTemplate gridFs;
 
 	@Autowired
+	@Qualifier("mongoStorePlacementService")
 	private PlacementService mongoStorePlacementService;
 
     @Autowired(required=false)

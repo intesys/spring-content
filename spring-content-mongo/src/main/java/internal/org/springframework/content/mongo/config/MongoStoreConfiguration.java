@@ -17,7 +17,7 @@ public class MongoStoreConfiguration {
 	@Autowired(required = false)
 	private List<MongoStoreConverter<?, String>> customConverters;
 
-	@Bean
+	@Bean("mongoStorePlacementService")
 	public PlacementService mongoStorePlacementService() {
 		PlacementService conversion = new PlacementServiceImpl();
 

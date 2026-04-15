@@ -18,7 +18,7 @@ public class FilesystemStoreConfiguration {
 	@Autowired(required = false)
 	private List<FilesystemStoreConfigurer> configurers;
 
-	@Bean
+	@Bean("filesystemStorePlacementService")
 	public PlacementService filesystemStorePlacementService() {
 		PlacementService conversion = new PlacementServiceImpl();
 		conversion.addConverter(new Converter<URI, String>() {
