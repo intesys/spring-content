@@ -10,21 +10,21 @@ Spring Content provides modules for managing content in JPA, MongoDB's GridFS, S
 ## Getting help
 Having trouble with Spring Content? We'd like to help!
 
-* Check the [reference documentation](https://paulcwarren.github.io/spring-content/).
+* Check the [reference documentation](https://intesys.github.io/spring-content/).
 * Learn the Spring basics -- Spring Content builds on many other Spring projects, check
   the [spring.io](https://spring.io) web-site for a wealth of reference documentation. If
   you are just starting out with Spring, try one of the [spring.io guides](https://spring.io/guides).
-* If you are upgrading, read the [release notes](https://github.com/paulcwarren/spring-content/releases).
+* If you are upgrading, read the [release notes](https://github.com/intesys/spring-content/releases).
   for upgrade instructions and "new and noteworthy" features.
-* Report bugs with Spring Content at [github.com/paulcwarren/spring-content/issues](https://github.com/paulcwarren/spring-content/issues).
+* Report bugs with Spring Content at [github.com/intesys/spring-content/issues](https://github.com/intesys/spring-content/issues).
 
 ## Reporting Issues
 Spring Content uses GitHub's integrated issue tracking system to record bugs and feature
 requests. If you want to raise an issue, please follow the recommendations below:
 
-* Before you log a bug, please [search the issue tracker](https://github.com/paulcwarren/spring-content/issues)
+* Before you log a bug, please [search the issue tracker](https://github.com/intesys/spring-content/issues)
   to see if someone has already reported the problem.
-* If the issue doesn't already exist, [create a new issue](https://github.com/paulcwarren/spring-content/issues/new).
+* If the issue doesn't already exist, [create a new issue](https://github.com/intesys/spring-content/issues/new).
 * Please provide as much information as possible with the issue report, we like to know
   the version of Spring Content that you are using, as well as your Operating System and
   JVM version.
@@ -43,7 +43,7 @@ $ [AWS_REGION=us-west-1] ./mvnw [-P tests] clean install
 ```
 
 where:
-- AWS_REGION is already set when developer inside our [devcontainer](https://github.com/paulcwarren/spring-content/blob/main/.devcontainer/devcontainer.json).  Give it a go inside a [Codespace](https://github.com/codespaces/new).
+- AWS_REGION is already set when developer inside our [devcontainer](https://github.com/intesys/spring-content/blob/main/.devcontainer/devcontainer.json).  Give it a go inside a [Codespace](https://github.com/codespaces/new).
 - the optional `-P tests` invokes the maven build with integration (*IT.java) tests as well as units (default).
 
 If you want to build with the regular `mvn` command, you will need
@@ -63,12 +63,12 @@ $ [AWS_REGION=us-west-1] ./mvnw -P docs clean install
 TIP: The generated documentation is available from `spring-content/target/generated-docs/refs/dev/`
 
 ## Guides
-The [https://paulcwarren.github.io/spring-content/](https://paulcwarren.github.io/spring-content/) site contains several guides that show how to use Spring
+The [https://intesys.github.io/spring-content/](https://intesys.github.io/spring-content/) site contains several guides that show how to use Spring
 Content step-by-step:
 
-* [Getting Started with Spring Content](https://paulcwarren.github.io/spring-content/spring-content-fs-docs/) is a
+* [Getting Started with Spring Content](https://intesys.github.io/spring-content/spring-content-fs-docs/) is a
   very basic guide that shows you how to create a simple application, backed by a filesystem-based content store.
-* [Getting Started with Spring Content REST](https://paulcwarren.github.io/spring-content/spring-content-rest-docs/) is a guide that shows you how to create a REST Content Service backed by a filesystem-based content store
+* [Getting Started with Spring Content REST](https://intesys.github.io/spring-content/spring-content-rest-docs/) is a guide that shows you how to create a REST Content Service backed by a filesystem-based content store
   can be configured.
 
 ## License
