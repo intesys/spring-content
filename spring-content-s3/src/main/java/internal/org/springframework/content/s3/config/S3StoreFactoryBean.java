@@ -5,6 +5,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.content.commons.mappingcontext.MappingContext;
 import org.springframework.content.commons.repository.ReactiveContentStore;
@@ -61,7 +62,7 @@ public class S3StoreFactoryBean extends AbstractStoreFactoryBean {
 	}
 
 	@Autowired
-	public void setS3StorePlacementService(PlacementService s3StorePlacementService) {
+	public void setS3StorePlacementService(@Qualifier("s3StorePlacementService") PlacementService s3StorePlacementService) {
 		this.s3StorePlacementService = s3StorePlacementService;
 	}
 

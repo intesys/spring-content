@@ -3,6 +3,7 @@ package internal.org.springframework.content.fs.config;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.content.commons.mappingcontext.MappingContext;
 import org.springframework.content.commons.repository.Store;
 import org.springframework.content.commons.store.factory.AbstractStoreFactoryBean;
@@ -18,10 +19,11 @@ import internal.org.springframework.content.fs.store.DefaultFilesystemStoreImpl;
 public class FilesystemStoreFactoryBean extends AbstractStoreFactoryBean {
 
 	@Autowired
-	FileSystemResourceLoader loader;
+	private FileSystemResourceLoader loader;
 
 	@Autowired
-	PlacementService filesystemStorePlacementService;
+	@Qualifier("filesystemStorePlacementService")
+	private PlacementService filesystemStorePlacementService;
 
 	@Autowired(required=false)
 	private LockingAndVersioningProxyFactory versioning;

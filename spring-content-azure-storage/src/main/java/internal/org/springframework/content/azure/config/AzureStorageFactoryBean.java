@@ -3,6 +3,7 @@ package internal.org.springframework.content.azure.config;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.content.commons.mappingcontext.MappingContext;
 import org.springframework.content.commons.repository.Store;
 import org.springframework.content.commons.store.factory.AbstractStoreFactoryBean;
@@ -55,7 +56,7 @@ public class AzureStorageFactoryBean extends AbstractStoreFactoryBean {
 	}
 
 	@Autowired
-	public void setStorePlacementService(PlacementService storePlacementService) {
+	public void setStorePlacementService(@Qualifier("azureStoragePlacementService") PlacementService storePlacementService) {
 		this.storePlacementService = storePlacementService;
 	}
 
