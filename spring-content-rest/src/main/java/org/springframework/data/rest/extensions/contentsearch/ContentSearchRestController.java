@@ -226,9 +226,7 @@ public class ContentSearchRestController {
 
             if (contentIds.size() > 0) {
                 if (ri != null) {
-                    if (ri.getQueryMethods()
-                            .filter(m -> m.getAnnotation(FulltextEntityLookupQuery.class) != null)
-                            .isEmpty()) {
+                    if (ri.getQueryMethods().stream().noneMatch(m -> m.getAnnotation(FulltextEntityLookupQuery.class) != null)) {
 
                         defaultLookupStrategy.lookup(repoInfo, ri, contentIds, results);
                     } else {

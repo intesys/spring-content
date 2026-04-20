@@ -20,15 +20,16 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.UUID;
 
-import jakarta.persistence.*;
-import org.apache.commons.io.IOUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
 import org.springframework.content.commons.annotations.MimeType;
@@ -54,6 +55,11 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.apache.commons.io.IOUtils;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
 import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
@@ -411,21 +417,16 @@ public class FilesystemStorePropertyPathAccessorsIT {
 	    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
 
 	        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-				vendorAdapter.setDatabase(Database.HSQL);
+	        vendorAdapter.setDatabase(Database.HSQL);
 	        vendorAdapter.setGenerateDdl(true);
 
-			EntityManagerFactoryBuilder builder = createEntityManagerFactoryBuilder(new JpaProperties());
-			return builder.dataSource(dataSource).packages(TEntity.class).persistenceUnit("firstDs").build();
-		}
+	        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+	        factory.setJpaVendorAdapter(vendorAdapter);
+	        factory.setPackagesToScan(TEntity.class.getPackage().getName());
+	        factory.setDataSource(dataSource);
 
-		private EntityManagerFactoryBuilder createEntityManagerFactoryBuilder(JpaProperties jpaProperties) {
-
-			HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-			vendorAdapter.setDatabase(Database.HSQL);
-			vendorAdapter.setGenerateDdl(true);
-
-			return new EntityManagerFactoryBuilder(vendorAdapter, jpaProperties.getProperties(), null);
-		}
+	        return factory;
+	    }
 
 	    @Bean
 	    public PlatformTransactionManager transactionManager(DataSource dataSource) {

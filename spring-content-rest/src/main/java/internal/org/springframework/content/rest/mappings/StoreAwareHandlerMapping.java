@@ -2,18 +2,14 @@ package internal.org.springframework.content.rest.mappings;
 
 import internal.org.springframework.content.rest.annotations.StoreAwareController;
 import org.springframework.content.rest.config.RestConfiguration;
-import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
-import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -44,7 +40,7 @@ public class StoreAwareHandlerMapping extends RequestMappingHandlerMapping {
 
 		RequestMappingInfo.Builder builder = info.mutate();
 
-		Set<String> patterns = info.getPatternsCondition() != null ? info.getPatternsCondition().getPatterns() : Collections.emptySet();
+		Set<String> patterns = info.getPatternValues();
 		String[] augmentedPatterns = new String[patterns.size()];
 		int count = 0;
 
@@ -82,25 +78,25 @@ public class StoreAwareHandlerMapping extends RequestMappingHandlerMapping {
 	}
 
 	/**
-	 * Customize the given {@link PatternsRequestCondition} and prefix.
+	 * Customize the given {@link PathPatternsRequestCondition} and prefix.
 	 *
 	 * @param condition will never be {@literal null}.
 	 * @param prefix will never be {@literal null}.
 	 * @return
 	 */
-	protected PatternsRequestCondition customize(PatternsRequestCondition condition, String prefix) {
+	protected PathPatternsRequestCondition customize(PathPatternsRequestCondition condition, String prefix) {
 		if (!condition.isEmpty()) {
 			return condition;
 		}
 
-		Set<String> patterns = condition.getPatterns();
-		String[] augmentedPatterns = new String[patterns.size()];
+		Set<String> patternValues = condition.getPatternValues();
+		String[] augmentedPatterns = new String[patternValues.size()];
 		int count = 0;
 
-		for (String pattern : patterns) {
+		for (String pattern : patternValues) {
 			augmentedPatterns[count++] = prefix.concat(pattern);
 		}
 
-		return new PatternsRequestCondition(augmentedPatterns, false, getPathMatcher());
+		return new PathPatternsRequestCondition(getPatternParser(), augmentedPatterns);
 	}
 }
