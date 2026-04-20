@@ -114,7 +114,7 @@ public class StoreMethodInterceptorTest {
 					result = new ByteArrayInputStream(new byte[]{});
 
 					store = mock(ContentStore.class);
-					when(store.getContent(anyObject())).thenReturn((InputStream)result);
+					when(store.getContent(any(Object.class))).thenReturn((InputStream)result);
 
 					invocation = new TestMethodInvocation(store, getContentMethod, new Object[]{new Object()});
 				});
@@ -126,7 +126,7 @@ public class StoreMethodInterceptorTest {
 					InOrder inOrder = Mockito.inOrder(publisher, store);
 
 					inOrder.verify(publisher, times(1)).publishEvent(argThat(isA(StoreEvent.class)));
-					inOrder.verify(store).getContent(anyObject());
+					inOrder.verify(store).getContent(any(Object.class));
 					inOrder.verify(publisher, times(1)).publishEvent(captor.capture());
 					assertThat(captor.getValue().getResult(), is(result));
 				});
@@ -150,7 +150,7 @@ public class StoreMethodInterceptorTest {
 					result = new Object();
 
 					store = mock(ContentStore.class);
-					when(store.setContent(anyObject(), any(InputStream.class))).thenReturn(result);
+					when(store.setContent(any(Object.class), any(InputStream.class))).thenReturn(result);
 
 					invocation = new TestMethodInvocation(store, setContentMethod, new Object[]{new Object(), new ByteArrayInputStream("test".getBytes())});
 				});
@@ -167,7 +167,7 @@ public class StoreMethodInterceptorTest {
 					assertThat(beforeArgCaptor.getValue().getResource(), is(nullValue()));
 					assertThat(beforeArgCaptor.getValue().getInputStream(), is(not(nullValue())));
 
-					inOrder.verify(store).setContent(anyObject(), setContentArgCaptor.capture());
+					inOrder.verify(store).setContent(any(Object.class), setContentArgCaptor.capture());
 					try (InputStream setContentInputStream = setContentArgCaptor.getValue()) {
 						assertThat(IOUtils.toString(setContentInputStream), is("test"));
 					}
@@ -196,7 +196,7 @@ public class StoreMethodInterceptorTest {
 
 						inOrder.verify(publisher).publishEvent(argThat(isA(BeforeSetContentEvent.class)));
 
-						inOrder.verify(store).setContent(anyObject(), setContentArgCaptor.capture());
+						inOrder.verify(store).setContent(any(Object.class), setContentArgCaptor.capture());
 						try (InputStream setContentInputStream = setContentArgCaptor.getValue()) {
 							assertThat(IOUtils.toString(setContentInputStream), is("test"));
 						}
@@ -227,7 +227,7 @@ public class StoreMethodInterceptorTest {
 
 						inOrder.verify(publisher).publishEvent(argThat(isA(BeforeSetContentEvent.class)));
 
-						inOrder.verify(store).setContent(anyObject(), setContentArgCaptor.capture());
+						inOrder.verify(store).setContent(any(Object.class), setContentArgCaptor.capture());
 
 						try (InputStream setContentInputStream = setContentArgCaptor.getValue()) {
 							assertThat(IOUtils.toString(setContentInputStream), is("test"));
@@ -256,7 +256,7 @@ public class StoreMethodInterceptorTest {
 
 						inOrder.verify(publisher).publishEvent(argThat(isA(BeforeSetContentEvent.class)));
 
-						inOrder.verify(store).setContent(anyObject(), setContentArgCaptor.capture());
+						inOrder.verify(store).setContent(any(Object.class), setContentArgCaptor.capture());
 
 						try (InputStream setContentInputStream = setContentArgCaptor.getValue()) {
 							assertThat(IOUtils.toString(setContentInputStream), is("test"));
@@ -287,7 +287,7 @@ public class StoreMethodInterceptorTest {
 
 						inOrder.verify(publisher).publishEvent(argThat(isA(BeforeSetContentEvent.class)));
 
-						inOrder.verify(store).setContent(anyObject(), setContentArgCaptor.capture());
+						inOrder.verify(store).setContent(any(Object.class), setContentArgCaptor.capture());
 
 						try (InputStream setContentInputStream = setContentArgCaptor.getValue()) {
 							assertThat(setContentInputStream, is(modifiedStream));
@@ -317,7 +317,7 @@ public class StoreMethodInterceptorTest {
 					result = new Object();
 
 					store = mock(ContentStore.class);
-					when(store.setContent(anyObject(), any(Resource.class))).thenReturn(result);
+					when(store.setContent(any(Object.class), any(Resource.class))).thenReturn(result);
 
 					invocation = new TestMethodInvocation(store, setContentFromResourceMethod, new Object[]{new Object(), new InputStreamResource(new ByteArrayInputStream("test".getBytes()))});
 				});
@@ -334,7 +334,7 @@ public class StoreMethodInterceptorTest {
 					assertThat(beforeArgCaptor.getValue().getResource(), is(not(nullValue())));
 					assertThat(beforeArgCaptor.getValue().getInputStream(), is(nullValue()));
 
-					inOrder.verify(store).setContent(anyObject(), setContentArgCaptor.capture());
+					inOrder.verify(store).setContent(any(Object.class), setContentArgCaptor.capture());
 					try (InputStream setContentInputStream = setContentArgCaptor.getValue().getInputStream()) {
 						assertThat(IOUtils.toString(setContentInputStream), is("test"));
 					}
@@ -350,7 +350,7 @@ public class StoreMethodInterceptorTest {
 
 				result = new Object();
 				store = mock(ContentStore.class);
-				when(store.unsetContent(anyObject())).thenReturn(result);
+				when(store.unsetContent(any(Object.class))).thenReturn(result);
 
 				invocation = new TestMethodInvocation(store, unsetContentMethod, new Object[]{new Object()});
 			});
@@ -363,7 +363,7 @@ public class StoreMethodInterceptorTest {
 					InOrder inOrder = Mockito.inOrder(publisher, store);
 
 					inOrder.verify(publisher).publishEvent(argThat(isA(BeforeUnsetContentEvent.class)));
-					inOrder.verify(store).unsetContent(anyObject());
+					inOrder.verify(store).unsetContent(any(Object.class));
 
 					ArgumentCaptor<AfterStoreEvent> captor = ArgumentCaptor.forClass(AfterStoreEvent.class);
 					inOrder.verify(publisher, times(1)).publishEvent(captor.capture());
@@ -495,7 +495,7 @@ public class StoreMethodInterceptorTest {
 				Context("when toString is invoked", () -> {
 
 					It("should proceed", () -> {
-						verify(publisher, never()).publishEvent(anyObject());
+						verify(publisher, never()).publishEvent(any(Object.class));
 					});
 				});
 			});

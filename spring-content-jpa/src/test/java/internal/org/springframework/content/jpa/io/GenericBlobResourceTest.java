@@ -8,7 +8,7 @@ import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +57,7 @@ public class GenericBlobResourceTest {
 
 					when(ds.getConnection()).thenReturn(conn);
 					when(conn.createStatement()).thenReturn(statement);
-					when(statement.executeQuery(anyObject())).thenReturn(rs);
+					when(statement.executeQuery(anyString())).thenReturn(rs);
 				});
 				JustBeforeEach(() -> {
 					resource = new GenericBlobResource(id, template, txnMgr);
@@ -80,7 +80,7 @@ public class GenericBlobResourceTest {
 
 					when(ds.getConnection()).thenReturn(conn);
 					when(conn.createStatement()).thenReturn(statement);
-					when(statement.executeQuery(anyObject())).thenReturn(rs);
+					when(statement.executeQuery(anyString())).thenReturn(rs);
 				});
 				JustBeforeEach(() -> {
 					resource = new GenericBlobResource(id, template, txnMgr);

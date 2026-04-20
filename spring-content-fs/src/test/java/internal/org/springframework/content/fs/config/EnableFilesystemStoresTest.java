@@ -17,6 +17,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.convert.converter.ConverterRegistry;
 
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -83,7 +84,7 @@ public class EnableFilesystemStoresTest {
 					context.close();
 				});
 				It("should call that configurer to help customize the store", () -> {
-					verify(configurer).configureFilesystemStoreConverters(anyObject());
+					verify(configurer).configureFilesystemStoreConverters(any(ConverterRegistry.class));
 				});
 			});
 

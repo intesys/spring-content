@@ -52,18 +52,17 @@ Integrates with Spring Data, Spring Data REST and Apache Solr</description>
         <ginkgo4j-version>1.0.15</ginkgo4j-version>
         <springboot-version>4.0.5</springboot-version>
         <spring-cloud.version>2025.1.1</spring-cloud.version>
-        <commonsio-version>2.20.0</commonsio-version>
-        <common-logging.version>1.3.5</common-logging.version>
-        <commons-text.version>1.14.0</commons-text.version>
-        <jakarta-persistence-api.version>3.1.0</jakarta-persistence-api.version>
-        <hibernate.version>5.6.15.Final</hibernate.version>
-        <hibernate-orm.version>6.1.7.Final</hibernate-orm.version>
-        <solr-solrj.version>9.9.0</solr-solrj.version>
+        <commonsio-version>2.21.0</commonsio-version>
+        <common-logging.version>1.3.6</common-logging.version>
+        <commons-text.version>1.15.0</commons-text.version>
+        <!--<jakarta-persistence-api.version>4.0.0-M1</jakarta-persistence-api.version>-->
+        <!--<hibernate.version>5.6.15.Final</hibernate.version>-->
+        <!--<hibernate-orm.version>7.3.1.Final</hibernate-orm.version>-->
+        <solr-solrj.version>10.0.0</solr-solrj.version>
         <elasticsearch-rest-high-level-client.version>7.17.29</elasticsearch-rest-high-level-client.version>
 
         <!-- Test dependencies -->
-        <test-containers.version>1.17.6</test-containers.version>
-        <mockito.version>3.12.4</mockito.version>
+        <test-containers.version>2.0.4</test-containers.version>
         <spring-mock-mvc.version>6.0.0</spring-mock-mvc.version>
 
         <docs.output.dir>../target/generated-docs/refs/${env.BUILD_TYPE}/</docs.output.dir>

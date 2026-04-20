@@ -11,8 +11,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.atLeastOnce;
@@ -102,7 +103,7 @@ public class DefaultJpaStoreImplTest {
 									entity = new TestEntity();
 								});
 								It("should return null", () -> {
-									verify(blobResourceLoader, never()).getResource(anyObject());
+									verify(blobResourceLoader, never()).getResource(anyString());
 									assertThat(resource, is(nullValue()));
 								});
 							});
@@ -226,7 +227,7 @@ public class DefaultJpaStoreImplTest {
 					});
 					It("should write the contents of the inputstream to the resource's outputstream",
 							() -> {
-								verify(outputStream, atLeastOnce()).write(anyObject(),
+								verify(outputStream, atLeastOnce()).write(any(byte[].class),
 										anyInt(), anyInt());
 							});
 					It("should update the @ContentId field", () -> {

@@ -53,7 +53,7 @@ public class FsTypeSupportConfig {
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("examples.models");
+        factory.setPackagesToScan("it.typesupport.model");
         factory.setDataSource(dataSource());
 
         return factory;

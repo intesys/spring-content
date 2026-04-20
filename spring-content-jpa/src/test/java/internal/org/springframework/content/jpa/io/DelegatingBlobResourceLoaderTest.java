@@ -17,7 +17,6 @@ import java.util.List;
 import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.*;
 
 @RunWith(Ginkgo4jRunner.class)
@@ -59,7 +58,7 @@ public class DelegatingBlobResourceLoaderTest {
 						loaders.add(customLoader);
 					});
 					It("should return a PostgresBlobResource", () -> {
-						verify(customLoader).getResource(anyObject());
+						verify(customLoader).getResource(anyString());
 					});
 				});
 				Context("given a datasource that doesn't have a matching blobresourceloader",

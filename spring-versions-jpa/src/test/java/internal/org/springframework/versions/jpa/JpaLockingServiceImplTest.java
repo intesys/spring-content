@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -73,7 +72,7 @@ public class JpaLockingServiceImplTest {
                     BeforeEach(() -> {
                         ResultSet rs = mock(ResultSet.class);
                         when(jdbcTemplate.queryForObject(any(String.class), any(Object[].class), any(Class.class))).thenReturn(0);
-                        when(jdbcTemplate.update(any(String.class), ArgumentMatchers.<String>any())).thenThrow(new CannotGetJdbcConnectionException("connection-error"));
+                        when(jdbcTemplate.update(any(String.class), any(Object[].class))).thenThrow(new CannotGetJdbcConnectionException("connection-error"));
                     });
                     It("should throw the DataAccessException.class", () -> {
                         assertThat(e, is(instanceOf(DataAccessException.class)));
@@ -96,7 +95,7 @@ public class JpaLockingServiceImplTest {
                 });
                 Context("given the lock record deletion fails", () -> {
                     BeforeEach(() -> {
-                        when(jdbcTemplate.update(any(String.class), ArgumentMatchers.<String>any())).thenThrow(new CannotGetJdbcConnectionException("connection-error"));
+                        when(jdbcTemplate.update(any(String.class), any(Object[].class))).thenThrow(new CannotGetJdbcConnectionException("connection-error"));
                     });
                     It("should throw a DataAccessException", () -> {
                         assertThat(e, is(instanceOf(DataAccessException.class)));
@@ -127,7 +126,7 @@ public class JpaLockingServiceImplTest {
                 });
                 Context("given the database fails", () -> {
                     BeforeEach(() -> {
-                        when(jdbcTemplate.queryForRowSet(any(String.class), ArgumentMatchers.<String>any())).thenThrow(new CannotGetJdbcConnectionException("connection-error"));
+                        when(jdbcTemplate.queryForRowSet(any(String.class), any(Object[].class))).thenThrow(new CannotGetJdbcConnectionException("connection-error"));
                     });
                     It("should throw the DataAccessException", () -> {
                         assertThat(e, is(instanceOf(DataAccessException.class)));
@@ -137,7 +136,7 @@ public class JpaLockingServiceImplTest {
                     BeforeEach(() -> {
                         SqlRowSet rs = mock(SqlRowSet.class);
                         when(rs.next()).thenReturn(true);
-                        when(jdbcTemplate.queryForRowSet(any(String.class), ArgumentMatchers.<String>any())).thenReturn(rs);
+                        when(jdbcTemplate.queryForRowSet(any(String.class), any(Object[].class))).thenReturn(rs);
                     });
                     It("should return true", () -> {
                         assertThat(result, is(true));
@@ -147,7 +146,7 @@ public class JpaLockingServiceImplTest {
                     BeforeEach(() -> {
                         SqlRowSet rs = mock(SqlRowSet.class);
                         when(rs.next()).thenReturn(false);
-                        when(jdbcTemplate.queryForRowSet(any(String.class), ArgumentMatchers.<String>any())).thenReturn(rs);
+                        when(jdbcTemplate.queryForRowSet(any(String.class), any(Object[].class))).thenReturn(rs);
                     });
                     It("should return false", () -> {
                         assertThat(result, is(false));

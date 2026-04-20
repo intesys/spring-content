@@ -52,7 +52,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -521,8 +521,7 @@ public class AnnotatedStoreEventInvokerTest {
 							"afterUnsetContent", Object.class);
 					assertThat(handler, is(not(nullValue())));
 
-					verify(reflectionService, never()).invokeMethod(anyObject(),
-							anyObject(), anyObject());
+					verify(reflectionService, never()).invokeMethod(any(Method.class), any(Object.class), any(Object.class));
 				});
 			});
 		});
