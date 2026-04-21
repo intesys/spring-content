@@ -60,7 +60,7 @@ import lombok.ToString;
 @Ginkgo4jConfiguration(threads = 1)
 @SpringBootTest(classes = {EmbeddedIdTest.Application.class},
                 webEnvironment=WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration(exclude = { HypermediaAutoConfiguration.class, SecurityAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { HypermediaAutoConfiguration.class })
 public class EmbeddedIdTest {
 
     @LocalServerPort

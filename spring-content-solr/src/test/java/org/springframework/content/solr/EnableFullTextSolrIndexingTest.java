@@ -8,7 +8,7 @@ import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.fragments.SearchableImpl;
 import internal.org.springframework.content.solr.SolrFulltextIndexServiceImpl;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -64,7 +64,7 @@ public class EnableFullTextSolrIndexingTest {
 
 		@Bean
 		public SolrClient solrClient() {
-			SolrClient sc = new HttpSolrClient.Builder("http://some/url").build();
+			SolrClient sc = new HttpJdkSolrClient.Builder("http://some/url").build();
 			return sc;
 		}
 

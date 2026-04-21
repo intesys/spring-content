@@ -7,12 +7,11 @@ import java.io.InputStream;
 import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.repository.StoreAccessException;
@@ -29,8 +28,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +71,7 @@ public class SolrFulltextIndexServiceImplTest {
                 Context(format("when solr throws a %s", ex.getClass().getSimpleName()), () -> {
 
                     BeforeEach(() -> {
-                        when(solr.request(anyObject(), any())).thenThrow(ex);
+                        when(solr.request(any(SolrRequest.class), any())).thenThrow(ex);
                     });
 
                     It("should throw a StoreAccessException", () -> {
@@ -109,7 +106,7 @@ public class SolrFulltextIndexServiceImplTest {
                 Context(format("when solr throws a %s", ex.getClass().getSimpleName()), () -> {
 
                     BeforeEach(() -> {
-                        when(solr.request(anyObject(), any())).thenThrow(ex);
+                        when(solr.request(any(SolrRequest.class), any())).thenThrow(ex);
                     });
 
                     It("should throw a StoreAccessException", () -> {

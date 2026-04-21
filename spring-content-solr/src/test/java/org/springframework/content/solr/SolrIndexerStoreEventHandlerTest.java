@@ -26,7 +26,7 @@ import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -97,7 +97,7 @@ public class SolrIndexerStoreEventHandlerTest {
 					Context("given the indexer throws an Exception", () -> {
 						BeforeEach(() -> {
 							sae = new StoreAccessException("badness");
-							doThrow(sae).when(indexer).index(anyObject(), anyObject());
+							doThrow(sae).when(indexer).index(any(Object.class), any(InputStream.class));
 						});
 						It("should re-throw that exception", () -> {
 							assertThat(e, is(sae));
@@ -110,7 +110,7 @@ public class SolrIndexerStoreEventHandlerTest {
 					});
 					It("should call update", () -> {
 						assertThat(e, is(nullValue()));
-						verify(indexer, never()).index(anyObject(), anyObject());
+						verify(indexer, never()).index(any(Object.class), any(InputStream.class));
 					});
 				});
 				Context("given a bogus content entity", () -> {
@@ -119,7 +119,7 @@ public class SolrIndexerStoreEventHandlerTest {
 					});
 					It("", () -> {
 						assertThat(e, is(nullValue()));
-						verify(indexer, never()).index(anyObject(), anyObject());
+						verify(indexer, never()).index(any(Object.class), any(InputStream.class));
 					});
 				});
 			});
@@ -171,7 +171,7 @@ public class SolrIndexerStoreEventHandlerTest {
 					Context("given a IOException", () -> {
 						BeforeEach(() -> {
 							sae = new StoreAccessException("badness");
-							doThrow(sae).when(indexer).unindex(anyObject());
+							doThrow(sae).when(indexer).unindex(any(Object.class));
 						});
 						It("should throw a ContextAccessException", () -> {
 							assertThat(e, is(sae));
@@ -184,7 +184,7 @@ public class SolrIndexerStoreEventHandlerTest {
 					});
 					It("should call update", () -> {
 						assertThat(e, is(nullValue()));
-						verify(indexer, never()).unindex(anyObject());
+						verify(indexer, never()).unindex(any(Object.class));
 					});
 				});
 				Context("given a bogus content entity", () -> {
@@ -193,7 +193,7 @@ public class SolrIndexerStoreEventHandlerTest {
 					});
 					It("should never attempt deletion", () -> {
 						assertThat(e, is(nullValue()));
-						verify(indexer, never()).unindex(anyObject());
+						verify(indexer, never()).unindex(any(Object.class));
 					});
 				});
 			});
