@@ -20,6 +20,7 @@ Having trouble with Spring Content? We'd like to help!
 * If you are upgrading, read the [release notes](https://github.com/intesys/spring-content/releases).
   for upgrade instructions and "new and noteworthy" features.
 * Report bugs with Spring Content at [github.com/intesys/spring-content/issues](https://github.com/intesys/spring-content/issues).
+* For support, you can contact us at [spring-content.support@intesys.it](mailto:spring-content.support@intesys.it).
 
 ## Reporting Issues
 Spring Content uses GitHub's integrated issue tracking system to record bugs and feature
