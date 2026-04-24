@@ -440,8 +440,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Spring Content Renditions - Reference Documentation</h1>
 <div class="details">
 <span id="author" class="author">Paul Warren</span><br>
-<span id="revnumber">version 3.0.17-SNAPSHOT,</span>
-<span id="revdate">2025-06-04</span>
+<span id="revnumber">version 3.1.0-SNAPSHOT,</span>
+<span id="revdate">2026-04-24</span>
 </div>
 </div>
 <div id="content">
@@ -490,6 +490,8 @@ Copies of this document may be made for your own use and for distribution to oth
 <li><a href="#_making_stores_renderable">2.4. Making Stores Renderable</a></li>
 <li><a href="#_renderers">2.5. Renderers</a></li>
 <li><a href="#_renditionprovider_extension_point">2.6. RenditionProvider Extension Point</a></li>
+<li><a href="#_renditionprovider_extension_point_for_alfresco_ecm">2.7. RenditionProvider Extension Point for Alfresco ECM</a></li>
+<li><a href="#_externalrenditionproviderloader_extension_point">2.8. ExternalRenditionProviderLoader Extension Point</a></li>
 </ul>
 </li>
 </ul>
@@ -505,10 +507,10 @@ Copies of this document may be made for your own use and for distribution to oth
 <div class="ulist">
 <ul>
 <li>
-<p>Version control - <a href="http://github.com/paulcwarren/spring-content/" class="bare">http://github.com/paulcwarren/spring-content/</a></p>
+<p>Version control - <a href="https://github.com/intesys/spring-content/" class="bare">https://github.com/intesys/spring-content/</a></p>
 </li>
 <li>
-<p>Bugtracker - <a href="http://github.com/paulcwarren/spring-content/issues" class="bare">http://github.com/paulcwarren/spring-content/issues</a></p>
+<p>Bugtracker - <a href="https://github.com/intesys/spring-content/issues" class="bare">https://github.com/intesys/spring-content/issues</a></p>
 </li>
 <li>
 <p>Release repository - <a href="https://repo1.maven.org/maven2/" class="bare">https://repo1.maven.org/maven2/</a></p>
@@ -1487,7 +1489,7 @@ can convert documents between Microsoft Word, Adobe PDF and HTML based on the do
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
-    &lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+    &lt;groupId&gt;it.intesys&lt;/groupId&gt;
     &lt;artifactId&gt;spring-content-renditions&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
@@ -1498,7 +1500,7 @@ can convert documents between Microsoft Word, Adobe PDF and HTML based on the do
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
-    &lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+    &lt;groupId&gt;it.intesys&lt;/groupId&gt;
     &lt;artifactId&gt;spring-content-bom&lt;/artifactId&gt;
     &lt;version&gt;${spring-content-version}&lt;/version&gt;
     &lt;type&gt;pom&lt;/type&gt;
@@ -1635,13 +1637,120 @@ public static class ApplicationConfig {
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_renditionprovider_extension_point_for_alfresco_ecm">2.7. RenditionProvider Extension Point for Alfresco ECM</h3>
+<div class="paragraph">
+<p>Spring Content supports the renditions integration with the <a href="https://docs.alfresco.com/transform-service/latest/">Alfresco Transform Core</a> service.
+When the <code>spring-content-renditions</code> (or <code>spring-content-renditions-boot-starter</code>) dependency is included, you can add the RenditionProvider list from Alfresco
+Transform Service simply adding the property <code>alfresco.transform.core.url</code> on your application.properties.</p>
+</div>
+<div class="paragraph">
+<p>This mechanism, allows the creation of <code>AlfrescoTransformCoreRenditionProviderLoader</code> bean that:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Check if the service is up;</p>
+</li>
+<li>
+<p>If it&#8217;s running, the <code>AlfrescoTransformCoreRenditionProviderLoader</code> register a bean of type RenditionProvider for each transformer found on the Alfresco Transform Service configuration.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If you have more than one Alfresco Transform Core instance (for example a custom implementation), you can add it simply declaring a new bean of type <code>AlfrescoTransformCoreRenditionProviderLoader</code>:</p>
+</div>
+<div class="exampleblock">
+<div class="title">Example 19. Implementing the AlfrescoTransformCoreRenditionProviderLoader Extension Point</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Configuration
+public class MyAppBeansConfig {
+
+	@Bean
+	public ExternalRenditionProviderLoader customAlfrescoTransformCoreRenditionProviderLoader(
+		@Value("${custom.alfresco.transform.core.url}") String customAlfrescoTransformCoreUrl,
+		@Value("${spring.content.renditions.loaders.maxRetries}") Integer maxRetries,
+		@Value("${spring.content.renditions.loaders.timeoutSeconds}") Integer timeoutSeconds, DefaultListableBeanFactory registry) {
+
+		return new AlfrescoTransformCoreRenditionProviderLoader(customAlfrescoTransformCoreUrl, "CustomAlfrescoTransformCore", maxRetries, timeoutSeconds, registry);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The AlfrescoTransformCoreRenditionProviderLoader works with 4 parameters:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>the service url, used for API calls;</p>
+</li>
+<li>
+<p>the max retries, that is the max attempts number for check if the service is up (default 5, but it&#8217;s simply overridable adding the property <code>spring.content.renditions.loaders.maxRetries</code> to your application.properties);</p>
+</li>
+<li>
+<p>the timeout seconds, that is the max seconds before the timeout in the service availability check (default 5, but it&#8217;s simply overridable adding the property <code>spring.content.renditions.loaders.timeoutSeconds</code> to your application.properties);</p>
+</li>
+<li>
+<p>the DefaultListableBeanFactory for register <code>RenditionProvider</code> beans dynamically.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>You can also disable the automatic beans loading specifying the property <code>spring.content.renditions.loaders.active=false</code> in your application.yml (the default value is true);</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_externalrenditionproviderloader_extension_point">2.8. ExternalRenditionProviderLoader Extension Point</h3>
+<div class="paragraph">
+<p>If you need to dynamically load beans of type <code>RenditionProvider</code> like the Alfresco Transform Core service, you can implement the <code>ExternalRenditionProviderLoader</code> interface, defining:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>the logic for register beans;</p>
+</li>
+<li>
+<p>the loader name;</p>
+</li>
+</ol>
+</div>
+<div class="exampleblock">
+<div class="title">Example 20. Implementing the ExternalRenditionProviderLoader Extension Point</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Component
+public class CustomExternalRenditionProviderLoader implements ExternalRenditionProviderLoader {
+
+    @Override
+    public void loadBeans() {
+        LOGGER.info("Loading beans for loader {}", getLoaderName());
+        ...
+    }
+
+    @Override
+    public String getLoaderName() {
+
+        return "CustomExternalRenditionProviderLoader";
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 3.0.17-SNAPSHOT<br>
-Last updated 2025-06-04 04:14:06 UTC
+Version 3.1.0-SNAPSHOT<br>
+Last updated 2026-04-24 12:38:18 UTC
 </div>
 </div>
 </body>

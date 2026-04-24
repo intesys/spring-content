@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.23">
-<title>Indexing &amp; Searching with Solr</title>
+<title>Metadata Extraction</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -434,50 +434,74 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 </head>
-<body id="solr-search" class="book">
+<body id="renditions" class="book">
 <div id="header">
-<h1>Indexing &amp; Searching with Solr</h1>
+<h1>Metadata Extraction</h1>
 </div>
 <div id="content">
 <div class="sect1">
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>When enabled the Solr integration will forward all content to Solr for fulltext indexing which can then be searched by adding the optional <code>Searchable&lt;CID&gt;</code> interface to the Content Repositories.</p>
+<p>This feature is capable of extracting a specific set of metadata from files and representing it as a map of key-value pairs.</p>
+</div>
+<div class="paragraph">
+<p>It also provides an extension point for providing your own metadata extractors.</p>
+</div>
+<div class="paragraph">
+<p>To enable metadata extraction add the <code>spring-content-metadata-extraction</code> or <code>spring-content-metadata-extraction-boot-starter</code> dependency to your
+project. This enables the default metadata extractor.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dependencies">Dependencies</h2>
+<h2 id="_maven_central_coordinates">Maven Central Coordinates</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Add the solrj to the classpath.</p>
+<p>The maven coordinates for this Spring Content library are as follows:</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-content-metadata-extraction&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As it is usual to use several Spring Content libraries together importing the bom is recommended:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-content-bom&lt;/artifactId&gt;
+    &lt;version&gt;${spring-content-version}&lt;/version&gt;
+    &lt;type&gt;pom&lt;/type&gt;
+    &lt;scope&gt;import&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_annotation_based_configuration">Annotation-based Configuration</h2>
+<div class="sectionbody">
 <div class="exampleblock">
+<div class="title">Example 1. Enabling Spring Content Metadata Extraction with Java Config</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">	&lt;dependency&gt;
-		&lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
-		&lt;artifactId&gt;solr-solrj&lt;/artifactId&gt;
-		&lt;version&gt;5.5.3&lt;/version&gt;			<b class="conum">(1)</b>
-		&lt;exclusions&gt;
-			&lt;exclusion&gt;
-				&lt;groupId&gt;org.codehaus.woodstox&lt;/groupId&gt;
-				&lt;artifactId&gt;wstx-asl&lt;/artifactId&gt;
-			&lt;/exclusion&gt;
-			&lt;exclusion&gt;
-				&lt;artifactId&gt;log4j&lt;/artifactId&gt;
-				&lt;groupId&gt;log4j&lt;/groupId&gt;
-			&lt;/exclusion&gt;
-		&lt;/exclusions&gt;
-	&lt;/dependency&gt;</code></pre>
+<pre class="highlight"><code class="language-java" data-lang="java">@Configuration
+@Import(org.springframework.content.metadataextraction.config.MetadataExtractionConfiguration.class) <b class="conum">(1)</b>
+public static class ApplicationConfig {
+}</code></pre>
 </div>
 </div>
-<div class="colist arabic">
-<ol>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>If using Spring Boot the version may be omitted</p>
+<p>Not required when using <code>spring-content-metadata-extraction-boot-starter</code></p>
 </li>
 </ol>
 </div>
@@ -486,55 +510,136 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_enabling">Enabling</h2>
+<h2 id="_extractors">Extractors</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>By default, there is only a <code>DefaultMetadataExtractor</code> which extracts the following metadata from each type of file:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Specify the <code>@EnableFullTextSolrIndexing</code> annotation to your <code>@Configuration</code> Spring Application block.</p>
+<p>fileName</p>
 </li>
 <li>
-<p>Ensure a <code>(SolrJ) SolrClient</code> <code>@Bean</code> is instantiated somewhere within your <code>@Configuration</code> Spring Application block.</p>
+<p>fileExtension</p>
+</li>
+<li>
+<p>size</p>
+</li>
+<li>
+<p>mimeType</p>
+</li>
+<li>
+<p>creationTime</p>
+</li>
+<li>
+<p>lastModifiedTime</p>
+</li>
+<li>
+<p>lastAccessTime</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_configuring">Configuring</h2>
+<h2 id="_alfresco_transform_core_metadata_extractor">Alfresco Transform Core Metadata Extractor</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By default when the Solr module is enabled Spring-Content looks for a <code><a href="http://localhost:8983/solr/solr" class="bare">http://localhost:8983/solr/solr</a></code> solr server with no username or password.</p>
+<p>Spring content metadata extraction modules support the integration with the <a href="https://docs.alfresco.com/transform-service/latest/">Alfresco Transform Core</a> service.
+To use it, simply add the property <code>alfresco.transform.core.url</code> with the url of Alfresco Transform Core service.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_metadata_extraction_extension_point">Metadata Extraction Extension Point</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>To change this behavior the following variables need to be set via the <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html#boot-features-external-config">Externalized Configuration</a> method.</p>
+<p>If you need to create custom Metadata Extractors to meet your specific requirements, you can implement the MetadataExtractor extension point.
+This involves implementing the <code>MetadataExtractor</code> interface, annotating this implementation as a <code>@Service</code>, and ensuring it is registered
+as a bean in your application context at runtime.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Property</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">solr.url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Url of the Solr host (including port and core)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">solr.username</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Solr user</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">solr.password</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Solr user&#8217;s password</p></td>
-</tr>
-</tbody>
-</table>
+<div class="exampleblock">
+<div class="title">Example 2. Implementing the MetadataExtractor Extension Point</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package my.custom.metadata.extractor;
+
+@Service    <b class="conum">(2)</b>
+public class CustomMetadataExtractor implements MetadataExtractor { <b class="conum">(1)</b>
+
+	@Override
+	public Map&lt;String, Object&gt; extractMetadata(File file) {
+		// your custom code
+		return new HashMap&lt;&gt;();
+	}
+}
+
+...
+
+@Configuration
+@ComponentScan("my.custom.metadata.extractor")         <b class="conum">(3)</b>
+public static class ApplicationConfig {
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Implementation of <code>MetadataExtractor</code></p>
+</li>
+<li>
+<p>Marked as an <code>@Service</code></p>
+</li>
+<li>
+<p>Ensure the service is scanned by Spring and offered as a bean</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_metadata_extraction_service">Metadata Extraction Service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As with the renditions module, here too, a bean of type <strong>"MetadataExtractionService"</strong> is available, which automatically provides all instances of
+<strong>MetadataExtractor</strong> and allows to retrieve, in one central location, all the metadata extracted by the various extractors.</p>
+</div>
+<div class="exampleblock">
+<div class="title">Example 3. Example of usage of MetadataExtractionService</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Service
+public class MyServiceImpl implements MyService {
+
+    private MetadataExtractionService metadataExtractionService;
+
+    public MyServiceImpl(MetadataExtractionService metadataExtractionService) {
+        this.metadataExtractionService = metadataExtractionService; <b class="conum">(1)</b>
+    }
+
+    public Map&lt;String, Object&gt; getFileMetadata(File file) {
+        return metadataExtractionService.extractMetadata(file); <b class="conum">(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Injection of <code>MetadataExtractionService</code> in a custom service</p>
+</li>
+<li>
+<p>Extract file metadata using all instances of <code>MetadataExtractor</code> (default, AlfrescoTransformCore if enabled, custom, &#8230;&#8203;)</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
