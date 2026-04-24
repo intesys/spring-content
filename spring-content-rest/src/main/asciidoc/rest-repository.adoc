@@ -1,1 +1,0 @@
-= Repository Resources (Spring Data REST Extensions)
