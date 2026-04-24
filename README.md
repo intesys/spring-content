@@ -2,7 +2,9 @@
 [![codecov](https://codecov.io/gh/intesys/spring-content/graph/badge.svg?token=ZKB1PYE265)](https://codecov.io/gh/intesys/spring-content)
 
 This project is a fork of [github.com/paulcwarren/spring-content](https://github.com/paulcwarren/spring-content/), originally created by 
-[Paul Warren](https://github.com/paulcwarren).
+[Paul Warren](https://github.com/paulcwarren). 
+
+**Maintained by Intesys:** This repository is maintained by [Intesys](https://www.intesys.it/), which has taken over the development and maintenance of this fork.
 
 # Spring Content
 
