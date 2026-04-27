@@ -114,7 +114,7 @@ jobs:
         popd
 
         # Replace snippets in generated HTML
-        python3 scripts/replace_snippets.py /tmp/generated-site
+        python3 /tmp/spring-content-docs/scripts/replace_snippets.py /tmp/generated-site
 
         git config --global user.email "${CI_EMAIL}"
         git config --global user.name "${CI_USERNAME}"
