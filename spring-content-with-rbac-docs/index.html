@@ -1,104 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-      <script>
-	// Hack for scrolling window when linking to anchor tag with fixed nav header
-        var shiftWindow = function() { scrollBy(0, -75) };
-        window.addEventListener("hashchange", shiftWindow);
-        function load() { if (window.location.hash) shiftWindow(); }
-      </script>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        
-        
-        <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>RBAC - Content Services for Spring</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link href="../css/font-awesome.min.css" rel="stylesheet">
-    <link href="../css/base.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      
+      
+      <link rel="shortcut icon" href="../img/favicon.ico">
+      <title>RBAC - Content Services for Spring</title>
+      <script src="../dist/bundle.js"></script>
+    
+  </head>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/http.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script src="../js/base.js"></script> 
-    </head>
-
-    <body class="">
-
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-	<div class="container">
-	<a class="navbar-brand" href="..">Content Services for Spring</a>
-	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+  <body class="">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark navbar-fixed-top">
+      <div class="container">
+          <a class="navbar-brand" href="..">Content Services for Spring</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
-	</button>
+        </button>
 
-	<div class="collapse navbar-collapse">
-          <!-- Main navigation -->
-          <nav class="nav">
-            <ul class="navbar-nav">
-              <li >
-                <a class="nav-link" href="..">Home</a>
-              </li>
-              <li class="nav-item dropdown active">
-                <a href="#" role="button" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="nav-dropdown-Guides">Guides <b class="caret"></b></a>
-                <div class="dropdown-menu" aria-labelledby="nav-dropdown-Guides">
-                  
-<a href="../spring-content-fs-docs/" class="dropdown-item">Java API</a>
-                  
-<a href="../spring-content-rest-docs/" class="dropdown-item">REST API</a>
-                  
-<a href="../spring-content-with-renditions-docs/" class="dropdown-item">Renditions</a>
-                  
-<a href="../spring-content-with-fulltext-docs/" class="dropdown-item">Fulltext</a>
-                  
-<a href="../spring-content-with-versions-docs/" class="dropdown-item">Versions</a>
-                  
-<a href="./" class="dropdown-item active">RBAC</a>
-                  
-<a href="../spring-content-with-cmis-docs/" class="dropdown-item">CMIS</a>
-                  
-<a href="../spring-content-with-encryption-docs/" class="dropdown-item">Encryption</a>
-                </div>
-              </li>
-            </ul>
-          </nav>
+        <div id="navbar-top" class="collapse navbar-collapse">
+              <nav class="nav">
+                <ul class="navbar-nav">
+                      <li >
+                        <a class="nav-link" href="..">Home</a>
+                      </li>
+                      <li class="nav-item dropdown active">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Guides <b class="caret"></b>
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            
+  <li>
+    <a href="../spring-content-fs-docs/" class="dropdown-item">Java API</a>
+  </li>
+                            
+  <li>
+    <a href="../spring-content-rest-docs/" class="dropdown-item">REST API</a>
+  </li>
+                            
+  <li>
+    <a href="../spring-content-with-renditions-docs/" class="dropdown-item">Renditions</a>
+  </li>
+                            
+  <li>
+    <a href="../spring-content-with-fulltext-docs/" class="dropdown-item">Fulltext</a>
+  </li>
+                            
+  <li>
+    <a href="../spring-content-with-versions-docs/" class="dropdown-item">Versions</a>
+  </li>
+                            
+  <li>
+    <a href="./" class="dropdown-item active">RBAC</a>
+  </li>
+                            
+  <li>
+    <a href="../spring-content-with-cmis-docs/" class="dropdown-item">CMIS</a>
+  </li>
+                            
+  <li>
+    <a href="../spring-content-with-encryption-docs/" class="dropdown-item">Encryption</a>
+  </li>
+                        </ul>
+                      </li>
+                </ul>
+              </nav>
 
           <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-		<i class="fa fa-search"></i> Search
-              </a>
-            </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#" data-toggle="modal" data-target="#mkdocs-search-modal">
+                    <i class="fa fa-search"></i> Search
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" rel="next" href="../spring-content-with-versions-docs/">
+                    <i class="fa fa-arrow-left"></i> Previous
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" rel="prev" href="../spring-content-with-cmis-docs/">
+                    Next <i class="fa fa-arrow-right"></i>
+                  </a>
+                </li>
           </ul>
-	</div>
-	</div>
-      </nav><div id="content" class="container">
-        
+        </div>
+      </div>
+    </nav><div id="content" class="container">
+          
       <div class="row">
         <div class="col-md-9" role="main">
 
 
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    
-    
-    <li class="breadcrumb-item">Guides</li>
-    
-    
-    <li class="breadcrumb-item active" aria-current="page">RBAC</li>
-  </ol>
-</nav>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      
+        
+          <li class="breadcrumb-item">Guides</li>
+        
+      
+      
+        <li class="breadcrumb-item active" aria-current="page">
+          RBAC
+        </li>
+      
+    </ol>
+  </nav>
 
 
 <h1 id="getting-started-spring-content-with-rbac">Getting Started Spring Content with RBAC</h1>
@@ -124,7 +134,7 @@
 <ul>
 <li>
 <p>Download and unzip the source repository for this guide, or clone it
-using Git: <code>git clone https://github.com/paulcwarren/spring-content-gettingstarted.git</code></p>
+using Git: <code>git clone https://github.com/intesys/spring-content-gettingstarted.git</code></p>
 </li>
 <li>
 <p>We are going to start where Getting Started with Spring Content REST API leaves off so
@@ -136,116 +146,114 @@ using Git: <code>git clone https://github.com/paulcwarren/spring-content-getting
 <h3 id="update-dependencies">Update dependencies</h3>
 <p>Add <code>org.springframework.boot:spring-boot-starter-security</code> dependencies.</p>
 <p><code>pom.xml</code></p>
-<pre><code>
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
-    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+<pre><code><?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-    &lt;artifactId&gt;spring-content-with-rbac&lt;/artifactId&gt;
+    <artifactId>spring-content-with-rbac</artifactId>
 
-    &lt;parent&gt;
-        &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-        &lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
-        &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
-        &lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
-    &lt;/parent&gt;
+    <parent>
+        <groupId>it.intesys</groupId>
+        <artifactId>gettingstarted-spring-content</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
 
-    &lt;dependencyManagement&gt;
-        &lt;dependencies&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-                &lt;version&gt;3.3.2&lt;/version&gt;
-                &lt;type&gt;pom&lt;/type&gt;
-                &lt;scope&gt;import&lt;/scope&gt;
-            &lt;/dependency&gt;
-        &lt;/dependencies&gt;
-    &lt;/dependencyManagement&gt;
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-parent</artifactId>
+                <version>3.5.7</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
-            &lt;artifactId&gt;h2&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
-            &lt;version&gt;${spring.content.version}&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-content-rest-boot-starter&lt;/artifactId&gt;
-            &lt;version&gt;${spring.content.version}&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-          &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
-          &lt;artifactId&gt;lombok&lt;/artifactId&gt;
-        &lt;/dependency&gt;
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>it.intesys</groupId>
+            <artifactId>spring-content-fs-boot-starter</artifactId>
+            <version>${spring.content.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.intesys</groupId>
+            <artifactId>spring-content-rest-boot-starter</artifactId>
+            <version>${spring.content.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+        </dependency>
 
-        &lt;!-- Test dependencies --&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-            &lt;exclusions&gt;
-                &lt;exclusion&gt;
-                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
-                    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
-                &lt;/exclusion&gt;
-                &lt;exclusion&gt;
-                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
-                    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;
-                &lt;/exclusion&gt;
-            &lt;/exclusions&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.security&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-security-test&lt;/artifactId&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-mock-mvc&lt;/artifactId&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-            &lt;artifactId&gt;ginkgo4j&lt;/artifactId&gt;
-            &lt;version&gt;${ginkgo.version}&lt;/version&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-        &lt;/dependency&gt;
-    &lt;/dependencies&gt;
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>spring-mock-mvc</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.paulcwarren</groupId>
+            <artifactId>ginkgo4j</artifactId>
+            <version>${ginkgo.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-    &lt;build&gt;
-        &lt;plugins&gt;
-            &lt;plugin&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-            &lt;/plugin&gt;
-        &lt;/plugins&gt;
-    &lt;/build&gt;
-&lt;/project&gt;
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
 </code></pre>
 <h2 id="add-security-constraints">Add Security Constraints</h2>
 <p>Enable web security.</p>
-<pre><code>
-package gettingstarted;
+<pre><code>package gettingstarted;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -302,8 +310,7 @@ public class SpringSecurityConfig /*extends WebSecurityConfigurerAdapter*/ {
 <p>Second, secure the Spring Content endpoint <code>/files/**/content</code> that <code>GETs</code> and <code>SETs</code> content to the <code>reader</code> and <code>author</code> roles respectively.</p>
 <h3 id="preauthorize">@PreAuthorize</h3>
 <p>As an alternative secure removing content to the <code>author</code> role by using an alternative approach using the <code>@PreAuthorize</code> annotation on the FileContentStore's <code>unset</code> method.</p>
-<pre><code>
-package gettingstarted;
+<pre><code>package gettingstarted;
 
 import org.springframework.content.commons.property.PropertyPath;
 import org.springframework.content.commons.repository.ContentStore;
@@ -312,7 +319,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 @Component  // just to keep the ide happy!
-public interface FileContentStore extends ContentStore&lt;File, String&gt; {
+public interface FileContentStore extends ContentStore<File, String> {
 
 	@Override
 	@PreAuthorize("hasRole('ROLE_AUTHOR')")
@@ -361,136 +368,75 @@ storage technology.  </p>
 <li>
 <p>Spring Content MongoDB; stores content as Resources in Mongo's GridFS</p>
 </li>
-</ul>
-
-<ul class="metadata page-metadata" data-bi-name="page info" lang="en-us" dir="ltr">
-  <li class="last-updated-holder displayDate loading">
-    <span class="last-updated-text">Last updated:</span>
-    <time role="presentation" datetime="2018-10-25T00:00:00.000Z" data-article-date-source="ms.date"></time>
-  </li>
-<!--
-  <li class="readingTime">
-    2 minutes to read
-  </li>
--->
-  <li class="contributors-holder">
-    <span class="contributors-text">Contributors</span>
-    <ul class="contributors" data-bi-name="contributors"></ul>
-  </li>
-</ul>
-</div>
+</ul></div>
         <div class="col-md-3"><div class="navbar-light navbar-expand-md hidden-print sticky-top sticky-offset" role="complementary">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
-            <span class="fa fa-angle-down"></span>
-        </button>
-    </div>
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+      <span class="fa fa-angle-down"></span>
+    </button>
+  </div>
 
-    <div id="toc-collapse" class="navbar-collapse collapse card">
-        <ul class="nav flex-column bs-sidenav">
-            <li class="nav-item main"><a class="nav-link" href="#getting-started-spring-content-with-rbac">Getting Started Spring Content with RBAC</a></li>
-                <li class="nav-item">
-                    <a href="#what-youll-build" class="nav-link">What you'll build</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#what-youll-need" class="nav-link">What you'll need</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#how-to-complete-this-guide" class="nav-link">How to complete this guide</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#add-security-constraints" class="nav-link">Add Security Constraints</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#build-an-executable-jar" class="nav-link">Build an executable JAR</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#create-an-entity-and-version-it" class="nav-link">Create an Entity and version it</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#summary" class="nav-link">Summary</a>
-                </li>
-        </ul>
-    </div>
+  <div id="toc-collapse" class="navbar-collapse collapse card">
+    <ul class="nav flex-column bs-sidenav">
+        <li class="nav-item main"><a class="nav-link" href="#getting-started-spring-content-with-rbac">Getting Started Spring Content with RBAC</a></li>
+          <li class="nav-item">
+            <a href="#what-youll-build" class="nav-link">What you'll build</a>
+          </li>
+          <li class="nav-item">
+            <a href="#what-youll-need" class="nav-link">What you'll need</a>
+          </li>
+          <li class="nav-item">
+            <a href="#how-to-complete-this-guide" class="nav-link">How to complete this guide</a>
+          </li>
+          <li class="nav-item">
+            <a href="#add-security-constraints" class="nav-link">Add Security Constraints</a>
+          </li>
+          <li class="nav-item">
+            <a href="#build-an-executable-jar" class="nav-link">Build an executable JAR</a>
+          </li>
+          <li class="nav-item">
+            <a href="#create-an-entity-and-version-it" class="nav-link">Create an Entity and version it</a>
+          </li>
+          <li class="nav-item">
+            <a href="#summary" class="nav-link">Summary</a>
+          </li>
+    </ul>
+  </div>
 </div></div>
       </div>
+        </div>
+
+    <footer class="col-md-12">
+      <hr>
+      <div class="container">
       </div>
-
-      <footer class="col-md-12">
-	<hr>
-	<div class="container">
-	</div>
-      </footer>
+    </footer>
       <script>
-	var base_url = "..",
-            shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        var base_url = "..";
       </script>
-      <script src="../js/base.js" defer></script>
-      <script src="../search/main.js" defer></script>
+        <script src="../search/main.js" defer></script>
 
-      <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Search</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
+    <div class="modal" id="mkdocs-search-modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Search</h4>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>
+      <div class="modal-body">
+        <p>From here you can search these documents. Enter your search terms below.</p>
+        <form role="form">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+          </div>
+        </form>
+        <div id="mkdocs-search-results"></div>
+      </div>
+      <div class="modal-footer">
+      </div>
     </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <p class="h4 modal-title">Keyboard Shortcuts</p>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
-
-    </body>
+  </body>
 </html>
+
