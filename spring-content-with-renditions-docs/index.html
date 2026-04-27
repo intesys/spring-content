@@ -146,113 +146,113 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
 <h2 id="update-dependencies">Update dependencies</h2>
 <p>Add the <code>it.intesys:spring-content-renditions-boot-starter</code> dependency.</p>
 <p><code>pom.xml</code></p>
-<pre><code><?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
 
-    <artifactId>spring-content-with-renditions</artifactId>
+    &lt;artifactId&gt;spring-content-with-renditions&lt;/artifactId&gt;
 
-    <parent>
-        <groupId>it.intesys</groupId>
-        <artifactId>gettingstarted-spring-content</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
+    &lt;parent&gt;
+        &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+        &lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
+        &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+        &lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
+    &lt;/parent&gt;
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-parent</artifactId>
-                <version>3.5.7</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+                &lt;version&gt;3.5.7&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-rest</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>it.intesys</groupId>
-            <artifactId>spring-content-commons</artifactId>
-            <version>${spring.content.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.intesys</groupId>
-            <artifactId>spring-content-fs-boot-starter</artifactId>
-            <version>${spring.content.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.intesys</groupId>
-            <artifactId>spring-content-rest-boot-starter</artifactId>
-            <version>${spring.content.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.intesys</groupId>
-            <artifactId>spring-content-renditions-boot-starter</artifactId>
-            <version>${spring.content.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-        </dependency>
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+            &lt;artifactId&gt;h2&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-content-commons&lt;/artifactId&gt;
+            &lt;version&gt;${spring.content.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
+            &lt;version&gt;${spring.content.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-content-rest-boot-starter&lt;/artifactId&gt;
+            &lt;version&gt;${spring.content.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-content-renditions-boot-starter&lt;/artifactId&gt;
+            &lt;version&gt;${spring.content.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+          &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+        &lt;/dependency&gt;
 
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>spring-mock-mvc</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.paulcwarren</groupId>
-            <artifactId>ginkgo4j</artifactId>
-            <version>${ginkgo.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+        &lt;!-- Test dependencies --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-mock-mvc&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+            &lt;artifactId&gt;ginkgo4j&lt;/artifactId&gt;
+            &lt;version&gt;${ginkgo.version}&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
 </code></pre>
 <h2 id="update-file">Update File</h2>
 <p>To be able to return renditions we need to know the mime-type of the existing
@@ -303,7 +303,7 @@ import org.springframework.content.commons.store.ContentStore;
 import org.springframework.stereotype.Component;
 
 @Component  // just to keep the ide happy!
-public interface FileContentStore extends ContentStore<File, String>, Renderable<File> {
+public interface FileContentStore extends ContentStore&lt;File, String&gt;, Renderable&lt;File&gt; {
 }
 </code></pre>
 <h2 id="build-an-executable-jar">Build an executable JAR</h2>
@@ -417,15 +417,15 @@ public class StoredRenditionsEventHandler {
 
         long renderedLength = 0;
 
-        try (InputStream originalInputStream = store.getContent(entity, PropertyPath.from("content"))) {
+        try (InputStream originalInputStream = store.getContent(entity, PropertyPath.from(&quot;content&quot;))) {
 
-            InputStream renderedContent = renditionService.convert("text/plain", originalInputStream, "image/jpeg");
+            InputStream renderedContent = renditionService.convert(&quot;text/plain&quot;, originalInputStream, &quot;image/jpeg&quot;);
 
-            Resource renditionResource = store.getResource(entity, PropertyPath.from("rendition"));
+            Resource renditionResource = store.getResource(entity, PropertyPath.from(&quot;rendition&quot;));
             if (renditionResource == null) {
                 String newId = UUID.randomUUID().toString();
                 renditionResource = store.getResource(newId);
-                store.associate(entity, PropertyPath.from("rendition"), newId);
+                store.associate(entity, PropertyPath.from(&quot;rendition&quot;), newId);
             }
 
             try (OutputStream renditionPropertyStream = ((WritableResource)renditionResource).getOutputStream()) {
@@ -436,7 +436,7 @@ public class StoredRenditionsEventHandler {
         }
 
         entity.setRenditionLen(renderedLength);
-        entity.setRenditionMimeType("image/jpeg");
+        entity.setRenditionMimeType(&quot;image/jpeg&quot;);
     }
 
     @HandleBeforeUnsetContent
@@ -444,7 +444,7 @@ public class StoredRenditionsEventHandler {
 
         File entity = (File)event.getSource();
 
-        ((DeletableResource)store.getResource(entity, PropertyPath.from("rendition"))).delete();
+        ((DeletableResource)store.getResource(entity, PropertyPath.from(&quot;rendition&quot;))).delete();
 
         entity.setRenditionId(null);
         entity.setRenditionLen(0L);

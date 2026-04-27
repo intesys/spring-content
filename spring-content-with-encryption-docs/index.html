@@ -150,66 +150,66 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
 <p>Add the <code>it.intesys:spring-content-encryption</code> dependency.  This provides us the implementation of a EncryptingContentStore.</p>
 <p>Also add <code>org.testcontainers:vault:1.17.6</code>.  We are going to use vault to provide a keyring for encrypting the content encryption key which in turn is used to encrypt the content. </p>
 <p><code>pom.xml</code></p>
-<pre><code class="language-java"><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  	<modelVersion>4.0.0</modelVersion>
+<pre><code class="language-java">&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+  	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
   
-  	<artifactId>spring-content-with-encryption</artifactId>
+  	&lt;artifactId&gt;spring-content-with-encryption&lt;/artifactId&gt;
 
-	<parent>
-		<groupId>it.intesys</groupId>
-		<artifactId>gettingstarted-spring-content</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
-	</parent>
+	&lt;parent&gt;
+		&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+		&lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
+		&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+		&lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
+	&lt;/parent&gt;
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-parent</artifactId>
-				<version>3.5.7</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	&lt;dependencyManagement&gt;
+		&lt;dependencies&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+				&lt;version&gt;3.5.7&lt;/version&gt;
+				&lt;type&gt;pom&lt;/type&gt;
+				&lt;scope&gt;import&lt;/scope&gt;
+			&lt;/dependency&gt;
+		&lt;/dependencies&gt;
+	&lt;/dependencyManagement&gt;
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>it.intesys</groupId>
-			<artifactId>spring-content-fs-boot-starter</artifactId>
-			<version>${spring.content.version}</version>
-		</dependency>
- 		<dependency>
-			<groupId>it.intesys</groupId>
-			<artifactId>spring-content-rest-boot-starter</artifactId>
-			<version>${spring.content.version}</version>
-		</dependency>
-        <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-        </dependency>
-		<dependency>
-			<groupId>it.intesys</groupId>
-			<artifactId>spring-content-encryption</artifactId>
-			<version>${spring.content.version}</version>
-		</dependency>
+	&lt;dependencies&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.h2database&lt;/groupId&gt;
+			&lt;artifactId&gt;h2&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
+			&lt;version&gt;${spring.content.version}&lt;/version&gt;
+		&lt;/dependency&gt;
+ 		&lt;dependency&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-content-rest-boot-starter&lt;/artifactId&gt;
+			&lt;version&gt;${spring.content.version}&lt;/version&gt;
+		&lt;/dependency&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+          &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-content-encryption&lt;/artifactId&gt;
+			&lt;version&gt;${spring.content.version}&lt;/version&gt;
+		&lt;/dependency&gt;
 </code></pre>
 <h2 id="vault-testcontainer">Vault TestContainer</h2>
 <p>First we add a simple class that creates and starts a vault test container upon demand.  The vault is configured with a vault token <code>root-token</code> (referenced later) and enables the transit module that provides cryptographic functions to the encrypting content store. </p>
@@ -225,10 +225,10 @@ public class VaultContainerSupport {
     public static VaultContainer getVaultContainer() {
 
         if (vaultContainer == null) {
-            vaultContainer = new VaultContainer<>()
-                    .withVaultToken("root-token")
+            vaultContainer = new VaultContainer&lt;&gt;()
+                    .withVaultToken(&quot;root-token&quot;)
                     .withVaultPort(8200)
-                    .withInitCommand("secrets enable transit");
+                    .withInitCommand(&quot;secrets enable transit&quot;);
 
             vaultContainer.start();
         }
@@ -273,24 +273,24 @@ public class SpringContentApplication {
 			int port = VaultContainerSupport.getVaultContainer().getMappedPort(8200);
 
 			VaultEndpoint vault = VaultEndpoint.create(host, port);
-			vault.setScheme("http");
+			vault.setScheme(&quot;http&quot;);
 			return vault;
 		}
 
 		@Override
 		public ClientAuthentication clientAuthentication() {
-			return new TokenAuthentication("root-token");
+			return new TokenAuthentication(&quot;root-token&quot;);
 		}
 
 		@Bean
-		public EncryptingContentStoreConfigurer<FileContentStore> config(VaultOperations vaultOperations) {
-			return new EncryptingContentStoreConfigurer<FileContentStore>() {
+		public EncryptingContentStoreConfigurer&lt;FileContentStore&gt; config(VaultOperations vaultOperations) {
+			return new EncryptingContentStoreConfigurer&lt;FileContentStore&gt;() {
 				@Override
 				public void configure(EncryptingContentStoreConfiguration config) {
 					config.dataEncryptionKeyWrappers(List.of(
-									new VaultTransitDataEncryptionKeyWrapper(vaultOperations.opsForTransit(), "fsfile")
+									new VaultTransitDataEncryptionKeyWrapper(vaultOperations.opsForTransit(), &quot;fsfile&quot;)
 							))
-							.encryptionKeyContentProperty("key");
+							.encryptionKeyContentProperty(&quot;key&quot;);
 				}
 			};
 		}
@@ -337,7 +337,7 @@ public class File {
 
 	@ContentId private String contentId;
 	@ContentLength private long contentLength;
-	@MimeType private String contentMimeType = "text/plain";
+	@MimeType private String contentMimeType = &quot;text/plain&quot;;
 	@JsonIgnore
 	private byte[] contentKey;
 }
@@ -352,7 +352,7 @@ import org.springframework.content.encryption.store.EncryptingContentStore;
 import org.springframework.content.rest.StoreRestResource;
 
 @StoreRestResource
-public interface FileContentStore extends ContentStore<File, String>, EncryptingContentStore<File, String> {
+public interface FileContentStore extends ContentStore&lt;File, String&gt;, EncryptingContentStore&lt;File, String&gt; {
 }
 </code></pre>
 <h2 id="build-an-executable-jar">Build an executable JAR</h2>

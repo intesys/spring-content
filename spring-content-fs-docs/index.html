@@ -158,110 +158,110 @@ When you’re finished, you can check your results against the code in <code>spr
            ∟ static
 </code></pre>
 <p><code>pom.xml</code></p>
-<pre><code><?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
 
-	<artifactId>spring-content-with-fs</artifactId>
-	<packaging>jar</packaging>
+	&lt;artifactId&gt;spring-content-with-fs&lt;/artifactId&gt;
+	&lt;packaging&gt;jar&lt;/packaging&gt;
 
- 	<parent>
-		<groupId>it.intesys</groupId>
-		<artifactId>gettingstarted-spring-content</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
-	</parent>
+ 	&lt;parent&gt;
+		&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+		&lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
+		&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+		&lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
+	&lt;/parent&gt;
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-parent</artifactId>
-				<version>3.5.7</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	&lt;dependencyManagement&gt;
+		&lt;dependencies&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+				&lt;version&gt;3.5.7&lt;/version&gt;
+				&lt;type&gt;pom&lt;/type&gt;
+				&lt;scope&gt;import&lt;/scope&gt;
+			&lt;/dependency&gt;
+		&lt;/dependencies&gt;
+	&lt;/dependencyManagement&gt;
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>it.intesys</groupId>
-			<artifactId>spring-content-fs-boot-starter</artifactId>
-			<version>${spring.content.version}</version>
-		</dependency>
-		<dependency>
-		  <groupId>org.projectlombok</groupId>
-		  <artifactId>lombok</artifactId>
-	    </dependency>
+	&lt;dependencies&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.h2database&lt;/groupId&gt;
+			&lt;artifactId&gt;h2&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
+			&lt;version&gt;${spring.content.version}&lt;/version&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+		  &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+		  &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+	    &lt;/dependency&gt;
 
-		<!-- Test dependencies -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                </exclusion>
-            </exclusions>
-		</dependency>
-		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>spring-mock-mvc</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.paulcwarren</groupId>
-			<artifactId>ginkgo4j</artifactId>
-			<version>${ginkgo.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+		&lt;!-- Test dependencies --&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-mock-mvc&lt;/artifactId&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+			&lt;artifactId&gt;ginkgo4j&lt;/artifactId&gt;
+			&lt;version&gt;${ginkgo.version}&lt;/version&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+	&lt;/dependencies&gt;
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+	&lt;build&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
 	
-	<repositories>
-		<repository>
-			<id>snapshots</id>
-			<name>nexus</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+	&lt;repositories&gt;
+		&lt;repository&gt;
+			&lt;id&gt;snapshots&lt;/id&gt;
+			&lt;name&gt;nexus&lt;/name&gt;
+			&lt;url&gt;https://oss.sonatype.org/content/repositories/snapshots&lt;/url&gt;
+			&lt;snapshots&gt;
+				&lt;enabled&gt;true&lt;/enabled&gt;
+			&lt;/snapshots&gt;
+		&lt;/repository&gt;
+	&lt;/repositories&gt;
 	
-</project>
+&lt;/project&gt;
 </code></pre>
 <p>We add several dependencies:-</p>
 <ul>
@@ -317,7 +317,7 @@ public class File {
 
 	@ContentId private String contentId;
 	@ContentLength private long contentLength;
-	private String contentMimeType = "text/plain";
+	private String contentMimeType = &quot;text/plain&quot;;
 }
 </code></pre>
 <p>As you would expect we created a standard JPA Entity to capture some metadata about our file; <code>name</code> and <code>summary</code>.  In addition, because we will be serving these files over the web, we also record <code>mimeType</code> so that we can instruct the browser correctly.</p>
@@ -333,8 +333,8 @@ public class File {
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(path="files", collectionResourceRel="files")
-public interface FileRepository extends JpaRepository<File, Long> {
+@RepositoryRestResource(path=&quot;files&quot;, collectionResourceRel=&quot;files&quot;)
+public interface FileRepository extends JpaRepository&lt;File, Long&gt; {
 
 }
 </code></pre>
@@ -345,7 +345,7 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
 import org.springframework.content.commons.store.ContentStore;
 
-public interface FileContentStore extends ContentStore<File, String> {
+public interface FileContentStore extends ContentStore&lt;File, String&gt; {
 }
 </code></pre>
 <p>Let's investigate this interface:-</p>
@@ -392,11 +392,11 @@ public class FileContentController {
 	@Autowired private FileRepository filesRepo;
 	@Autowired private FileContentStore contentStore;
 
-	@RequestMapping(value="/files/{fileId}", method = RequestMethod.PUT)
-	public ResponseEntity<?> setContent(@PathVariable("fileId") Long id, @RequestParam("file") MultipartFile file)
+	@RequestMapping(value=&quot;/files/{fileId}&quot;, method = RequestMethod.PUT)
+	public ResponseEntity&lt;?&gt; setContent(@PathVariable(&quot;fileId&quot;) Long id, @RequestParam(&quot;file&quot;) MultipartFile file)
 			throws IOException {
 
-		Optional<File> f = filesRepo.findById(id);
+		Optional&lt;File&gt; f = filesRepo.findById(id);
 		if (f.isPresent()) {
 			f.get().setContentMimeType(file.getContentType());
 
@@ -405,21 +405,21 @@ public class FileContentController {
 			// save updated content-related info
 			filesRepo.save(f.get());
 
-			return new ResponseEntity<Object>(HttpStatus.OK);
+			return new ResponseEntity&lt;Object&gt;(HttpStatus.OK);
 		}
 		return null;
 	}
 
-	@RequestMapping(value="/files/{fileId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getContent(@PathVariable("fileId") Long id) {
+	@RequestMapping(value=&quot;/files/{fileId}&quot;, method = RequestMethod.GET)
+	public ResponseEntity&lt;?&gt; getContent(@PathVariable(&quot;fileId&quot;) Long id) {
 
-		Optional<File> f = filesRepo.findById(id);
+		Optional&lt;File&gt; f = filesRepo.findById(id);
 		if (f.isPresent()) {
 			InputStreamResource inputStreamResource = new InputStreamResource(contentStore.getContent(f.get()));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentLength(f.get().getContentLength());
-			headers.set("Content-Type", f.get().getContentMimeType());
-			return new ResponseEntity<Object>(inputStreamResource, headers, HttpStatus.OK);
+			headers.set(&quot;Content-Type&quot;, f.get().getContentMimeType());
+			return new ResponseEntity&lt;Object&gt;(inputStreamResource, headers, HttpStatus.OK);
 		}
 		return null;
 	}
@@ -446,48 +446,48 @@ public class FileContentController {
 <h2 id="create-web-client">Create Web Client</h2>
 <p>Now let's create a really simple angular web front-end for our document list.  </p>
 <p><code>src/main/resources/static/index.html</code></p>
-<pre><code><!doctype html>
-<html ng-app="filesApp">
-  <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-    <script src="files.js"></script>
-  </head>
-  <body>
-    <div ng-controller="FilesListController as filesList">
-	    <h1>Files</h1>
+<pre><code>&lt;!doctype html&gt;
+&lt;html ng-app=&quot;filesApp&quot;&gt;
+  &lt;head&gt;
+    &lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;files.js&quot;&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div ng-controller=&quot;FilesListController as filesList&quot;&gt;
+	    &lt;h1&gt;Files&lt;/h1&gt;
 	    
-	    <section style="display: table; width: 80%">
-		  <header style="display: table-row;">
-		    <div style="display: table-cell;">Name</div>
-		    <div style="display: table-cell;">Length</div>
-		    <div style="display: table-cell;">Created</div>
-		    <div style="display: table-cell;">Summary</div>
-		  </header>
-		  <div style="display: table-row;" ng-repeat="file in filesList.files">
-		    <div style="display: table-cell;"><a href="{{filesList.getHref(file)}}" type={{file.mimeType}} download={{file.name}}>{{file.name}}</a></div>
-		    <div style="display: table-cell;"><label>{{file.contentLength}}</label></div>
-		    <div style="display: table-cell;"><label>{{file.created}}</label></div>
-		    <div style="display: table-cell;"><label>{{file.summary}}</label></div>
-		  </div>
-		</section>
+	    &lt;section style=&quot;display: table; width: 80%&quot;&gt;
+		  &lt;header style=&quot;display: table-row;&quot;&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;Name&lt;/div&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;Length&lt;/div&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;Created&lt;/div&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;Summary&lt;/div&gt;
+		  &lt;/header&gt;
+		  &lt;div style=&quot;display: table-row;&quot; ng-repeat=&quot;file in filesList.files&quot;&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;a href=&quot;{{filesList.getHref(file)}}&quot; type={{file.mimeType}} download={{file.name}}&gt;{{file.name}}&lt;/a&gt;&lt;/div&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;label&gt;{{file.contentLength}}&lt;/label&gt;&lt;/div&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;label&gt;{{file.created}}&lt;/label&gt;&lt;/div&gt;
+		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;label&gt;{{file.summary}}&lt;/label&gt;&lt;/div&gt;
+		  &lt;/div&gt;
+		&lt;/section&gt;
 	    
-	    <h2>New File</h2>
-	    <input type="file" id="file" name="file"/>
-	    <input type="summary" id="summary" name="summary" ng-model="filesList.summary" placeholder="Summary"/>
-		<button ng-click="filesList.upload()">Upload</button>
-    </div>
-  </body>
-</html>
+	    &lt;h2&gt;New File&lt;/h2&gt;
+	    &lt;input type=&quot;file&quot; id=&quot;file&quot; name=&quot;file&quot;/&gt;
+	    &lt;input type=&quot;summary&quot; id=&quot;summary&quot; name=&quot;summary&quot; ng-model=&quot;filesList.summary&quot; placeholder=&quot;Summary&quot;/&gt;
+		&lt;button ng-click=&quot;filesList.upload()&quot;&gt;Upload&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
 <p>This HTML presents a simple list of files using an <code>ng-repeat</code> directive and contains a simple form allowing new files to be uploaded.</p>
 <p>All the interesting code is in the code-behind file so add the following code behind to <code>src/main/resources/static/files.js</code></p>
-<pre><code>angular.module('filesApp', [])
-  .controller('FilesListController', function($http) {
+<pre><code>angular.module(&#x27;filesApp&#x27;, [])
+  .controller(&#x27;FilesListController&#x27;, function($http) {
     var filesList = this;
     filesList.files = []; 
     
     filesList.getFilesList = function() {
-        $http.get('/files/').
+        $http.get(&#x27;/files/&#x27;).
             success(function(data, status, headers, config) {
                 if (data._embedded != undefined) {
         			filesList.files = [];
@@ -500,27 +500,27 @@ public class FileContentController {
     filesList.getFilesList(); 
     
     filesList.getHref = function(file) {
-    	return file._links["self"].href
+    	return file._links[&quot;self&quot;].href
     };
 
     filesList.upload = function() {
-    	var f = document.getElementById('file').files[0];
+    	var f = document.getElementById(&#x27;file&#x27;).files[0];
     	var file = {name: f.name, summary: filesList.summary};
     	
-    	$http.post('/files/', file).
+    	$http.post(&#x27;/files/&#x27;, file).
     		then(function(response) {
 	    		var fd = new FormData();
-	            fd.append('file', f);
-	            return $http.put(response.headers("Location"), fd, {
+	            fd.append(&#x27;file&#x27;, f);
+	            return $http.put(response.headers(&quot;Location&quot;), fd, {
 	                transformRequest: angular.identity,
-	                headers: {'Content-Type': undefined}
+	                headers: {&#x27;Content-Type&#x27;: undefined}
 	            });
 	        })
 	        .then(function(response) {
-    			filesList.title = "";
-    			filesList.keywords = "";
+    			filesList.title = &quot;&quot;;
+    			filesList.keywords = &quot;&quot;;
     			filesList.getFilesList();
-    			document.getElementById('file').files[0] = undefined;
+    			document.getElementById(&#x27;file&#x27;).files[0] = undefined;
 	        });
     }
   });

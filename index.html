@@ -193,13 +193,13 @@ public class File {
 
 	@ContentId private String contentId;
 	@ContentLength private long contentLength;
-	private String contentMimeType = "text/plain";
+	private String contentMimeType = &quot;text/plain&quot;;
 }
 </code></pre>
 <p>This defines a simple JPA entity with a few structured data fields; title, authors and keywords and two Spring Content-managed data fields; <code>@ContentId</code> and <code>@ContentLength</code>.</p>
 <p>The structured data fields are managed in the usual way through a <code>CrudRepository&lt;SopDocument,String&gt;</code> interface.  </p>
 <p>Content is handled separately with a ContentStore interface:-</p>
-<pre><code class="language-java">public interface FileContentStore extends ContentStore<File, String> {
+<pre><code class="language-java">public interface FileContentStore extends ContentStore&lt;File, String&gt; {
 }
 </code></pre>
 <p>This interface extends Spring Content’s <code>ContentStore</code> and is typed to the entity class File and the id class String.  Put this code inside a Spring Boot application with <code>spring-boot-starter-data-jpa</code> and <code>spring-content-fs-boot-starter</code> like this:</p>
@@ -401,5 +401,5 @@ public class SpringContentApplication {
 
   <!--
     MkDocs version : 1.6.1
-    Build Date UTC : 2026-04-27 12:59:22.398491+00:00
+    Build Date UTC : 2026-04-27 13:53:02.176063+00:00
   -->

@@ -146,116 +146,116 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
 <h3 id="update-dependencies">Update dependencies</h3>
 <p>Add the <code>it.intesys:spring-versions-boot-starter</code> and <code>org.springframework.boot:spring-boot-starter-security</code> dependencies.</p>
 <p><code>pom.xml</code></p>
-<pre><code><?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
 
-    <artifactId>spring-content-with-versions</artifactId>
+    &lt;artifactId&gt;spring-content-with-versions&lt;/artifactId&gt;
 
-    <parent>
-        <groupId>it.intesys</groupId>
-        <artifactId>gettingstarted-spring-content</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
+    &lt;parent&gt;
+        &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+        &lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
+        &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+        &lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
+    &lt;/parent&gt;
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-parent</artifactId>
-                <version>3.5.7</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+                &lt;version&gt;3.5.7&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-rest</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>it.intesys</groupId>
-            <artifactId>spring-content-fs-boot-starter</artifactId>
-            <version>${spring.content.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.intesys</groupId>
-            <artifactId>spring-content-rest-boot-starter</artifactId>
-            <version>${spring.content.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.intesys</groupId>
-            <artifactId>spring-versions-jpa-boot-starter</artifactId>
-            <version>${spring.content.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-        </dependency>
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+            &lt;artifactId&gt;h2&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
+            &lt;version&gt;${spring.content.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-content-rest-boot-starter&lt;/artifactId&gt;
+            &lt;version&gt;${spring.content.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-versions-jpa-boot-starter&lt;/artifactId&gt;
+            &lt;version&gt;${spring.content.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+          &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+        &lt;/dependency&gt;
 
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+        &lt;!-- Test dependencies --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.security&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-security-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
 
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>spring-mock-mvc</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.paulcwarren</groupId>
-            <artifactId>ginkgo4j</artifactId>
-            <version>${ginkgo.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-mock-mvc&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+            &lt;artifactId&gt;ginkgo4j&lt;/artifactId&gt;
+            &lt;version&gt;${ginkgo.version}&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
 </code></pre>
 <h2 id="update-file-entity">Update File Entity</h2>
 <p>Add the following annotations to our Entity.</p>
@@ -297,7 +297,7 @@ public class File {
 
 	@ContentId private String contentId;
 	@ContentLength private long contentLength;
-	private String contentMimeType = "text/plain";
+	private String contentMimeType = &quot;text/plain&quot;;
 
 	@LockOwner
 	private String lockOwner;
@@ -340,7 +340,7 @@ public class File {
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.versions.LockingAndVersioningRepository;
 
-public interface FileRepository extends JpaRepository<File, Long>, LockingAndVersioningRepository<File, Long> {
+public interface FileRepository extends JpaRepository&lt;File, Long&gt;, LockingAndVersioningRepository&lt;File, Long&gt; {
 
 }
 </code></pre>
@@ -359,14 +359,14 @@ public interface FileRepository extends JpaRepository<File, Long>, LockingAndVer
     @EnableWebSecurity
     public static class SpringSecurityConfig /*extends WebSecurityConfigurerAdapter*/ {
 
-        protected static String REALM = "SPRING_CONTENT";
+        protected static String REALM = &quot;SPRING_CONTENT&quot;;
 
         @Autowired
         public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
             // Enable if spring-doc apps supports user accounts in the future
             auth.inMemoryAuthentication().
-                    withUser(User.withDefaultPasswordEncoder().username("paul").password("warren").roles("ADMIN").
-//                    withUser(User.withDefaultPasswordEncoder().username("john123").password("password").roles("USER").
+                    withUser(User.withDefaultPasswordEncoder().username(&quot;paul&quot;).password(&quot;warren&quot;).roles(&quot;ADMIN&quot;).
+//                    withUser(User.withDefaultPasswordEncoder().username(&quot;john123&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).
                         build());
 
         }
@@ -381,7 +381,7 @@ public interface FileRepository extends JpaRepository<File, Long>, LockingAndVer
 //
 //            http.csrf().disable()
 //                    .authorizeRequests()
-//                    .antMatchers("/admin/**").hasRole("ADMIN")
+//                    .antMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
 //                    .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
 //                    .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //
@@ -391,7 +391,7 @@ public interface FileRepository extends JpaRepository<File, Long>, LockingAndVer
             http
                     .csrf().disable()
                     .authorizeRequests()
-                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
                     .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
                     .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
