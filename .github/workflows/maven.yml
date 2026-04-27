@@ -128,8 +128,8 @@ jobs:
         git clone --branch gh-pages git@github.com:intesys/spring-content.git /tmp/spring-content-gh-pages
 
         # Replace main documentation in gh-pages
-        # We keep the refs directory as requested "effettuare la sostituzione della ref documentation (AS IS)"
-        # and "effettuare il replace della documentazione buildata" (the mkdocs one)
+        # Keep the refs directory
+        # and replace the mkdocs
         
         # First, copy mkdocs built site to the root of gh-pages
         cp -R /tmp/generated-site/* /tmp/spring-content-gh-pages/
