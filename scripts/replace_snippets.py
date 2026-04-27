@@ -2,6 +2,7 @@ import os
 import re
 import urllib.request
 import sys
+import html
 
 def replace_snippets(content):
     def get_snippet(match):
@@ -18,7 +19,9 @@ def replace_snippets(content):
                         lines = lines[start-1:end]
                     else:
                         lines = [lines[int(line_range)-1]]
-                return "\n".join(lines)
+                snippet_text = "\n".join(lines)
+                # Escape HTML characters so they are rendered literally in the browser
+                return html.escape(snippet_text)
         except Exception as e:
             print(f"Error fetching {url}: {e}")
             return match.group(0)
