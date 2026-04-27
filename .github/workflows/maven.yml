@@ -76,7 +76,7 @@ jobs:
         set -eux
 
         # Install MkDocs and plugins
-        pip install mkdocs mkdocs-git-committers-plugin-2 mkdocs-theme-bootstrap4
+        pip install mkdocs mkdocs-git-committers-plugin-2 mkdocs-theme-bootstrap4 mkdocs-macros-plugin
 
         # Version calculation
         POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
