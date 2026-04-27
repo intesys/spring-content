@@ -18,7 +18,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 17
-        server-id: ossrh
+        server-id: central
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
@@ -48,7 +48,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 17
-        server-id: ossrh
+        server-id: central
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
@@ -60,7 +60,7 @@ jobs:
         key: ${{ runner.os }}-maven-${{ github.run_id }}
     - uses: actions/checkout@v2
       with:
-        repository: paulcwarren/spring-content-gettingstarted
+        repository: intesys/spring-content-gettingstarted
         path: spring-content-gettingstarted
     
     - name: Validate against Getting Started Guides
