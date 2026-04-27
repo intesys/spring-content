@@ -88,16 +88,11 @@ jobs:
             mvn org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion="${TAG}"
             
             export SPRING_CONTENT_GA_VERSION="${TAG}"
-            # Simple version increment for snapshot: e.g., 3.1.0 -> 3.1.1-SNAPSHOT
-            # This is a bit naive but follows "tag + 1 -SNAPSHOT"
-            if [[ $TAG =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-                MAJOR=${BASH_REMATCH[1]}
-                MINOR=${BASH_REMATCH[2]}
-                PATCH=${BASH_REMATCH[3]}
-                export SPRING_CONTENT_SNAPSHOT_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))-SNAPSHOT"
-            else
-                export SPRING_CONTENT_SNAPSHOT_VERSION="${TAG}-SNAPSHOT"
-            fi
+            
+            # Retrieve the version from the pom.xml in the main branch
+            # We use git show to read the content without changing branches
+            git show main:pom.xml > /tmp/main-pom.xml
+            export SPRING_CONTENT_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f /tmp/main-pom.xml)
         else
             export BUILD_TYPE=snapshot/"${GITHUB_REF#refs/heads/}"
             export SPRING_CONTENT_GA_VERSION="${LATEST_TAG}"
