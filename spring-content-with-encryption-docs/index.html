@@ -137,7 +137,7 @@ using Git: <code>git clone https://github.com/paulcwarren/spring-content-getting
 <p>When you're finished, you can check your results against the code in
 <code>spring-content-gettingstarted/spring-content-with-encryption/complete</code>.</p>
 <h2 id="update-dependencies">Update dependencies</h2>
-<p>Add the <code>com.github.paulcwarren:spring-content-encryption</code> dependency.  This provides us the implementation of a EncryptingContentStore.</p>
+<p>Add the <code>it.intesys:spring-content-encryption</code> dependency.  This provides us the implementation of a EncryptingContentStore.</p>
 <p>Also add <code>org.testcontainers:vault:1.17.6</code>.  We are going to use vault to provide a keyring for encrypting the content encryption key which in turn is used to encrypt the content. </p>
 <p><code>pom.xml</code></p>
 <pre><code class="language-java">
@@ -147,7 +147,7 @@ using Git: <code>git clone https://github.com/paulcwarren/spring-content-getting
   	&lt;artifactId&gt;spring-content-with-encryption&lt;/artifactId&gt;
 
 	&lt;parent&gt;
-		&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+		&lt;groupId&gt;it.intesys&lt;/groupId&gt;
 		&lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
 		&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
 		&lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
@@ -183,12 +183,12 @@ using Git: <code>git clone https://github.com/paulcwarren/spring-content-getting
 			&lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
 		&lt;/dependency&gt;
 		&lt;dependency&gt;
-			&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
 			&lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
 			&lt;version&gt;${spring.content.version}&lt;/version&gt;
 		&lt;/dependency&gt;
  		&lt;dependency&gt;
-			&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
 			&lt;artifactId&gt;spring-content-rest-boot-starter&lt;/artifactId&gt;
 			&lt;version&gt;${spring.content.version}&lt;/version&gt;
 		&lt;/dependency&gt;
@@ -197,7 +197,7 @@ using Git: <code>git clone https://github.com/paulcwarren/spring-content-getting
           &lt;artifactId&gt;lombok&lt;/artifactId&gt;
         &lt;/dependency&gt;
 		&lt;dependency&gt;
-			&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
 			&lt;artifactId&gt;spring-content-encryption&lt;/artifactId&gt;
 			&lt;version&gt;${spring.content.version}&lt;/version&gt;
 		&lt;/dependency&gt;

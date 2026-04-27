@@ -138,7 +138,7 @@ Guide so <code>cd</code> into <code>spring-content-gettingstarted/spring-content
 <p>When you’re finished, you can check your results against the code in
 <code>spring-content-gettingstarted/spring-content-rest/complete</code>.</p>
 <h3 id="update-dependencies">Update dependencies</h3>
-<p>Add the <code>com.github.paulcwarren:spring-content-rest-boot-starter</code> dependency.</p>
+<p>Add the <code>it.intesys:spring-content-rest-boot-starter</code> dependency.</p>
 <p><code>pom.xml</code></p>
 <pre><code>{snippet: https://raw.githubusercontent.com/paulcwarren/spring-content-gettingstarted/main/spring-content-rest/complete/pom.xml 1-}
 </code></pre>

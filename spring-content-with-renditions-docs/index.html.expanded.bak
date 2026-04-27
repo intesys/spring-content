@@ -134,7 +134,7 @@ using Git: <code>git clone https://github.com/paulcwarren/spring-content-getting
 <p>When you’re finished, you can check your results against the code in
 <code>spring-content-gettingstarted/spring-content-with-fulltext/complete</code>.</p>
 <h2 id="update-dependencies">Update dependencies</h2>
-<p>Add the <code>com.github.paulcwarren:spring-content-renditions-boot-starter</code> dependency.</p>
+<p>Add the <code>it.intesys:spring-content-renditions-boot-starter</code> dependency.</p>
 <p><code>pom.xml</code></p>
 <pre><code>{snippet: https://raw.githubusercontent.com/paulcwarren/spring-content-gettingstarted/main/spring-content-with-renditions/complete/pom.xml 1-}
 </code></pre>

@@ -137,7 +137,7 @@ using Git: <code>git clone https://github.com/paulcwarren/spring-content-getting
 <p>When you're finished, you can check your results against the code in
 <code>spring-content-gettingstarted/spring-content-with-encryption/complete</code>.</p>
 <h2 id="update-dependencies">Update dependencies</h2>
-<p>Add the <code>com.github.paulcwarren:spring-content-encryption</code> dependency.  This provides us the implementation of a EncryptingContentStore.</p>
+<p>Add the <code>it.intesys:spring-content-encryption</code> dependency.  This provides us the implementation of a EncryptingContentStore.</p>
 <p>Also add <code>org.testcontainers:vault:1.17.6</code>.  We are going to use vault to provide a keyring for encrypting the content encryption key which in turn is used to encrypt the content. </p>
 <p><code>pom.xml</code></p>
 <pre><code class="language-java">{snippet: https://raw.githubusercontent.com/paulcwarren/spring-content-gettingstarted/main/spring-content-with-encryption/complete/pom.xml 1-60}

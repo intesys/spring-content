@@ -197,7 +197,7 @@ association with an Entity</p>
 getContent and unsetContent</p>
 </li>
 <li>
-<p>The dependency <code>com.github.paulcwarren:spring-content-fs-boot-starter</code>
+<p>The dependency <code>it.intesys:spring-content-fs-boot-starter</code>
 provides a Filesystem-based implementation of this interface and Spring
 Content auto-configuration ensures that this implementation will be used
 wherever the <code>FileContentRepository</code> is <code>@Autowired</code>.</p>

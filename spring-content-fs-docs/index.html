@@ -158,7 +158,7 @@ When you’re finished, you can check your results against the code in <code>spr
 	&lt;packaging&gt;jar&lt;/packaging&gt;
 
  	&lt;parent&gt;
-		&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+		&lt;groupId&gt;it.intesys&lt;/groupId&gt;
 		&lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
 		&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
 		&lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
@@ -194,7 +194,7 @@ When you’re finished, you can check your results against the code in <code>spr
 			&lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
 		&lt;/dependency&gt;
 		&lt;dependency&gt;
-			&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
 			&lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
 			&lt;version&gt;${spring.content.version}&lt;/version&gt;
 		&lt;/dependency&gt;
@@ -225,7 +225,7 @@ When you’re finished, you can check your results against the code in <code>spr
 			&lt;scope&gt;test&lt;/scope&gt;
 		&lt;/dependency&gt;
 		&lt;dependency&gt;
-			&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
 			&lt;artifactId&gt;ginkgo4j&lt;/artifactId&gt;
 			&lt;version&gt;${ginkgo.version}&lt;/version&gt;
 			&lt;scope&gt;test&lt;/scope&gt;
@@ -349,7 +349,7 @@ public interface FileContentStore extends ContentStore&lt;File, String&gt; {
 getContent and unsetContent</p>
 </li>
 <li>
-<p>The dependency <code>com.github.paulcwarren:spring-content-fs-boot-starter</code>
+<p>The dependency <code>it.intesys:spring-content-fs-boot-starter</code>
 provides a Filesystem-based implementation of this interface and Spring
 Content auto-configuration ensures that this implementation will be used
 wherever the <code>FileContentRepository</code> is <code>@Autowired</code>.</p>
