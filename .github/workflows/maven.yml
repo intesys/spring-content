@@ -114,8 +114,7 @@ jobs:
         popd
 
         # Replace snippets in generated HTML
-        printf "import os, re, urllib.request\ndef replace_snippets(content):\n    def get_snippet(match):\n        url = match.group(1)\n        line_range = match.group(2)\n        try:\n            with urllib.request.urlopen(url) as response:\n                lines = response.read().decode(\"utf-8\").splitlines()\n                if line_range:\n                    if line_range.endswith(\"-\"):\n                        lines = lines[int(line_range[:-1]) - 1:]\n                    elif \"-\" in line_range:\n                        start, end = map(int, line_range.split(\"-\"))\n                        lines = lines[start-1:end]\n                    else:\n                        lines = [lines[int(line_range)-1]]\n                return \"\\n\".join(lines)\n        except Exception as e:\n            print(f\"Error fetching {url}: {e}\")\n            return match.group(0)\n    pattern = re.compile(r\"\{snippet:\s*(https?://[^\s}]+)(?:\s+([0-9-]+))?\s*\}\")\n    return pattern.sub(get_snippet, content)\nsite_dir = \"/tmp/generated-site\"\nfor root, _, files in os.walk(site_dir):\n    for file in files:\n        if file.endswith(\".html\"):\n            path = os.path.join(root, file)\n            with open(path, \"r\", encoding=\"utf-8\") as f: content = f.read()\n            new_content = replace_snippets(content)\n            if new_content != content:\n                with open(path, \"w\", encoding=\"utf-8\") as f: f.write(new_content)\n" > /tmp/replace_snippets.py
-        python3 /tmp/replace_snippets.py
+        python3 scripts/replace_snippets.py /tmp/generated-site
 
         git config --global user.email "${CI_EMAIL}"
         git config --global user.name "${CI_USERNAME}"
