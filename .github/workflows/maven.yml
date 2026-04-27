@@ -17,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Set up JDK 17
       uses: actions/setup-java@v1
       with:
@@ -62,21 +64,52 @@ jobs:
         CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
     - name: Publish Docs
       run: |
         #!/bin/bash
 
         set -eux
 
+        # Install MkDocs and plugins
+        pip install mkdocs mkdocs-git-committers-plugin-2 mkdocs-theme-bootstrap4 mkdocs-macros-plugin
+
+        # Version calculation
+        POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "3.0.17")
+
         if [[ "${GITHUB_REF}" == *"tags"* ]]; then
             TAG="${GITHUB_REF#refs/tags/}"
             export BUILD_TYPE=release/"${TAG}"
             mvn org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion="${TAG}"
+            
+            export SPRING_CONTENT_GA_VERSION="${TAG}"
+            
+            # Retrieve the version from the pom.xml in the main branch
+            # We use git show to read the content without changing branches
+            git show main:pom.xml > /tmp/main-pom.xml
+            export SPRING_CONTENT_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f /tmp/main-pom.xml)
         else
             export BUILD_TYPE=snapshot/"${GITHUB_REF#refs/heads/}"
+            export SPRING_CONTENT_GA_VERSION="${LATEST_TAG}"
+            export SPRING_CONTENT_SNAPSHOT_VERSION="${POM_VERSION}"
         fi
 
+        # Build reference documentation (AS IS)
         mvn -B -U -P docs generate-resources -DskipTests=true -Dmaven.javadoc.skip=true
+
+        # Clone and build main docs
+        git clone https://github.com/intesys/spring-content-docs.git /tmp/spring-content-docs
+        pushd /tmp/spring-content-docs
+            mkdocs build --clean --site-dir ../generated-site
+        popd
+
+        # Replace snippets in generated HTML
+        python3 /tmp/spring-content-docs/scripts/replace_snippets.py /tmp/generated-site
 
         git config --global user.email "${CI_EMAIL}"
         git config --global user.name "${CI_USERNAME}"
@@ -92,11 +125,20 @@ jobs:
         mkdir -p /tmp/spring-content-gh-pages
         git clone --branch gh-pages git@github.com:intesys/spring-content.git /tmp/spring-content-gh-pages
 
+        # Replace main documentation in gh-pages
+        # Keep the refs directory
+        # and replace the mkdocs
+        
+        # First, copy mkdocs built site to the root of gh-pages
+        cp -R /tmp/generated-site/* /tmp/spring-content-gh-pages/
+        
+        # Then, replace/add the reference documentation (AS IS)
+        mkdir -p /tmp/spring-content-gh-pages/refs/
         cp -R target/generated-docs/refs/* /tmp/spring-content-gh-pages/refs/
 
         pushd /tmp/spring-content-gh-pages
             git add .
-            git commit -m "Publishing reference guides for ${GITHUB_REF}"
+            git commit -m "Publishing documentation for ${GITHUB_REF}"
             git push origin gh-pages
         popd
       env:
