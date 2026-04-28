@@ -47,6 +47,10 @@
   </li>
                             
   <li>
+    <a href="../spring-content-metadata-extraction-docs/" class="dropdown-item">Metadata Extraction</a>
+  </li>
+                            
+  <li>
     <a href="../spring-content-with-fulltext-docs/" class="dropdown-item">Fulltext</a>
   </li>
                             
@@ -615,27 +619,57 @@ public interface DocumentRepository extends JpaRepository&lt;Document, Long&gt;,
 <p>Spring Content CMIS exports the CMIS browser bindings to the <code>/browser</code> endpoint therefore the URL is
 <code>http://localhost:8080/browser</code> and the binding type is <code>Browser</code>.</p>
 <p>The username and password, as per the <code>SecurityConfig</code>, is <code>test/test</code>.</p>
-<center>![Spring Content With CMIS Workbench Login](spring-content-with-cmis-login.png)</center>
+<p align="center">
+  <img src="spring-content-with-cmis-login.png" alt="spring-content-with-cmis-login">
+</p>
+<p align="center">
+  <em>Figure 1. Spring Content With CMIS Workbench Login</em>
+</p>
 
 <p>Click <code>Load Repositores</code> and you should see this:</p>
-<center>![Spring Content With CMIS Workbench Repositories](spring-content-with-cmis-repositories.png)</center>
+<p align="center">
+  <img src="spring-content-with-cmis-repositories.png" alt="spring-content-with-cmis-repositories">
+</p>
+<p align="center">
+  <em>Figure 2. Spring Content With CMIS Workbench Repositories</em>
+</p>
 
 <p>This information should match the information provided in the Application class.  </p>
 <p>Click <code>Login</code> and you should see something like this:</p>
-<center>![Spring Content With CMIS Workbench](spring-content-with-cmis-workbench.png)</center>
+<p align="center">
+  <img src="spring-content-with-cmis-workbench.png" alt="spring-content-with-cmis-workbench">
+</p>
+<p align="center">
+  <em>Figure 3. Spring Content With CMIS Workbench</em>
+</p>
 
 <p>Let's create a folder.  Click <code>Create Object</code> -&gt; <code>Folder</code>.  Enter <code>test-folder</code> as the name and click <code>Create Folder</code>.</p>
 <p>You'll see the folder in the navigation pane.  Double-click on the folder to navigate into it.  Select the <code>Properties</code> tab
 to view its properties.</p>
-<center>![Spring Content With CMIS Folder](spring-content-with-cmis-folder.png)</center>
+<p align="center">
+  <img src="spring-content-with-cmis-folder.png" alt="spring-content-with-cmis-folder">
+</p>
+<p align="center">
+  <em>Figure 4. Spring Content With CMIS Folder</em>
+</p>
 
 <p>Now, let's create a Document in this Folder.  Click <code>Create Object</code> -&gt; <code>Document</code>.  Enter <code>test-document</code> as the name and 
 generate 100 bytes of content.  Click <code>Create Document</code>.</p>
-<center>![Spring Content With CMIS Document](spring-content-with-cmis-document.png)</center>
+<p align="center">
+  <img src="spring-content-with-cmis-document.png" alt="spring-content-with-cmis-document">
+</p>
+<p align="center">
+  <em>Figure 5. Spring Content With CMIS Document</em>
+</p>
 
 <p>Let's take a look at its content.  Double-click on the document in the navigator to open the content in a new window.</p>
 <p>Earlier we made our Entity's versionable by having our <code>DocumentRepository</code> extend <code>LockingAndVersioningRepository</code> so let's create a new version of this document.  Make sure the document is selected in the navigator.  Select the <code>Actions</code> tab and <code>Check-out Object</code>.  Now you should see two documents in your navigator.  One blue, the original.  One green, a private working copy of the new version.</p>
-<center>![Spring Content With CMIS Private Working Copy](spring-content-with-cmis-pwc.png)</center>
+<p align="center">
+  <img src="spring-content-with-cmis-pwc.png" alt="spring-content-with-cmis-pwc">
+</p>
+<p align="center">
+  <em>Figure 6. Spring Content With CMIS Private Working Copy</em>
+</p>
 
 <p>Usually, a user would iterate on their content and save it by setting the content stream.  All of which is private to them.
 For simplicity we'll skip this step and go straight to checking in.  In the <code>Check-in Object</code> panel select a local file and 

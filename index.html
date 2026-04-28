@@ -49,6 +49,10 @@
   </li>
                             
   <li>
+    <a href="spring-content-metadata-extraction-docs/" class="dropdown-item">Metadata Extraction</a>
+  </li>
+                            
+  <li>
     <a href="spring-content-with-fulltext-docs/" class="dropdown-item">Fulltext</a>
   </li>
                             
@@ -130,6 +134,9 @@
 <p>Content rendition and transformation</p>
 </li>
 <li>
+<p>Metadata extraction from files</p>
+</li>
+<li>
 <p>Pessimistic versioning or auto-versioning</p>
 </li>
 <li>
@@ -159,6 +166,7 @@
 <li>Mongo - Store support for Mongo's GridFS storage</li>
 <li>JPA - Store support for JPA BLOB storage</li>
 <li>Renditions - Extensible rendition service for content transformations</li>
+<li>Metadata Extraction - Extensible metadata extraction service from files</li>
 <li>Solr - Content indexing and search with Apache Solr</li>
 <li>Elasticsearch  - Content indexing and search with Elasticsearch</li>
 <li>Versions Commons - Locking and versioning semantics for Entities and associated content</li>
@@ -167,8 +175,12 @@
 <li>CMIS - Exports Stores through the CMIS browser bindings</li>
 </ul>
 <h2 id="overview">Overview</h2>
-<center>![spring-content-arch](spring-content-arch.jpg)</center>
-<center>_Figure 1. understanding how Spring Content fits into the Spring eco-system_</center>
+<p align="center">
+  <img src="spring-content-arch.jpg" alt="spring-content-arch">
+</p>
+<p align="center">
+  <em>Figure 1. understanding how Spring Content fits into the Spring eco-system</em>
+</p>
 
 <h2 id="quick-start">Quick Start</h2>
 <pre><code class="language-xml">&lt;dependency&gt;
@@ -297,6 +309,16 @@ public class SpringContentApplication {
             <td><a href="refs/snapshot/main/renditions-index.html">3.1.0-SNAPSHOT</a></td>
         </tr>
         <tr>
+            <th colspan=9>Metadata Extraction</th>
+        </tr>
+        <tr>
+            <td>Spring Content Metadata Extraction</td>
+            <td>Not implemented</td>
+            <td>Not implemented</td>
+            <td><a href="refs/release/3.0.17/metadata-extraction-index.html">3.0.17</a></td>
+            <td><a href="refs/snapshot/main/metadata-extraction-index.html">3.1.0-SNAPSHOT</a></td>
+        </tr>
+        <tr>
             <th colspan=9>Versioning</th>
         </tr>
         <tr>
@@ -401,5 +423,5 @@ public class SpringContentApplication {
 
   <!--
     MkDocs version : 1.6.1
-    Build Date UTC : 2026-04-27 13:53:02.176063+00:00
+    Build Date UTC : 2026-04-28 13:49:20.131476+00:00
   -->
