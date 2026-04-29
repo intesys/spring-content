@@ -61,6 +61,12 @@ public class AlfrescoTransformCoreMetadataExtractor implements MetadataExtractor
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Constructs an instance of {@code AlfrescoTransformCoreMetadataExtractor} with the
+     * specified Alfresco Transform Core service URL.
+     *
+     * @param alfrescoTransformCoreUrl the URL of the Alfresco Transform Core service.
+     */
     @Autowired
     public AlfrescoTransformCoreMetadataExtractor(@Value("${alfresco.transform.core.url}") String alfrescoTransformCoreUrl) {
 

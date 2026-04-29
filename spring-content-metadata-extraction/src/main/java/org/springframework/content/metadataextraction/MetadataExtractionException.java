@@ -31,6 +31,11 @@ import org.springframework.content.commons.metadataextraction.MetadataExtractor;
  */
 public class MetadataExtractionException extends RuntimeException {
 
+    /**
+     * Constructs a {@code MetadataExtractionException} with the specified cause.
+     *
+     * @param cause the cause of the exception.
+     */
     public MetadataExtractionException(Throwable cause) {
 
         super(cause);
