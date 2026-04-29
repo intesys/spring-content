@@ -36,6 +36,7 @@ import java.util.Map;
  * <p>
  * This implementation retrieves detailed metadata using Java NIO's file attributes and utility
  * classes. Metadata extracted by this class includes:
+ * </p>
  * <ul>
  *     <li><b>fileName</b></li>
  *     <li><b>fileExtension</b></li>
@@ -45,7 +46,6 @@ import java.util.Map;
  *     <li><b>lastModifiedTime</b></li>
  *     <li><b>lastAccessTime</b></li>
  * </ul>
- * </p>
  * <p>
  * If an error occurs during metadata extraction, a {@link MetadataExtractionException} is
  * thrown, encapsulating the root cause of the error. This class also logs the extraction process
@@ -56,6 +56,12 @@ import java.util.Map;
  */
 @Service
 public class DefaultMetadataExtractor implements MetadataExtractor {
+
+    /**
+     * Constructs a new {@code DefaultMetadataExtractor}.
+     */
+    public DefaultMetadataExtractor() {
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMetadataExtractor.class);
 

@@ -40,6 +40,19 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackageClasses = DefaultMetadataExtractor.class)
 public class MetadataExtractionConfiguration {
 
+    /**
+     * Constructs a new {@code MetadataExtractionConfiguration}.
+     */
+    public MetadataExtractionConfiguration() {
+    }
+
+    /**
+     * Creates a {@link MetadataExtractionService} bean that uses the provided
+     * {@link MetadataExtractor} implementations.
+     *
+     * @param metadataExtractors the extractors to be used by the service.
+     * @return the configured {@link MetadataExtractionService}.
+     */
     @Bean
     public MetadataExtractionService metadataExtractionService(MetadataExtractor... metadataExtractors) {
 
