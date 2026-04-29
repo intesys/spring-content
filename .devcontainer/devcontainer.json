@@ -1,7 +1,7 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/java
 {
   "name": "Spring Content",
-  //"image": "mcr.microsoft.com/devcontainers/java:1-17",
+  //"image": "mcr.microsoft.com/devcontainers/java:1-21",
   "build": {
     "dockerfile": "Dockerfile"
   },

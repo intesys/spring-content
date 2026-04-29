@@ -42,7 +42,7 @@ requests. If you want to raise an issue, please follow the recommendations below
 You don't need to build from source to use Spring Content (binaries in
 https://repo.maven.apache.org/maven2/), but if you want to try out the latest and
 greatest, Spring Content can be easily built with the
-[maven wrapper](https://github.com/takari/maven-wrapper). You also need JDK 17.
+[maven wrapper](https://github.com/takari/maven-wrapper). You also need JDK 21.
 
 ```
 $ [AWS_REGION=us-west-1] ./mvnw [-P tests] clean install

@@ -17,7 +17,7 @@
 
 ## Environment
 
-- **JDK**: 17 required
+- **JDK**: 21 required
 - **Devcontainer**: Already sets `AWS_REGION=us-west-1` (required for S3 tests)
 - **Windows**: Git clone needs `git clone -c core.longPaths=true ...` due to long file paths
 
