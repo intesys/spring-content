@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      
+      
+      <link rel="shortcut icon" href="img/favicon.ico">
+      <title>CMIS - Content Services for Spring</title>
+      <script src="dist/bundle.js"></script>
+    
+  </head>
+
+  <body class="">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark navbar-fixed-top">
+      <div class="container">
+          <a class="navbar-brand" href="index.html">Content Services for Spring</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="navbar-top" class="collapse navbar-collapse">
+              <nav class="nav">
+                <ul class="navbar-nav">
+                      <li >
+                        <a class="nav-link" href="index.html">Home</a>
+                      </li>
+                      <li class="nav-item dropdown active">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Guides <b class="caret"></b>
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            
+  <li>
+    <a href="spring-content-fs-docs.html" class="dropdown-item">Java API</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-rest-docs.html" class="dropdown-item">REST API</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-with-renditions-docs.html" class="dropdown-item">Renditions</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-metadata-extraction-docs.html" class="dropdown-item">Metadata Extraction</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-with-fulltext-docs.html" class="dropdown-item">Fulltext</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-with-versions-docs.html" class="dropdown-item">Versions</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-with-rbac-docs.html" class="dropdown-item">RBAC</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-with-cmis-docs.html" class="dropdown-item active">CMIS</a>
+  </li>
+                            
+  <li>
+    <a href="spring-content-with-encryption-docs.html" class="dropdown-item">Encryption</a>
+  </li>
+                        </ul>
+                      </li>
+                </ul>
+              </nav>
+
+          <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+                <li class="nav-item">
+                  <a class="nav-link" href="#" data-toggle="modal" data-target="#mkdocs-search-modal">
+                    <i class="fa fa-search"></i> Search
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" rel="next" href="spring-content-with-rbac-docs.html">
+                    <i class="fa fa-arrow-left"></i> Previous
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" rel="prev" href="spring-content-with-encryption-docs.html">
+                    Next <i class="fa fa-arrow-right"></i>
+                  </a>
+                </li>
+          </ul>
+        </div>
+      </div>
+    </nav><div id="content" class="container">
+          
+      <div class="row">
+        <div class="col-md-9" role="main">
+
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      
+        
+          <li class="breadcrumb-item">Guides</li>
+        
+      
+      
+        <li class="breadcrumb-item active" aria-current="page">
+          CMIS
+        </li>
+      
+    </ol>
+  </nav>
+
+
+<h1 id="getting-started-with-spring-content-and-cmis-spring-content-2x-only-deprecated">Getting Started with Spring Content and CMIS (Spring Content 2.x only - Deprecated)</h1>
+<h2 id="what-youll-build">What you'll build</h2>
+<p>You'll build a simple document management application using Spring Content and Spring Content CMIS.</p>
+<h2 id="what-youll-need">What you'll need</h2>
+<ul>
+<li>
+<p>About 30 minutes</p>
+</li>
+<li>
+<p>A favorite text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or later</p>
+</li>
+<li>
+<p>Maven 3.0+</p>
+</li>
+</ul>
+<p>You can also import the code from this guide as well as view the web page directly into Spring Tool Suite (STS) and work your way through it from there.</p>
+<h2 id="how-to-complete-this-guide">How to complete this guide</h2>
+<p>Like most Spring Getting Started guides, you can start form scratch and complete each step, or you can bypass basic setup steps that are already familiar to you.  Either way, you end up with working code.</p>
+<p>To start from scratch, move on to Build with Maven.</p>
+<p>To skip the basics, do the following:</p>
+<ul>
+<li>
+<p>Download and unzip the source repository for this guide, or clone it using Git: <code>git clone https://github.com/intesys/spring-content-gettingstarted.git</code></p>
+</li>
+<li>
+<p><code>cd</code> into <code>spring-content-gettingstarted/spring-content-with-cmis/initial</code></p>
+</li>
+<li>
+<p>Jump ahead to <code>Define a simple entity</code>.
+When you’re finished, you can check your results against the code in <code>spring-content-gettingstarted/spring-content-with-cmis/complete</code>.</p>
+</li>
+</ul>
+<h2 id="build-with-maven">Build with Maven</h2>
+<p>First you set up a basic build script. You can use any build system you like when building apps with Spring, but the code you need to work with <a href="https://maven.apache.org/">Maven</a> is included here.  If you’re not familiar with Maven, refer to <a href="http://spring.io/guides/gs/maven">Building Java Projects with Maven</a>.</p>
+<h3 id="create-a-directory-structure">Create a directory structure</h3>
+<p>In a project directory of your choosing, create the following subdirectory structure; for example, with <code>mkdir -p src/main/java/gettingstarted</code> on *nix systems:</p>
+<pre><code>∟ src
+   ∟ main
+       ∟ java
+           ∟ gettingstarted
+       ∟ resources
+           ∟ static
+</code></pre>
+<p><code>pom.xml</code></p>
+<pre><code>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+  &lt;artifactId&gt;spring-content-with-cmis&lt;/artifactId&gt;
+
+ 	&lt;parent&gt;
+		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+		&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+		&lt;version&gt;2.7.4&lt;/version&gt;
+	&lt;/parent&gt;
+
+	&lt;properties&gt;
+		&lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+		&lt;java.version&gt;1.8&lt;/java.version&gt;
+		&lt;ginkgo.version&gt;1.0.12&lt;/ginkgo.version&gt;
+	&lt;/properties&gt;
+
+	&lt;dependencies&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.h2database&lt;/groupId&gt;
+			&lt;artifactId&gt;h2&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
+			&lt;version&gt;3.0.0&lt;/version&gt;
+		&lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-versions-jpa&lt;/artifactId&gt;
+            &lt;version&gt;3.0.0&lt;/version&gt;
+        &lt;/dependency&gt;
+ 		&lt;dependency&gt;
+			&lt;groupId&gt;it.intesys&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-content-cmis&lt;/artifactId&gt;
+			&lt;version&gt;3.0.0&lt;/version&gt;
+		&lt;/dependency&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+          &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+		&lt;!-- Test dependencies --&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.jayway.restassured&lt;/groupId&gt;
+			&lt;artifactId&gt;rest-assured&lt;/artifactId&gt;
+			&lt;version&gt;2.9.0&lt;/version&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
+			&lt;artifactId&gt;ginkgo4j&lt;/artifactId&gt;
+			&lt;version&gt;${ginkgo.version}&lt;/version&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+ 	&lt;/dependencies&gt;
+
+	&lt;build&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+
+	&lt;repositories&gt;
+		&lt;repository&gt;
+			&lt;id&gt;snapshots&lt;/id&gt;
+			&lt;name&gt;nexus&lt;/name&gt;
+			&lt;url&gt;https://central.sonatype.com/repository/maven-snapshots&lt;/url&gt;
+			&lt;snapshots&gt;
+				&lt;enabled&gt;true&lt;/enabled&gt;
+			&lt;/snapshots&gt;
+		&lt;/repository&gt;
+	&lt;/repositories&gt;
+
+&lt;/project&gt;
+</code></pre>
+<p>We add several dependencies:-</p>
+<ul>
+<li>
+<p>Spring Boot Starter Web provides the web server framework</p>
+</li>
+<li>
+<p>Spring Security provides the security framework</p>
+</li>
+<li>
+<p>Spring Boot Starter Data JPA will provide a relational database to
+store the metadata of our documents.  In this case we are using the H2
+in-memory database</p>
+</li>
+<li>
+<p>Spring Boot Starter Content FS will provide Filesystem-based
+storage for the content of each document and manage its association with a Document Entity</p>
+</li>
+<li>
+<p>Spring Versions JPA adds the ability to create new versions of a Document</p>
+</li>
+<li>
+<p>Spring Content CMIS provides the ability to export Document and Folder Entities via 
+CMIS browser bindings.</p>
+</li>
+</ul>
+<h2 id="create-an-application-class">Create an Application class</h2>
+<p>We need to initialize various aspects of our application.  First we'll add the usual Spring Boot Application class.</p>
+<p><code>src/main/java/gettingstarted/SpringContentApplication.java</code></p>
+<pre><code>package gettingstarted;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.content.cmis.EnableCmis;
+import org.springframework.content.fs.config.EnableFilesystemStores;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.versions.jpa.config.JpaLockingAndVersioningConfig;
+
+@SpringBootApplication
+@EnableCmis(basePackages = &quot;gettingstarted&quot;,
+        id = &quot;1&quot;,
+        name = &quot;spring-content-with-cmis&quot;,
+        description = &quot;Spring Content CMIS Getting Started Guide&quot;,
+        vendorName = &quot;Spring Content OSS&quot;,
+        productName = &quot;Spring Content CMIS Connector&quot;,
+        productVersion = &quot;1.0.0&quot;)
+@Import(JpaLockingAndVersioningConfig.class)
+@EnableJpaRepositories(
+        basePackages={  &quot;gettingstarted&quot;,
+                        &quot;org.springframework.versions&quot;},
+        considerNestedRepositories=true)
+@EnableFilesystemStores
+public class SpringContentApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SpringContentApplication.class, args);
+	}
+
+	@Configuration
+	@EnableWebSecurity
+	@EnableJpaAuditing
+	public static class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+	    @Autowired
+	    public void configureGlobal(AuthenticationManagerBuilder auth)
+	            throws Exception {
+	        auth.
+	                inMemoryAuthentication()
+	                    .withUser(&quot;test&quot;)
+	                    .password(&quot;{noop}test&quot;)
+	                        .roles(&quot;USER&quot;);
+	    }
+
+	    @Override
+	    protected void configure(HttpSecurity http) throws Exception {
+	        http
+	                .csrf()
+	                    .disable()
+	                .authorizeRequests()
+	                    .anyRequest()
+	                        .authenticated()
+	                    .and()
+	                        .httpBasic();
+	    }
+
+	    @Bean
+	    public AuditorAware&lt;String&gt; objectAuditor() {
+	        return new AuditorAware&lt;String&gt;() {
+	            @Override
+	            public Optional&lt;String&gt; getCurrentAuditor() {
+	                return Optional.ofNullable(SecurityContextHolder.getContext())
+	                        .map(SecurityContext::getAuthentication)
+	                        .filter(Authentication::isAuthenticated)
+	                        .map(Authentication::getPrincipal)
+	                        .map((u) -&gt; ((User)u).getUsername());
+	            }
+	        };
+	    }
+	}
+}
+</code></pre>
+<p>Let's talk through the annotations:</p>
+<ul>
+<li>
+<p><code>@SpringBootApplication</code> needs no explanation</p>
+</li>
+<li>
+<p><code>@EnableCmis</code> enables the cmis bindings.  The most important attribute is basePackages.  This tells the Spring Content CMIS 
+module which packages to scan for Entities with <code>@Cmis</code> annotations.  We'll see these presently.</p>
+</li>
+<li>
+<p><code>@Import</code> imports the Spring Versions JPA standard configuration</p>
+</li>
+<li>
+<p><code>@EnableJpaRepositories</code> tells Spring Data which packages to scan for Spring Data JPA Entities.  We need to add this annotation 
+in order to instruct Spring Data to scan the <code>org.springframework.versions</code> package (where it will find the <code>LockingAndVersioningRepository</code> fragment implementation) in addition to the <code>gettingstarted</code> package.</p>
+</li>
+<li>
+<p><code>@EnableFilesystemStores</code> enables Spring Content Filesystem Storage.  Technically, this is not required but added for clarity.</p>
+</li>
+</ul>
+<p>You will also see that this application enables Spring Security setting up a single user <code>test</code> with a password of <code>test</code>.  As
+well as entity auditing that we use to timestamp entity creation and modification. </p>
+<h2 id="define-a-baseobject">Define a BaseObject</h2>
+<p>We are going to model both Documents and Folders and they share some common characteristics so let's define a BaseObject that 
+they can both inherit from:</p>
+<p><code>src/main/java/gettingstarted/BaseObject.java</code></p>
+<pre><code>package gettingstarted;
+
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
+import javax.persistence.Version;
+
+import org.springframework.content.cmis.CmisDescription;
+import org.springframework.content.cmis.CmisName;
+import org.springframework.content.cmis.CmisReference;
+import org.springframework.content.cmis.CmisReferenceType;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Inheritance(strategy = InheritanceType.JOINED)
+@NoArgsConstructor
+@Getter
+@Setter
+public class BaseObject {
+
+	@javax.persistence.Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long Id;
+
+	@CmisName
+	private String name;
+
+	@CmisDescription
+	private String description;
+
+	@CreatedBy
+	private String createdBy;
+
+	@CreatedDate
+	private Long createdDate;
+
+	@LastModifiedBy
+	private String lastModifiedBy;
+
+	@LastModifiedDate
+	private Long lastModifiedDate;
+
+	@Version
+	private Long vstamp;
+
+	@CmisReference(type = CmisReferenceType.Parent)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Folder parent;
+
+	public BaseObject(String name) {
+		this.name = name;
+	}
+}
+</code></pre>
+<p>As you would expect we created a standard JPA Entity to capture some common metadata; <code>name</code> and <code>description</code>.  Standard audit 
+metadata; <code>createdBy</code>, <code>createdDate</code>, <code>modifiedBy</code>, <code>modifiedDate</code>, and a revision stamp; <code>vstamp</code>.  Lastly, we create a many-to-one relationship to a parent folder.</p>
+<p>You will notice that several of these fields are annotated with <code>@Cmis</code> annotations.  <code>@CmisName</code> and <code>@CmisDescription</code> map
+these fields to their respective cmis fields.  <code>@CmisReference</code> is a special reference that instructs Spring Content CMIS 
+that this is part of a parent/child relationship.  </p>
+<h2 id="create-a-folder-entity">Create a Folder Entity</h2>
+<p>Next, we'll create the Folder entity.  As you would expect a Folder is a containing object allowing users to arrange their
+documents hierarchically.</p>
+<p><code>src/main/java/gettingstarted/Folder.java</code></p>
+<pre><code>package gettingstarted;
+
+
+import java.util.Collection;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
+import org.springframework.content.cmis.CmisFolder;
+import org.springframework.content.cmis.CmisReference;
+import org.springframework.content.cmis.CmisReferenceType;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@NoArgsConstructor
+@Getter
+@Setter
+@CmisFolder
+public class Folder extends BaseObject {
+
+	@CmisReference(type= CmisReferenceType.Child)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = &quot;parent&quot;, cascade = CascadeType.ALL)
+	private Collection&lt;BaseObject&gt; children;
+
+	public Folder(String name) {
+		super(name);
+	}
+}
+</code></pre>
+<p>Note the <code>@CmisFolder</code> annotation that maps this entity to the cmis:folder object type.  Also note the <code>@CmisReference</code> annotation instructing Spring Content CMIS that this is the other end of the parent/child relationship.</p>
+<h2 id="create-a-document-entity">Create a Document entity</h2>
+<p>Lastly, we'll create the Document entity.  </p>
+<p><code>src/main/java/gettingstarted/Document.java</code></p>
+<pre><code>package gettingstarted;
+
+
+import java.util.UUID;
+
+import javax.persistence.Entity;
+
+import org.springframework.content.cmis.CmisDocument;
+import org.springframework.content.commons.annotations.ContentId;
+import org.springframework.content.commons.annotations.ContentLength;
+import org.springframework.content.commons.annotations.MimeType;
+import org.springframework.versions.AncestorId;
+import org.springframework.versions.AncestorRootId;
+import org.springframework.versions.LockOwner;
+import org.springframework.versions.SuccessorId;
+import org.springframework.versions.VersionLabel;
+import org.springframework.versions.VersionNumber;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@NoArgsConstructor
+@Getter
+@Setter
+@CmisDocument
+public class Document extends BaseObject {
+
+	@ContentId
+	private UUID contentId;
+
+	@ContentLength
+	private Long contentLen;
+
+	@MimeType
+	private String contentMimeType;
+
+	@LockOwner
+	private String lockOwner;
+
+	@AncestorId
+	private Long ancestorId;
+
+	@AncestorRootId
+	private Long ancestralRootId;
+
+	@SuccessorId
+	private Long successorId;
+
+	@VersionNumber
+	private String versionNumber = &quot;0.0&quot;;
+
+	@VersionLabel
+	private String versionLabel;
+
+	public Document(String name) {
+		super(name);
+	}
+
+	public Document(Document doc) {
+		this.setName(doc.getName());
+		this.setDescription(doc.getDescription());
+		this.setParent(doc.getParent());
+	}
+}
+</code></pre>
+<p>Again, note the <code>@CmisDocument</code> that maps this entity to the cmis:document object type.  We also see the standard Spring Versions
+JPA annotations for capturing version metadata as Documents are versioned.  </p>
+<h2 id="create-repositories-and-storage">Create Repositories and Storage</h2>
+<p>For both <code>Folder</code> and <code>Document</code> we create Repository interfaces:</p>
+<pre><code>public interface FolderRepository extends JpaRepository&lt;Folder, Long&gt; {
+}
+
+public interface DocumentRepository extends JpaRepository&lt;Document, Long&gt;, LockingAndVersioningRepository&lt;Document, Long&gt; {
+}
+</code></pre>
+<p>The <code>DocumentRepository</code> extends <code>LockingAndVersioningRepository</code> making Documents versionable.</p>
+<p>And, of course, we create a Storage interface for Documents:  </p>
+<pre><code>public interface DocumentStorage extends ContentStore&lt;Document, UUID&gt; {
+</code></pre>
+<h2 id="build-an-executable-jar">Build an executable JAR</h2>
+<p>That's it.  That's all you need.  So let's take our application for a spin. If you are using Maven, you can run the application using <code>mvn spring-boot:run</code>.  Or you can build the JAR file with <code>mvn clean package</code> and run the JAR by typing:</p>
+<p><code>java -jar target/gettingstarted-spring-content-with-cmis-0.0.1.jar</code></p>
+<h2 id="use-the-cmis-workbench-to-test-the-application">Use the CMIS Workbench to test the application</h2>
+<p>We'll use the CMIS Workbench from the Apache Chemistry project to test the application.</p>
+<p>The workbench can be downloaded from <a href="https://chemistry.apache.org/java/developing/tools/dev-tools-workbench.html">here</a>.</p>
+<p>Due to <a href="https://issues.apache.org/jira/browse/CMIS-1062">this bug</a>, Java 8 is required.</p>
+<p>Download and run the workbench; i.e. <code>./workbench.sh</code>.  </p>
+<p>Spring Content CMIS exports the CMIS browser bindings to the <code>/browser</code> endpoint therefore the URL is
+<code>http://localhost:8080/browser</code> and the binding type is <code>Browser</code>.</p>
+<p>The username and password, as per the <code>SecurityConfig</code>, is <code>test/test</code>.</p>
+<p align="center">
+  <img src="spring-content-with-cmis-login.png" alt="spring-content-with-cmis-login">
+</p>
+<p align="center">
+  <em>Figure 1. Spring Content With CMIS Workbench Login</em>
+</p>
+
+<p>Click <code>Load Repositores</code> and you should see this:</p>
+<p align="center">
+  <img src="spring-content-with-cmis-repositories.png" alt="spring-content-with-cmis-repositories">
+</p>
+<p align="center">
+  <em>Figure 2. Spring Content With CMIS Workbench Repositories</em>
+</p>
+
+<p>This information should match the information provided in the Application class.  </p>
+<p>Click <code>Login</code> and you should see something like this:</p>
+<p align="center">
+  <img src="spring-content-with-cmis-workbench.png" alt="spring-content-with-cmis-workbench">
+</p>
+<p align="center">
+  <em>Figure 3. Spring Content With CMIS Workbench</em>
+</p>
+
+<p>Let's create a folder.  Click <code>Create Object</code> -&gt; <code>Folder</code>.  Enter <code>test-folder</code> as the name and click <code>Create Folder</code>.</p>
+<p>You'll see the folder in the navigation pane.  Double-click on the folder to navigate into it.  Select the <code>Properties</code> tab
+to view its properties.</p>
+<p align="center">
+  <img src="spring-content-with-cmis-folder.png" alt="spring-content-with-cmis-folder">
+</p>
+<p align="center">
+  <em>Figure 4. Spring Content With CMIS Folder</em>
+</p>
+
+<p>Now, let's create a Document in this Folder.  Click <code>Create Object</code> -&gt; <code>Document</code>.  Enter <code>test-document</code> as the name and 
+generate 100 bytes of content.  Click <code>Create Document</code>.</p>
+<p align="center">
+  <img src="spring-content-with-cmis-document.png" alt="spring-content-with-cmis-document">
+</p>
+<p align="center">
+  <em>Figure 5. Spring Content With CMIS Document</em>
+</p>
+
+<p>Let's take a look at its content.  Double-click on the document in the navigator to open the content in a new window.</p>
+<p>Earlier we made our Entity's versionable by having our <code>DocumentRepository</code> extend <code>LockingAndVersioningRepository</code> so let's create a new version of this document.  Make sure the document is selected in the navigator.  Select the <code>Actions</code> tab and <code>Check-out Object</code>.  Now you should see two documents in your navigator.  One blue, the original.  One green, a private working copy of the new version.</p>
+<p align="center">
+  <img src="spring-content-with-cmis-pwc.png" alt="spring-content-with-cmis-pwc">
+</p>
+<p align="center">
+  <em>Figure 6. Spring Content With CMIS Private Working Copy</em>
+</p>
+
+<p>Usually, a user would iterate on their content and save it by setting the content stream.  All of which is private to them.
+For simplicity we'll skip this step and go straight to checking in.  In the <code>Check-in Object</code> panel select a local file and 
+<code>Check-in</code>.</p>
+<p>Investigate the properties of both versions to see how they are related.  You should see that they share the same version series
+id and in fact one of them, the first we created, is that document.  Also note, the content streams IDs are different and when viewed you, in fact, do see different content.  </p>
+<h2 id="summary">Summary</h2>
+<p>Congratulations! You’ve written a simple application that uses Spring
+Content CMIS.</p></div>
+        <div class="col-md-3"><div class="navbar-light navbar-expand-md hidden-print sticky-top sticky-offset" role="complementary">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+      <span class="fa fa-angle-down"></span>
+    </button>
+  </div>
+
+  <div id="toc-collapse" class="navbar-collapse collapse card">
+    <ul class="nav flex-column bs-sidenav">
+        <li class="nav-item main"><a class="nav-link" href="#getting-started-with-spring-content-and-cmis-spring-content-2x-only-deprecated">Getting Started with Spring Content and CMIS (Spring Content 2.x only - Deprecated)</a></li>
+          <li class="nav-item">
+            <a href="#what-youll-build" class="nav-link">What you'll build</a>
+          </li>
+          <li class="nav-item">
+            <a href="#what-youll-need" class="nav-link">What you'll need</a>
+          </li>
+          <li class="nav-item">
+            <a href="#how-to-complete-this-guide" class="nav-link">How to complete this guide</a>
+          </li>
+          <li class="nav-item">
+            <a href="#build-with-maven" class="nav-link">Build with Maven</a>
+          </li>
+          <li class="nav-item">
+            <a href="#create-an-application-class" class="nav-link">Create an Application class</a>
+          </li>
+          <li class="nav-item">
+            <a href="#define-a-baseobject" class="nav-link">Define a BaseObject</a>
+          </li>
+          <li class="nav-item">
+            <a href="#create-a-folder-entity" class="nav-link">Create a Folder Entity</a>
+          </li>
+          <li class="nav-item">
+            <a href="#create-a-document-entity" class="nav-link">Create a Document entity</a>
+          </li>
+          <li class="nav-item">
+            <a href="#create-repositories-and-storage" class="nav-link">Create Repositories and Storage</a>
+          </li>
+          <li class="nav-item">
+            <a href="#build-an-executable-jar" class="nav-link">Build an executable JAR</a>
+          </li>
+          <li class="nav-item">
+            <a href="#use-the-cmis-workbench-to-test-the-application" class="nav-link">Use the CMIS Workbench to test the application</a>
+          </li>
+          <li class="nav-item">
+            <a href="#summary" class="nav-link">Summary</a>
+          </li>
+    </ul>
+  </div>
+</div></div>
+      </div>
+        </div>
+
+    <footer class="col-md-12">
+      <hr>
+      <div class="container">
+      </div>
+    </footer>
+      <script>
+        var base_url = ".";
+      </script>
+        <script src="search/main.js" defer></script>
+
+    <div class="modal" id="mkdocs-search-modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Search</h4>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>
+      <div class="modal-body">
+        <p>From here you can search these documents. Enter your search terms below.</p>
+        <form role="form">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+          </div>
+        </form>
+        <div id="mkdocs-search-results"></div>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+  </body>
+</html>
+
