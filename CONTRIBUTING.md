@@ -22,7 +22,7 @@ vulnerabilities using GitHub issues, instead report it directly to the Authors v
 
 ## Sign the Contributor License Agreement
 Before we accept a non-trivial patch or pull request we will need you to
-[sign the Contributor License Agreement](https://cla-assistant.io/paulcwarren/spring-content).
+[sign the Contributor License Agreement](CLA.md).
 Signing the contributor's agreement does not grant anyone commit rights to the main
 repository, but it does mean that we can accept your contributions, and you will get an
 author credit if we do.  Active contributors might be asked to join the core team, and
