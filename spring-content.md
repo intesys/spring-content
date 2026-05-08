@@ -1,40 +1,44 @@
 # Spring Content (incl. Spring Content Rest)
 
-(Hopefully) a new spring community project adding basic content handling patterns to Spring for both java and hypermedia-based REST.  This is done through a central "content store" abstraction with basic content store implementations for JPA, Mongo databases and the popular S3 object store.
+Cloud-Native Headless Content Management Services (CMS) for Spring. Integrates with Spring Data, Spring Data REST and Apache Solr.
+
+This is done through a central "content store" abstraction with content store implementations for:
+- **Filesystem** (stores content on disk)
+- **JPA** (stores content as LOBs)
+- **MongoDB** (stores content in GridFS)
+- **Amazon S3** (stores content in an S3 bucket)
+- **Google Cloud Storage** (GCS)
+- **Azure Storage**
 
 ## Projects
 
 - spring-content-commons; common core
-- spring-content-jpa; JPA implementation of a ContentStore that stores content as LOBs
-- spring-content-mongo; mongo implementation of a ContentStore that stores content in GridFs
-- spring-content-s3; s3 implementation of a ContentStore that stores content in an Amazon S3 bucket
-- spring-content-rest; a REST layer on to of spring content that adds content links to spring data rest
+- spring-content-fs; Filesystem implementation
+- spring-content-jpa; JPA implementation
+- spring-content-mongo; MongoDB implementation
+- spring-content-s3; S3 implementation
+- spring-content-gcs; Google Cloud Storage implementation
+- spring-content-azure-storage; Azure Storage implementation
+- spring-content-rest; REST layer that adds content links to Spring Data REST
+- spring-content-solr; Solr integration for fulltext search
+- spring-content-elasticsearch; Elasticsearch integration for fulltext search
+- spring-content-encryption; support for encrypted content
+- spring-content-renditions; support for content transformations (e.g. doc -> pdf)
+- spring-content-metadata-extraction; support for metadata extraction
 
-- spring-boot-starter-content-jpa; spring boot starter including autoconfiguration for spring-content-jpa
-- spring-boot-starter-content-mongo; spring boot starter including autoconfiguration for spring-content-mongo
-- spring-boot-starter-content-s3; spring boot starter including autoconfiguration for spring-content-s3
-- spring-boot-starter-content-rest; spring boot starter incl. autoconfiguration for spring-content-rest
-
-### Example/Test Projects
-- spring-eg-content-jpa; tests spring-content-jpa Java API
-- spring-eg-content-mongo; tests spring-content-mongo Java API
-- spring-eg-content-s3; tests spring-content-mongo Java API
-- spring-eg-starter-content-jpa; tests spring-content-jpa autoconfiguration 
-- spring-eg-starter-content-mongo; tests spring-content-mongo autoconfiguration
-- spring-eg-starter-content-s3; tests spring-content-s3 autoconfiguration
-- spring-eg-content-rest; tests spring content REST API (on top of a mongo content store) 
-
-### Getting Started
-- spring-gs-accessing-content-mongo; standard spring.io getting started guide project
-- [spring-quickclaim](https://bitbucket.org/paulcwarren/spring-content/src/ef9e0716a56310fac5e6390233a6cd73ad4a28e8/spring-gs-content-quickclaim/readme.md?at=master); example spring-boot based application based on an insurance companies claim system showing spring content and spring content REST in action
+- spring-boot-starter-content-fs; Spring Boot starter for spring-content-fs
+- spring-boot-starter-content-jpa; Spring Boot starter for spring-content-jpa
+- spring-boot-starter-content-mongo; Spring Boot starter for spring-content-mongo
+- spring-boot-starter-content-s3; Spring Boot starter for spring-content-s3
+- spring-boot-starter-content-rest; Spring Boot starter for spring-content-rest
+- spring-content-solr-boot-starter; Spring Boot starter for spring-content-solr
+- spring-content-elasticsearch-boot-starter; Spring Boot starter for spring-content-elasticsearch
+- spring-content-renditions-boot-starter; Spring Boot starter for spring-content-renditions
+- spring-content-metadata-extraction-boot-starter; Spring Boot starter for spring-content-metadata-extraction
 
 ## Todo
-- --Add S3 implementation--
-- Add support for basic transformations; i.e. (doc -> pdf)
-- Add File System implementation
 - Add a CDN implementation (TBD: which CDN?)
 - Add ALPs support
-- Add support for fulltext query methods similar to SD's findBy methods (look at Solr)
 - Add support for byte range content handling for clients like Adobe's PDF Reader
 - Possibly add a Spring Content-based Webdav library implementation?
 - Possibly add a Spring Content-based CMIS implementation

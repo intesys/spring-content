@@ -144,5 +144,5 @@ characters), depending on where you clone the repository. If you get `Filename t
 errors, set the `core.longPaths=true` git option:
 
 ```
-git clone -c core.longPaths=true https://github.com/paulcwarren/spring-content
+git clone -c core.longPaths=true https://github.com/intesys/spring-content
 ```
