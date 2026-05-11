@@ -441,7 +441,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="details">
 <span id="author" class="author">Paul Warren</span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2026-04-29</span>
+<span id="revdate">2026-05-11</span>
 </div>
 </div>
 <div id="content">
@@ -533,10 +533,10 @@ module provides these capabilities.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://github.com/paulcwarren/spring-content/spring-content-fs">Spring Content Filesystem</a></p>
+<p><a href="https://github.com/intesys/spring-content/spring-content-fs">Spring Content Filesystem</a></p>
 </li>
 <li>
-<p><a href="https://github.com/paulcwarren/spring-content/spring-content-s3">Spring Content S3</a></p>
+<p><a href="https://github.com/intesys/spring-content/spring-content-s3">Spring Content S3</a></p>
 </li>
 </ul>
 </div>
@@ -551,7 +551,7 @@ module provides these capabilities.</p>
 <p>Spring Versions are enhancements to Spring Data that extend the existing optimistic locking semantics of Entities to
 any associated Spring Content Resources and also adds user-facing pessimistic locking and versioning semantics to
 Entities and their Content through a new <code>LockingAndVersioningRepository</code> interface defined in the base module
-<a href="https://github.com/paulcwarren/spring-content/spring-versions-jpa">Spring Version Commons</a>.</p>
+<a href="https://github.com/intesys/spring-content/spring-versions-jpa">Spring Version Commons</a>.</p>
 </div>
 <div class="paragraph">
 <p>Spring Versions JPA is the JPA-based implementation of these enhancements.</p>
@@ -570,7 +570,7 @@ with a Spring Boot application.  Add the <code>spring-versions-jpa-boot-starter<
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">dependencies {
     ...
-    compile("com.github.paulcwarren:spring-versions-jpa-boot-starter:${version}")
+    compile("it.intesys:spring-versions-jpa-boot-starter:${version}")
 	...
 }</code></pre>
 </div>
@@ -609,7 +609,7 @@ Spring Versions JPA to a non-Spring Boot project, add the <code>spring-versions-
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">dependencies {
     ...
-    compile("com.github.paulcwarren:spring-versions-jpa:${version}")
+    compile("it.intesys:spring-versions-jpa:${version}")
 	...
 }</code></pre>
 </div>
@@ -697,7 +697,7 @@ public class LockingAndVersioningConfig {
 </td>
 <td class="content">
 This step is unnecessary if you are using Spring Boot as it will automatically enable Spring Versions JPA
-when you place <code>com.github.paulcwarren:spring-versions-jpa-boot-starter</code> on your application&#8217;s classpath and your application
+when you place <code>it.intesys:spring-versions-jpa-boot-starter</code> on your application&#8217;s classpath and your application
 is annotated as a <code>@SpringBootApplication</code>.
 </td>
 </tr>
@@ -1136,7 +1136,7 @@ Not Allowed</code>.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2026-04-29 09:49:41 UTC
+Last updated 2026-05-11 08:46:51 UTC
 </div>
 </div>
 </body>
