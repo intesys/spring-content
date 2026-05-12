@@ -4,8 +4,8 @@ High-signal facts to avoid guessing wrong in this multi-module Java/Maven repo.
 
 ## Project Basics
 
-- **Group**: `it.intesys` | **Java**: 17 | **Maven**: wrapper (`./mvnw`) uses 3.6.3
-- **Boot**: 3.5.0 | **Spring Cloud**: 2024.0.1 | **Jakarta Persistence**: 3.1.0
+- **Group**: `it.intesys` | **Java**: 21 | **Maven**: wrapper (`./mvnw`) uses 3.6.3
+- **Boot**: 4.0.5 | **Spring Cloud**: 2025.1.1
 - **Maintained by Intesys**; forked from `paulcwarren/spring-content`.
 
 ## Build Commands
