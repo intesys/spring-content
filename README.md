@@ -12,6 +12,10 @@ Cloud-Native Content Services for Spring.
 
 Spring Content provides modules for managing content in JPA, MongoDB's GridFS, S3 or Filesystem storage.  When combined with Spring Data/REST it allows content to be associated with Spring Data Entities.  The Solr module provides an integration with Apache Solr for fulltext indexing and search capabilities.  The Renditions module provides a pluggable renditions framework and several out-of-the-box renderers that can render stored content in several different formats.   
 
+## AI Agent Skill
+
+This repository includes a `SKILL.md` file at the root. It contains structured guidelines, conventions, and implementation patterns for AI coding assistants working on the Spring Content codebase. Load it when generating or reviewing code in any module.
+
 ## Getting help
 Having trouble with Spring Content? We'd like to help!
 
@@ -56,7 +60,7 @@ If you want to build with the regular `mvn` command, you will need
 [Maven v3.2.1 or above](https://maven.apache.org/run-maven/index.html).
 
 _Also see [CONTRIBUTING.md](CONTRIBUTING.md) if you wish to submit pull requests,
-and in particular please fill out the [Contributor's License Agreement](https://cla-assistant.io/paulcwarren/spring-content) before your first change, however trivial._
+and in particular please fill out the [Contributor's License Agreement](CLA.md) before your first change, however trivial._
 
 #### Building reference documentation
 

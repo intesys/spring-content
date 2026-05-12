@@ -6,12 +6,12 @@ Spring Content REST builds on top of Spring Content stores and automatically exp
 
 Spring Content REST officially supports:
 
-- https://github.com/paulcwarren/spring-content/spring-content-fs[Spring Content Filesystem]
-- https://github.com/paulcwarren/spring-content/spring-content-s3[Spring Content S3]
-- https://github.com/paulcwarren/spring-content/spring-content-mongo[Spring Content Mongo]
-- https://github.com/paulcwarren/spring-content/spring-content-jpa[Spring Content JPA]
-- https://github.com/paulcwarren/spring-content/spring-content-gcs[Spring Content GCS]
-- https://github.com/paulcwarren/spring-content/spring-content-azure-storage[Spring Content Azure Storage]
+- https://github.com/intesys/spring-content/spring-content-fs[Spring Content Filesystem]
+- https://github.com/intesys/spring-content/spring-content-s3[Spring Content S3]
+- https://github.com/intesys/spring-content/spring-content-mongo[Spring Content Mongo]
+- https://github.com/intesys/spring-content/spring-content-jpa[Spring Content JPA]
+- https://github.com/intesys/spring-content/spring-content-gcs[Spring Content GCS]
+- https://github.com/intesys/spring-content/spring-content-azure-storage[Spring Content Azure Storage]
 
 = Getting Started
 
@@ -49,7 +49,7 @@ The simplest way to get to started is if you are building a Spring Boot applicat
 ----
 dependencies {
     ...
-    compile("com.github.paulcwarren:spring-content-rest-boot-starter:${version}")
+    compile("it.intesys:spring-content-rest-boot-starter:${version}")
 	... 
 }
 ----
@@ -82,7 +82,7 @@ To add Spring Content REST to a Gradle-based project, add the spring-content-res
 ----
 dependencies {
     ...
-    compile("com.github.paulcwarren:spring-content-rest:${version}")
+    compile("it.intesys:spring-content-rest:${version}")
 	... 
 }
 ----

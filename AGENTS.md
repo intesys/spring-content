@@ -1,74 +1,63 @@
-# Agent Instructions for Spring Content
+# AGENTS.md — Spring Content
+
+High-signal facts to avoid guessing wrong in this multi-module Java/Maven repo.
+
+## Project Basics
+
+- **Group**: `it.intesys` | **Java**: 17 | **Maven**: wrapper (`./mvnw`) uses 3.6.3
+- **Boot**: 3.5.0 | **Spring Cloud**: 2024.0.1 | **Jakarta Persistence**: 3.1.0
+- **Maintained by Intesys**; forked from `paulcwarren/spring-content`.
 
 ## Build Commands
 
-```bash
-# Basic build (unit tests only)
-./mvnw clean install
+- Quick build (units only, no ITs):  
+  `AWS_REGION=us-west-1 ./mvnw clean install`
+- Full build with integration tests:  
+  `AWS_REGION=us-west-1 ./mvnw -P tests clean install`
+- With reference docs:  
+  `AWS_REGION=us-west-1 ./mvnw -P docs clean install`
+- CI shortcut (no javadoc):  
+  `mvn -B -P tests -Dmaven.javadoc.skip=true install`
 
-# With integration tests (includes IT.java and Tests.java)
-./mvnw -P tests clean install
+> **Why `AWS_REGION`:** Required for `spring-content-s3` (LocalStack tests). Already set in the devcontainer; omitting it can cause S3 IT failures.
 
-# With reference docs generation
-./mvnw -P docs clean install
-```
+## Monorepo Layout
 
-**Important**: Integration tests require `AWS_REGION=us-west-1` (for S3/localstack).
+Key module families:
 
-## Environment
+- **Core libs**: `spring-content-commons`, `spring-content-fs`, `spring-content-jpa`, `spring-content-mongo`, `spring-content-s3`, `spring-content-rest`, `spring-content-solr`, `spring-content-elasticsearch`, `spring-content-renditions`, `spring-content-metadata-extraction`, `spring-content-encryption`, `spring-content-azure-storage`, `spring-content-gcs`
+- **Starters**: `spring-content-*-boot-starter` (current naming) and legacy `content-*-spring-boot-starter`
+- **Versions**: `spring-versions-commons`, `spring-versions-jpa`, `spring-versions-jpa-boot-starter`
+- **BOM**: `spring-content-bom`
+- **Autoconfigure**: `spring-content-autoconfigure`
+- `spring-content-docx4j` is currently **commented out** in the root `pom.xml` modules list.
 
-- **JDK**: 21 required
-- **Devcontainer**: Already sets `AWS_REGION=us-west-1` (required for S3 tests)
-- **Windows**: Git clone needs `git clone -c core.longPaths=true ...` due to long file paths
+## Testing
 
-## Test Conventions
+- **Framework**: [ginkgo4j](https://github.com/paulcwarren/ginkgo4j) BDD (not plain JUnit).  
+  Tests run via a custom `JUnitRunListener` (`com.github.paulcwarren.ginkgo4j.maven.JUnitRunListener`).
+- **Unit tests**: `*Test.java` — run by default.
+- **Integration tests**: `*IT.java` and `*Tests.java` — **only run with `-P tests`**.
+- Many ITs use Testcontainers / LocalStack / embedded DBs; Docker availability matters for a full `-P tests` pass.
+- To run a single test class:  
+  `./mvnw -pl <module> test -Dtest=ClassName`
 
-| Type | Pattern | Run with |
-|------|---------|----------|
-| Unit tests | `*Test.java` | Default (no profile) |
-| Integration tests | `*IT.java`, `*Tests.java` | `-P tests` |
+## Style & Conventions
 
-Tests use **ginkgo4j** BDD framework + JUnit. Test packages:
-- `org/` - unit tests
-- `it/` - integration tests
-- `internal/` - internal implementation tests
+- Use **Spring Framework code format** via `eclipse/eclipse-code-formatter.xml`.
+- New `.java` files need:
+  - ASF license header (copy from an existing file)
+  - Javadoc class comment with at least `@author`
+- Add `@author` to files you modify substantially.
+- Commit messages: follow [standard git conventions](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html); append `Fixes gh-XXXX` when applicable.
 
-## Module Structure
+## CI / Release Notes
 
-- `spring-content-commons` - Base module (interfaces, core logic)
-- `spring-content-jpa/mongo/fs/s3/gcs/azure-storage` - Storage backends
-- `spring-content-rest` - REST API layer
-- `spring-content-solr/elasticsearch` - Search integration
-- `spring-content-renditions` - Content rendering/transform
-- `spring-content-encryption` - Content encryption
-- `spring-content-metadata-extraction` - Metadata extraction
-- `*-boot-starter` modules - Spring Boot auto-configuration
-- `spring-versions-*` - Versioning/locking for JPA
+- PRs run `CLAAssistant` (sign the CLA) + build with `-P tests` + validation against the `spring-content-gettingstarted` repo.
+- Tags trigger release build (`-P ci,docs deploy`), GPG signing, Maven Central publish, and docs publish to `gh-pages`.
+- Docs output path: `target/generated-docs/refs/dev/`
 
-Each storage module depends on `spring-content-commons`. REST depends on commons + specific storage.
+## Local Dev Tips
 
-## Running Single Module Tests
-
-```bash
-cd spring-content-commons && ../mvnw test                    # unit tests only
-cd spring-content-rest && ../mvnw -P tests test           # includes integration tests
-```
-
-## Code Formatting
-
-Import `eclipse/eclipse-code-formatter.xml` into IntelliJ via Eclipse Code Formatter plugin, or use in Eclipse directly.
-
-## Dependencies
-
-- Spring Boot 4.0.5
-- Spring Cloud 2025.1.1
-- Hibernate ORM 6.1.7
-- Testcontainers for database containers in ITs
-
-## Architecture Notes
-
-- Stores use `ContentStore<T, ID>` interface pattern
-- JPA uses `Blob`/`GenericBlobResource` for binary content
-- MongoDB uses GridFS
-- S3 uses AWS SDK v2
-- Integration tests in `spring-content-rest` run against multiple DBs (H2, MySQL, PostgreSQL, Oracle, SQL Server) via testcontainers
+- Devcontainer is configured with `AWS_REGION=us-west-1` and Docker-in-Docker.
+- If importing into Eclipse, use the `.setup` file or import the root `pom.xml` with M2Eclipse.
