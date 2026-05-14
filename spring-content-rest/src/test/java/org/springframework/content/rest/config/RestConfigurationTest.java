@@ -1,10 +1,16 @@
 package org.springframework.content.rest.config;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+
 import java.io.IOException;
 import java.nio.file.Files;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
+
+
 import org.junit.runner.RunWith;
 
 import org.springframework.content.commons.annotations.ContentId;
@@ -21,10 +27,10 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
+
+
+
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -32,8 +38,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
+
+
 public class RestConfigurationTest {
 
    private AnnotationConfigWebApplicationContext context;
@@ -42,12 +48,18 @@ public class RestConfigurationTest {
    private static ContentRestConfigurer configurer;
 
    {
-      Describe("RestConfiguration", () -> {
-         BeforeEach(() -> {
+      @Nested
+    @DisplayName("RestConfiguration")
+    class Restconfiguration {
+         @BeforeEach
+        void setUp() throws Exception {
             configurer = mock(ContentRestConfigurer.class);
-         });
-         Context("given a context with a ContentRestConfiguration", () -> {
-            BeforeEach(() -> {
+         }
+         @Nested
+    @DisplayName("given a context with a ContentRestConfiguration")
+    class GivenAContextWithAContentrestconfiguration {
+            @BeforeEach
+        void setUp() throws Exception {
                context = new AnnotationConfigWebApplicationContext();
                context.setServletContext(new MockServletContext());
                context.register(TestConfig.class,
@@ -55,26 +67,32 @@ public class RestConfigurationTest {
                      RepositoryRestMvcConfiguration.class,
                      RestConfiguration.class);
                context.refresh();
-            });
+            }
 
-            It("should have a content handler mapping bean", () -> {
+            @Test
+        @DisplayName("should have a content handler mapping bean")
+        void shouldHaveAContentHandlerMappingBean() throws Exception {
                assertThat(context.getBean("contentHandlerMapping"),
                      is(not(nullValue())));
-            });
+            }
 
-            It("should have the content rest controllers", () -> {
+            @Test
+        @DisplayName("should have the content rest controllers")
+        void shouldHaveTheContentRestControllers() throws Exception {
                assertThat(
                      context.getBean("storeRestController"), is(not(nullValue())));
-            });
+            }
 
-            It("should be configurable", () -> {
+            @Test
+        @DisplayName("should be configurable")
+        void shouldBeConfigurable() throws Exception {
                RestConfiguration config = context.getBean(RestConfiguration.class);
                assertThat(config, is(not(nullValue())));
 
                verify(configurer).configure(config);
-            });
-         });
-      });
+            }
+         }
+      }
    }
 
    @Configuration

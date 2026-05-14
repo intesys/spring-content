@@ -119,10 +119,8 @@ mvn -B -P tests -Dmaven.javadoc.skip=true install
 
 ## Testing Conventions
 
-- **Framework:** [ginkgo4j](https://github.com/paulcwarren/ginkgo4j) BDD (`com.github.paulcwarren:ginkgo4j:1.0.15`).
 - **Unit tests:** classes named `*Test.java` — run by default.
 - **Integration tests:** classes named `*IT.java` or `*Tests.java` — **only run with `-P tests`**.
-- Some modules exclude JUnit Jupiter from `spring-boot-starter-test` to avoid conflicts with ginkgo4j; follow the existing `pom.xml` pattern.
 - Docker availability matters for ITs (Testcontainers, LocalStack, embedded dbs).
 
 ## Code Style Requirements

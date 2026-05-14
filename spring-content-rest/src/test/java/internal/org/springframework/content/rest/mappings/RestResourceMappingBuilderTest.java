@@ -1,6 +1,12 @@
 package internal.org.springframework.content.rest.mappings;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+
+
 import internal.org.springframework.content.rest.mappingcontext.RestResourceMappingBuilder;
 import org.junit.runner.RunWith;
 import org.springframework.content.commons.annotations.ContentId;
@@ -12,17 +18,21 @@ import org.springframework.content.rest.RestResource;
 
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
+
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 
-@RunWith(Ginkgo4jRunner.class)
+
 public class RestResourceMappingBuilderTest {
 
     {
-        Describe("RestResourceMappingBuilder", () -> {
-            It("should create a map of content property paths to request mapping paths", () -> {
+        @Nested
+    @DisplayName("RestResourceMappingBuilder")
+    class Restresourcemappingbuilder {
+            @Test
+        @DisplayName("should create a map of content property paths to request mapping paths")
+        void shouldCreateAMapOfContentPropertyPathsToRequestMappingPaths() throws Exception {
                 RestResourceMappingBuilder visitor = new RestResourceMappingBuilder((restResourceAnnotation) -> restResourceAnnotation.path());
                 ClassWalker walker = new ClassWalker(visitor);
                 walker.accept(TestClass.class);
@@ -60,8 +70,8 @@ public class RestResourceMappingBuilderTest {
                 assertThat(visitor.getInverseMappings(), hasEntry("childWithout/childWithout/preview", "childWithout/childWithout/preview"));
                 assertThat(visitor.getInverseMappings(), hasEntry("childWithout/childWithout/thumbnail", "childWithout/childWithout/thumbnail"));
                 assertThat(visitor.getInverseMappings(), hasEntry("childWithout/childWithout/idcard-front", "childWithout/childWithout/idcardFront"));
-            });
-        });
+            }
+        }
     }
 
     public static class TestSubClass {

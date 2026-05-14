@@ -1,6 +1,5 @@
 package internal.org.springframework.content.rest.storedrenditions;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -19,8 +18,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.annotations.HandleAfterSetContent;
 import org.springframework.content.commons.annotations.HandleBeforeUnsetContent;
@@ -45,16 +46,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
-
 import internal.org.springframework.content.rest.support.StoreConfig;
 import internal.org.springframework.content.rest.support.TestEntity5;
 import internal.org.springframework.content.rest.support.TestEntity5Repository;
 import internal.org.springframework.content.rest.support.TestEntity5Store;
 import lombok.Getter;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-// @Ginkgo4jConfiguration(threads=1)
 @WebAppConfiguration
 @ContextConfiguration(classes = { StoredRenditionsRestIT.StoredRenditionsConfig.class, StoreConfig.class, DelegatingWebMvcConfiguration.class, RepositoryRestMvcConfiguration.class, RestConfiguration.class })
 @Transactional
@@ -66,103 +63,109 @@ public class StoredRenditionsRestIT {
     @Autowired
     private TestEntity5Store store;
 
-    private TestEntity5 testEntity5;
-
     @Autowired
     private WebApplicationContext context;
 
     @Autowired
     private TestEventHandler eventHandler;
 
-    private MockMvc mvc;
+    @Nested
+    @DisplayName("Stored Renditions")
+    class StoredRenditionsTests {
 
-    {
-        Describe("Stored Renditions", () -> {
+        private MockMvc mvc;
+        private TestEntity5 testEntity5;
 
-            BeforeEach(() -> {
-                mvc = MockMvcBuilders.webAppContextSetup(context).build();
-            });
+        @BeforeEach
+        void setup() {
+            mvc = MockMvcBuilders.webAppContextSetup(context).build();
+        }
 
-            Context("given an Entity with a content property", () -> {
+        @Nested
+        @DisplayName("given an Entity with a content property")
+        class GivenEntityWithContentProperty {
 
-                BeforeEach(() -> {
-                    testEntity5 = repo.save(new TestEntity5());
-                });
+            @BeforeEach
+            void init() {
+                testEntity5 = repo.save(new TestEntity5());
+            }
 
-                Context("a PUT to /{repository}/{id}/{contentProperty}", () -> {
+            @Nested
+            @DisplayName("a PUT to /{repository}/{id}/{contentProperty}")
+            class PutToContentProperty {
 
-                    BeforeEach(() -> {
-                        mvc.perform(put("/testEntity5s/" + testEntity5.getId() + "/content").content("foo").contentType("text/plain")).andExpect(status().is2xxSuccessful());
-                    });
+                @BeforeEach
+                void putContent() throws Exception {
+                    mvc.perform(put("/testEntity5s/" + testEntity5.getId() + "/content").content("foo").contentType("text/plain")).andExpect(status().is2xxSuccessful());
+                }
 
-                    It("should store the rendition", () -> {
+                @Test
+                @DisplayName("should store the rendition")
+                void shouldStoreRendition() throws Exception {
+                    testEntity5 = repo.findById(testEntity5.getId()).get();
+                    Resource r = store.getResource(testEntity5, PropertyPath.from("content"));
+                    try (InputStream actual = r.getInputStream()) {
+                        assertThat(IOUtils.toString(actual), is("foo"));
+                    }
 
-                        testEntity5 = repo.findById(testEntity5.getId()).get();
-                        Resource r = store.getResource(testEntity5, PropertyPath.from("content"));
-                        try (InputStream actual = r.getInputStream()) {
-                            assertThat(IOUtils.toString(actual), is("foo"));
-                        }
+                    r = store.getResource(testEntity5, PropertyPath.from("rendition"));
+                    try (InputStream actual = r.getInputStream()) {
+                        assertThat(IOUtils.toString(actual), is("<html><head><title>Stored Rendition</title></head><body>foo</body></html>"));
+                    }
+                }
 
-                        r = store.getResource(testEntity5, PropertyPath.from("rendition"));
-                        try (InputStream actual = r.getInputStream()) {
-                            assertThat(IOUtils.toString(actual), is("<html><head><title>Stored Rendition</title></head><body>foo</body></html>"));
-                        }
-                    });
+                @Nested
+                @DisplayName("a GET to /{repository}/{id}/{contentProperty}")
+                class GetToContentProperty {
 
-                    Context("a GET to /{repository}/{id}/{contentProperty}", () -> {
+                    @Test
+                    @DisplayName("should get the stored rendition")
+                    void shouldGetStoredRendition() throws Exception {
+                        mvc.perform(
+                                get("/testEntity5s/" + testEntity5.getId() + "/content")
+                                .accept("text/html"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().string(not("<html><head><title>Dynamic Rendition</title></head><body>foo</body></html>")))
+                            .andExpect(content().string("<html><head><title>Stored Rendition</title></head><body>foo</body></html>"));
+                    }
+                }
 
-                        It("should get the stored rendition", () -> {
+                @Nested
+                @DisplayName("a GET to /{repository}/{id}/{renditionProperty}")
+                class GetToRenditionProperty {
 
-                            Long id = testEntity5.getId();
+                    @Test
+                    @DisplayName("should return a 405")
+                    void shouldReturn405() throws Exception {
+                        mvc.perform(
+                                get("/testEntity5s/" + testEntity5.getId() + "/rendition")
+                                .accept("text/html"))
+                            .andExpect(status().isMethodNotAllowed());
+                    }
+                }
 
-                            mvc.perform(
-                                    get("/testEntity5s/" + testEntity5.getId() + "/content")
-                                    .accept("text/html"))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string(not("<html><head><title>Dynamic Rendition</title></head><body>foo</body></html>")))
-                                .andExpect(content().string("<html><head><title>Stored Rendition</title></head><body>foo</body></html>"));
-                        });
-                    });
+                @Nested
+                @DisplayName("a DELETE to /{repository}/{id}/{contentProperty}")
+                class DeleteToContentProperty {
 
-                    Context("a GET to /{repository}/{id}/{renditionProperty}", () -> {
+                    @Test
+                    @DisplayName("should also delete the rendition")
+                    void shouldAlsoDeleteRendition() throws Exception {
+                        mvc.perform(delete("/testEntity5s/" + testEntity5.getId() + "/content")).andExpect(status().isNoContent());
 
-                        It("should return a 405", () -> {
+                        Optional<TestEntity5> fetched = repo.findById(testEntity5.getId());
+                        assertThat(fetched.isPresent(), is(true));
+                        assertThat(fetched.get().getContentId(), is(nullValue()));
+                        assertThat(fetched.get().getContentLen(), is(nullValue()));
+                        assertThat(fetched.get().getContentMimeType(), is(nullValue()));
 
-                            Long id = testEntity5.getId();
-
-                            mvc.perform(
-                                    get("/testEntity5s/" + testEntity5.getId() + "/rendition")
-                                    .accept("text/html"))
-                                .andExpect(status().isMethodNotAllowed());
-                        });
-                    });
-
-                    Context("a DELETE to /{repository}/{id}/{contentProperty}", () -> {
-
-                        It("should also delete the rendition", () -> {
-
-                            Long id = testEntity5.getId();
-
-                            mvc.perform(delete("/testEntity5s/" + testEntity5.getId() + "/content")).andExpect(status().isNoContent());
-
-                            Optional<TestEntity5> fetched = repo.findById(id);
-                            assertThat(fetched.isPresent(), is(true));
-                            assertThat(fetched.get().getContentId(), is(nullValue()));
-                            assertThat(fetched.get().getContentLen(), is(nullValue()));
-                            assertThat(fetched.get().getContentMimeType(), is(nullValue()));
-
-                            assertThat(fetched.get().getRenditionId(), is(nullValue()));
-                            assertThat(fetched.get().getRenditionLen(), is(0L));
-                            assertThat(fetched.get().getRenditionMimeType(), is(nullValue()));
-                        });
-                    });
-                });
-            });
-        });
-    }
-
-    @Test
-    public void noop() {
+                        assertThat(fetched.get().getRenditionId(), is(nullValue()));
+                        assertThat(fetched.get().getRenditionLen(), is(0L));
+                        assertThat(fetched.get().getRenditionMimeType(), is(nullValue()));
+                    }
+                }
+            }
+        }
     }
 
     @Configuration
@@ -173,7 +176,6 @@ public class StoredRenditionsRestIT {
             return new TestEventHandler();
         }
 
-        // a dynamic renderer helps prove the stored rendition was returned
         @Bean
         public RenditionProvider textToHtml() {
             return new RenditionProvider() {
@@ -224,7 +226,6 @@ public class StoredRenditionsRestIT {
 
                 String renderedContent = IOUtils.toString(inputStream);
 
-                // create and associate resource
                 UUID resourceId = UUID.randomUUID();
                 Resource r = store.getResource(resourceId);
                 store.associate(entity, PropertyPath.from("rendition"), resourceId);

@@ -1,14 +1,14 @@
 package org.springframework.content.mongo.boot;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 import com.mongodb.client.MongoClient;
 import internal.org.springframework.content.mongo.boot.autoconfigure.MongoContentAutoConfiguration;
 import internal.org.springframework.content.s3.boot.autoconfigure.S3ContentAutoConfiguration;
 import internal.org.springframework.content.solr.boot.autoconfigure.SolrAutoConfiguration;
 import internal.org.springframework.content.solr.boot.autoconfigure.SolrExtensionAutoConfiguration;
 import org.assertj.core.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -26,25 +26,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
-
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads=1)
+@DisplayName("ContentMongoAutoConfiguration")
 public class ContentMongoAutoConfigurationTest {
 
 	private ApplicationContextRunner contextRunner;
 
-	{
-		Describe("ContentMongoAutoConfiguration", () -> {
-			BeforeEach(() -> {
-				contextRunner = new ApplicationContextRunner()
-						.withConfiguration(AutoConfigurations.of(MongoContentAutoConfiguration.class));
-			});
-			It("should load the context", () -> {
-				contextRunner.withUserConfiguration(TestConfig.class).run((context) -> {
-					Assertions.assertThat(context).hasSingleBean(TestEntityContentRepository.class);
-				});
-			});
+	@BeforeEach
+	void setUp() {
+		contextRunner = new ApplicationContextRunner()
+				.withConfiguration(AutoConfigurations.of(MongoContentAutoConfiguration.class));
+	}
+
+	@Test
+	@DisplayName("should load the context")
+	void shouldLoadContext() {
+		contextRunner.withUserConfiguration(TestConfig.class).run((context) -> {
+			Assertions.assertThat(context).hasSingleBean(TestEntityContentRepository.class);
 		});
 	}
 

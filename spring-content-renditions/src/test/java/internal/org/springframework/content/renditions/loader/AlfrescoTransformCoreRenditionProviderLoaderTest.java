@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -58,7 +57,13 @@ class AlfrescoTransformCoreRenditionProviderLoaderTest {
     void setUp() {
 
         loader = new AlfrescoTransformCoreRenditionProviderLoader(TEST_URL, LOADER_NAME, MAX_RETRIES, TIMEOUT_SECONDS, registry);
-        ReflectionTestUtils.setField(loader, "restTemplate", restTemplate);
+        try {
+            var field = AlfrescoTransformCoreRenditionProviderLoader.class.getDeclaredField("restTemplate");
+            field.setAccessible(true);
+            field.set(loader, restTemplate);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

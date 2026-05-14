@@ -1,10 +1,11 @@
 package internal.org.springframework.content.jpa;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.AfterEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -21,8 +22,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.repository.ContentStore;
 import org.springframework.content.jpa.config.EnableJpaStores;
@@ -34,34 +33,17 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-
 import internal.org.springframework.content.jpa.StoreIT.H2Config;
-import internal.org.springframework.content.jpa.StoreIT.HSQLConfig;
-import internal.org.springframework.content.jpa.StoreIT.MySqlConfig;
-import internal.org.springframework.content.jpa.StoreIT.PostgresConfig;
-import internal.org.springframework.content.jpa.StoreIT.SqlServerConfig;
+import internal.org.springframework.content.jpa.StoreIT.TestConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1) // required
-public class TransactionIT {
 
-    private static Class<?>[] CONFIG_CLASSES = new Class[]{
-            H2Config.class,
-            HSQLConfig.class,
-            MySqlConfig.class,
-            PostgresConfig.class
-//            SqlServerConfig.class,
-//            StoreIT.OracleConfig.class
-    };
+public class TransactionIT {
 
 	private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
-	// for postgres (large object api operations must be in a transaction)
 	private PlatformTransactionManager ptm;
 
 	private TestEntityRepository repo = null;
@@ -70,56 +52,58 @@ public class TransactionIT {
 
 	private TestEntity te = null;
 
+	@Nested
+	@DisplayName("TransactionTest")
+	class Transactiontest {
 
-	{
-		Describe("TransactionTest", () -> {
+		@Nested
+		@DisplayName("given a context with a repository and a store")
+		class GivenAContextWithARepositoryAndAStore {
 
-			for (Class<?> configClass : CONFIG_CLASSES) {
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(TestConfig.class);
+				context.register(H2Config.class);
+				context.refresh();
 
-				Context(getContextName(configClass), () -> {
-					Context("given a context with a repository and a store", () -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(TestConfig.class);
-							context.register(configClass);
-							context.refresh();
+				repo = context.getBean(TestEntityRepository.class);
+				store = context.getBean(TestEntityContentRepository.class);
+				dbService = context.getBean(DbService.class);
+				ptm = context.getBean(PlatformTransactionManager.class);
 
-							repo = context.getBean(TestEntityRepository.class);
-							store = context.getBean(TestEntityContentRepository.class);
-							dbService = context.getBean(DbService.class);
-							ptm = context.getBean(PlatformTransactionManager.class);
-
-							te = new TestEntity();
-							te = repo.save(te);
-							assertThat(te.getId(), is(not(nullValue())));
-							assertThat(te.getContentId(), is(nullValue()));
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						Context("given an exception is thrown causing a rollback", () -> {
-							It("should not commit changes to content", () -> {
-
-								try {
-									te = dbService.doSomeDbStuff(store, te);
-								} catch (Exception e) {
-									ContentStoreIT.doInTransaction(ptm, () -> {
-										try (InputStream result = store.getContent(te)) {
-											assertThat(result, is(nullValue()));
-										} catch (IOException e1) {}
-										return null;
-									});
-								}
-							});
-						});
-					});
-				});
+				te = new TestEntity();
+				te = repo.save(te);
+				assertThat(te.getId(), is(not(nullValue())));
+				assertThat(te.getContentId(), is(nullValue()));
 			}
-		});
-	}
 
-	@Test
-	public void noop() {}
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Nested
+			@DisplayName("given an exception is thrown causing a rollback")
+			class GivenAnExceptionIsThrownCausingARollback {
+
+				@Test
+				@DisplayName("should not commit changes to content")
+				void shouldNotCommitChangesToContent() throws Exception {
+					try {
+						te = dbService.doSomeDbStuff(store, te);
+					} catch (Exception e) {
+						ContentStoreIT.doInTransaction(ptm, () -> {
+							try (InputStream result = store.getContent(te)) {
+								assertThat(result, is(nullValue()));
+							} catch (IOException e1) {}
+							return null;
+						});
+					}
+				}
+			}
+		}
+	}
 
 	private static String getContextName(Class<?> configClass) {
 		return configClass.getSimpleName().replaceAll("Config", "");
@@ -135,7 +119,6 @@ public class TransactionIT {
 			return new DbService();
 		}
 	}
-
 
 	@Component
 	public static class DbService {

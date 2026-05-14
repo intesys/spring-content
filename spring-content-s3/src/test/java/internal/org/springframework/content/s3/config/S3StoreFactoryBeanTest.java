@@ -1,10 +1,5 @@
 package internal.org.springframework.content.s3.config;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -13,18 +8,18 @@ import static org.mockito.Mockito.mock;
 
 import java.io.Serializable;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.repository.AssociativeStore;
 import org.springframework.content.commons.repository.ContentStore;
 import org.springframework.content.commons.repository.Store;
 import org.springframework.content.commons.utils.PlacementService;
 import org.springframework.context.support.GenericApplicationContext;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-
 import software.amazon.awssdk.services.s3.S3Client;
 
-@RunWith(Ginkgo4jRunner.class)
 public class S3StoreFactoryBeanTest {
 
 	private S3StoreFactoryBean factory;
@@ -35,39 +30,57 @@ public class S3StoreFactoryBeanTest {
 
 	private Store store;
 
-	{
-		Describe("S3StoreFactoryBean", () -> {
-			BeforeEach(() -> {
-				client = mock(S3Client.class);
-				placer = mock(PlacementService.class);
+	@Nested
+	@DisplayName("S3StoreFactoryBean")
+	class S3StoreFactoryBeanTests {
 
-				context.registerBean("amazonS3", S3Client.class, () -> client);
-				context.refresh();
+		@BeforeEach
+		void setUp() throws Exception {
+			client = mock(S3Client.class);
+			placer = mock(PlacementService.class);
 
-				factory = new S3StoreFactoryBean(S3StoreFactoryBeanTest.TestStore.class/*, context, client, placer*/);
-				factory.setContext(context);
-				factory.setClient(client);
-				factory.setS3StorePlacementService(placer);
-			});
-			Context("#getStore", () -> {
-				BeforeEach(() -> {
-					factory.setBeanClassLoader(Thread.currentThread().getContextClassLoader());
-				});
-				JustBeforeEach(() -> {
+			context.registerBean("amazonS3", S3Client.class, () -> client);
+			context.refresh();
+
+			factory = new S3StoreFactoryBean(S3StoreFactoryBeanTest.TestStore.class);
+			factory.setContext(context);
+			factory.setClient(client);
+			factory.setS3StorePlacementService(placer);
+		}
+
+		@Nested
+		@DisplayName("#getStore")
+		class GetStore {
+
+			@BeforeEach
+			void setUp() throws Exception {
+				factory.setBeanClassLoader(Thread.currentThread().getContextClassLoader());
+			}
+
+			@Nested
+			@DisplayName("given a Store")
+			class GivenAStore {
+
+				@Test
+				@DisplayName("should return a store implementation")
+				void shouldReturnStoreImpl() throws Exception {
 					store = factory.getStore();
-				});
-				Context("given a Store", () -> {
-					It("should return a store implementation", () -> {
-						assertThat(store, is(not(nullValue())));
-					});
-				});
-				Context("given an AssociativeStore", () -> {
-					It("should return a store implementation", () -> {
-						assertThat(store, is(not(nullValue())));
-					});
-				});
-			});
-		});
+					assertThat(store, is(not(nullValue())));
+				}
+			}
+
+			@Nested
+			@DisplayName("given an AssociativeStore")
+			class GivenAnAssociativeStore {
+
+				@Test
+				@DisplayName("should return a store implementation")
+				void shouldReturnStoreImpl() throws Exception {
+					store = factory.getStore();
+					assertThat(store, is(not(nullValue())));
+				}
+			}
+		}
 	}
 
 	public interface TestStore extends Store<Serializable> {

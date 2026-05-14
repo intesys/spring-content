@@ -1,27 +1,25 @@
 package internal.org.springframework.content.solr;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.runner.RunWith;
 
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.repository.StoreAccessException;
 import org.springframework.content.solr.SolrProperties;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -31,101 +29,143 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(Ginkgo4jRunner.class)
 public class SolrFulltextIndexServiceImplTest {
 
-    private SolrFulltextIndexServiceImpl indexer;
+	private SolrFulltextIndexServiceImpl indexer;
 
-    private TEntity entity;
-    private InputStream content;
+	private TEntity entity;
+	private InputStream content;
 
-    private Exception e;
+	private Exception e;
 
-    // mocks
-    private SolrClient solr;
-    private SolrProperties props;
+	private SolrClient solr;
+	private SolrProperties props;
 
-    {
-        Describe("#index", () -> {
+	@Nested
+	@DisplayName("#index")
+	class Index {
 
-            BeforeEach(() -> {
-                solr = mock(SolrClient.class);
-                props = new SolrProperties();
+		@BeforeEach
+		void setUp() throws Exception {
+			solr = mock(SolrClient.class);
+			props = new SolrProperties();
 
-                entity = new TEntity("12345");
-                content = new ByteArrayInputStream("foo".getBytes());
-            });
+			entity = new TEntity("12345");
+			content = new ByteArrayInputStream("foo".getBytes());
 
-            JustBeforeEach(() -> {
-                indexer = new SolrFulltextIndexServiceImpl(solr, props);
+			indexer = new SolrFulltextIndexServiceImpl(solr, props);
+		}
 
-                try {
-                    indexer.index(entity, content);
-                } catch (Exception e) {
-                    this.e = e;
-                }
-            });
+		@Nested
+		@DisplayName("when solr throws a SolrServerException")
+		class WhenSolrThrowsASolrserverexception {
 
-            for (Exception ex : new Exception[] {new SolrServerException("badness"), new IOException("badness")}) {
+			@BeforeEach
+			void setUp() throws Exception {
+				when(solr.request(any(SolrRequest.class), any())).thenThrow(new SolrServerException("badness"));
+				try {
+					indexer.index(entity, content);
+				} catch (Exception ex) {
+					e = ex;
+				}
+			}
 
-                Context(format("when solr throws a %s", ex.getClass().getSimpleName()), () -> {
+			@Test
+			@DisplayName("should throw a StoreAccessException")
+			void shouldThrowAStoreaccessexception() throws Exception {
+				assertThat(e, is(instanceOf(StoreAccessException.class)));
+				assertThat(e.getCause().getMessage(), containsString("badness"));
+			}
+		}
 
-                    BeforeEach(() -> {
-                        when(solr.request(any(SolrRequest.class), any())).thenThrow(ex);
-                    });
+		@Nested
+		@DisplayName("when solr throws an IOException")
+		class WhenSolrThrowsAnIoexception {
 
-                    It("should throw a StoreAccessException", () -> {
-                        assertThat(e, is(instanceOf(StoreAccessException.class)));
-                        assertThat(e.getCause().getMessage(), containsString("badness"));
-                    });
-                });
-            }
-        });
+			@BeforeEach
+			void setUp() throws Exception {
+				when(solr.request(any(SolrRequest.class), any())).thenThrow(new IOException("badness"));
+				try {
+					indexer.index(entity, content);
+				} catch (Exception ex) {
+					e = ex;
+				}
+			}
 
-        Describe("#unindex", () -> {
+			@Test
+			@DisplayName("should throw a StoreAccessException")
+			void shouldThrowAStoreaccessexception() throws Exception {
+				assertThat(e, is(instanceOf(StoreAccessException.class)));
+				assertThat(e.getCause().getMessage(), containsString("badness"));
+			}
+		}
+	}
 
-            BeforeEach(() -> {
-                solr = mock(SolrClient.class);
-                props = new SolrProperties();
+	@Nested
+	@DisplayName("#unindex")
+	class Unindex {
 
-                entity = new TEntity("12345");
-            });
+		@BeforeEach
+		void setUp() throws Exception {
+			solr = mock(SolrClient.class);
+			props = new SolrProperties();
 
-            JustBeforeEach(() -> {
-                indexer = new SolrFulltextIndexServiceImpl(solr, props);
+			entity = new TEntity("12345");
 
-                try {
-                    indexer.unindex(entity);
-                } catch (Exception e) {
-                    this.e = e;
-                }
-            });
+			indexer = new SolrFulltextIndexServiceImpl(solr, props);
+		}
 
-            for (Exception ex : new Exception[] {new SolrServerException("badness"), new IOException("badness")}) {
+		@Nested
+		@DisplayName("when solr throws a SolrServerException")
+		class WhenSolrThrowsASolrserverexception {
 
-                Context(format("when solr throws a %s", ex.getClass().getSimpleName()), () -> {
+			@BeforeEach
+			void setUp() throws Exception {
+				when(solr.request(any(SolrRequest.class), any())).thenThrow(new SolrServerException("badness"));
+				try {
+					indexer.unindex(entity);
+				} catch (Exception ex) {
+					e = ex;
+				}
+			}
 
-                    BeforeEach(() -> {
-                        when(solr.request(any(SolrRequest.class), any())).thenThrow(ex);
-                    });
+			@Test
+			@DisplayName("should throw a StoreAccessException")
+			void shouldThrowAStoreaccessexception() throws Exception {
+				assertThat(e, is(instanceOf(StoreAccessException.class)));
+				assertThat(e.getCause().getMessage(), containsString("badness"));
+			}
+		}
 
-                    It("should throw a StoreAccessException", () -> {
-                        assertThat(e, is(instanceOf(StoreAccessException.class)));
-                        assertThat(e.getCause().getMessage(), containsString("badness"));
-                    });
-                });
-            }
-        });
-    }
+		@Nested
+		@DisplayName("when solr throws an IOException")
+		class WhenSolrThrowsAnIoexception {
 
-    @AllArgsConstructor
-    @Getter
-    @Setter
-    private static class TEntity {
+			@BeforeEach
+			void setUp() throws Exception {
+				when(solr.request(any(SolrRequest.class), any())).thenThrow(new IOException("badness"));
+				try {
+					indexer.unindex(entity);
+				} catch (Exception ex) {
+					e = ex;
+				}
+			}
 
-        @ContentId
-        private String contentId;
-    }
+			@Test
+			@DisplayName("should throw a StoreAccessException")
+			void shouldThrowAStoreaccessexception() throws Exception {
+				assertThat(e, is(instanceOf(StoreAccessException.class)));
+				assertThat(e.getCause().getMessage(), containsString("badness"));
+			}
+		}
+	}
+
+	@AllArgsConstructor
+	@Getter
+	@Setter
+	private static class TEntity {
+
+		@ContentId
+		private String contentId;
+	}
 }
-
-

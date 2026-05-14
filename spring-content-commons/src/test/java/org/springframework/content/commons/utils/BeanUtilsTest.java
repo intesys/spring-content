@@ -2,389 +2,503 @@ package org.springframework.content.commons.utils;
 
 import java.lang.reflect.Field;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-import org.hamcrest.CoreMatchers;
-import org.junit.runner.RunWith;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
 import org.springframework.content.commons.annotations.MimeType;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 public class BeanUtilsTest {
 
 	private TestEntity testEntity;
 
-	{
-		Describe("BeanUtils", () -> {
-			Context("#setFieldWithAnnotation", () -> {
-				Context("given a simple, non-inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new TestEntity();
-					});
-					It("should set field directly", () -> {
-						BeanUtils.setFieldWithAnnotation(testEntity, ContentId.class,"a value");
-						assertThat(testEntity.fieldOnly, is("a value"));
-					});
-					It("should set field via its setter", () -> {
-						BeanUtils.setFieldWithAnnotation(testEntity, ContentLength.class,
-								"b value");
-						assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
-					});
-					It("should not fail when told to set on a missing field", () -> {
-						try {
-							BeanUtils.setFieldWithAnnotation(testEntity, Override.class,
-									"value");
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
+	@Nested
+	@DisplayName("setFieldWithAnnotation")
+	class SetFieldWithAnnotation {
+
+		@Nested
+		@DisplayName("given a simple, non-inheriting class")
+		class GivenSimpleClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new TestEntity();
+			}
+
+			@Test
+			@DisplayName("should set field directly")
+			void shouldSetFieldDirectly() {
+				BeanUtils.setFieldWithAnnotation(testEntity, ContentId.class, "a value");
+				assertThat(testEntity.fieldOnly, is("a value"));
+			}
+
+			@Test
+			@DisplayName("should set field via its setter")
+			void shouldSetFieldViaItsSetter() {
+				BeanUtils.setFieldWithAnnotation(testEntity, ContentLength.class, "b value");
+				assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
+			}
+
+			@Test
+			@DisplayName("should not fail when told to set on a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.setFieldWithAnnotation(testEntity, Override.class, "value");
 				});
-				Context("given an inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new InheritingTestEntity();
-					});
-					It("should set field directly", () -> {
-						BeanUtils.setFieldWithAnnotation(testEntity, ContentId.class,
-								"a value");
-						assertThat(testEntity.fieldOnly, is("a value"));
-					});
-					It("should set field via its setter", () -> {
-						BeanUtils.setFieldWithAnnotation(testEntity, ContentLength.class,
-								"b value");
-						assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
-					});
-					It("should not fail when told to set on a missing field", () -> {
-						try {
-							BeanUtils.setFieldWithAnnotation(testEntity, Override.class,
-									"value");
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
+			}
+		}
+
+		@Nested
+		@DisplayName("given an inheriting class")
+		class GivenInheritingClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new InheritingTestEntity();
+			}
+
+			@Test
+			@DisplayName("should set field directly")
+			void shouldSetFieldDirectly() {
+				BeanUtils.setFieldWithAnnotation(testEntity, ContentId.class, "a value");
+				assertThat(testEntity.fieldOnly, is("a value"));
+			}
+
+			@Test
+			@DisplayName("should set field via its setter")
+			void shouldSetFieldViaItsSetter() {
+				BeanUtils.setFieldWithAnnotation(testEntity, ContentLength.class, "b value");
+				assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
+			}
+
+			@Test
+			@DisplayName("should not fail when told to set on a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.setFieldWithAnnotation(testEntity, Override.class, "value");
 				});
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("setFieldWithAnnotationConditionally")
+	class SetFieldWithAnnotationConditionally {
+
+		@Nested
+		@DisplayName("given a simple, non-inheriting class")
+		class GivenSimpleClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new TestEntity();
+			}
+
+			@Test
+			@DisplayName("should set field if the condition matches")
+			void shouldSetFieldIfConditionMatches() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentId.class, "a value", new MatchingCondition());
+				assertThat(testEntity.fieldOnly, is("a value"));
+			}
+
+			@Test
+			@DisplayName("should set field via its setter if the condition matches")
+			void shouldSetFieldViaSetterIfConditionMatches() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentLength.class, "b value", new MatchingCondition());
+				assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
+			}
+
+			@Test
+			@DisplayName("should not set field if the condition does not match")
+			void shouldNotSetFieldIfConditionDoesNotMatch() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentId.class, "a value", new UnmatchingCondition());
+				assertThat(testEntity.fieldOnly, is(nullValue()));
+			}
+
+			@Test
+			@DisplayName("should not set field via its setter if the condition does not match")
+			void shouldNotSetFieldViaSetterIfConditionDoesNotMatch() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentLength.class, "b value", new UnmatchingCondition());
+				assertThat(testEntity.getFieldWithGetterSetter(), is(nullValue()));
+			}
+
+			@Test
+			@DisplayName("should not fail when told to set on a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.setFieldWithAnnotation(testEntity, Override.class, "value");
+				});
+			}
+		}
+
+		@Nested
+		@DisplayName("given an inheriting class")
+		class GivenInheritingClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new InheritingTestEntity();
+			}
+
+			@Test
+			@DisplayName("should set field if the condition matches")
+			void shouldSetFieldIfConditionMatches() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentId.class, "a value", new MatchingCondition());
+				assertThat(testEntity.fieldOnly, is("a value"));
+			}
+
+			@Test
+			@DisplayName("should set field via its setter if the condition matches")
+			void shouldSetFieldViaSetterIfConditionMatches() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentLength.class, "b value", new MatchingCondition());
+				assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
+			}
+
+			@Test
+			@DisplayName("should not set field if the condition does not match")
+			void shouldNotSetFieldIfConditionDoesNotMatch() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentId.class, "a value", new UnmatchingCondition());
+				assertThat(testEntity.fieldOnly, is(nullValue()));
+			}
+
+			@Test
+			@DisplayName("should not set field via its setter if the condition does not match")
+			void shouldNotSetFieldViaSetterIfConditionDoesNotMatch() {
+				BeanUtils.setFieldWithAnnotationConditionally(testEntity, ContentLength.class, "b value", new UnmatchingCondition());
+				assertThat(testEntity.getFieldWithGetterSetter(), is(nullValue()));
+			}
+
+			@Test
+			@DisplayName("should not fail when told to set on a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.setFieldWithAnnotation(testEntity, Override.class, "value");
+				});
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("getFieldWithAnnotation")
+	class GetFieldWithAnnotation {
+
+		@Nested
+		@DisplayName("given a simple, non-inheriting class")
+		class GivenSimpleClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new TestEntity();
+				testEntity.fieldOnly = "a value";
+				testEntity.setFieldWithGetterSetter("b value");
+			}
+
+			@Test
+			@DisplayName("should get field directly")
+			void shouldGetFieldDirectly() {
+				Object value = BeanUtils.getFieldWithAnnotation(testEntity, ContentId.class);
+				assertThat(value, is("a value"));
+			}
+
+			@Test
+			@DisplayName("should get field via its getter")
+			void shouldGetFieldViaItsGetter() {
+				Object value = BeanUtils.getFieldWithAnnotation(testEntity, ContentLength.class);
+				assertThat(value, is("b value"));
+			}
+
+			@Test
+			@DisplayName("should not fail when told to get on a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.getFieldWithAnnotation(testEntity, Override.class);
+				});
+			}
+		}
+
+		@Nested
+		@DisplayName("given an inheriting class")
+		class GivenInheritingClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new InheritingTestEntity();
+				testEntity.fieldOnly = "a value";
+				testEntity.setFieldWithGetterSetter("b value");
+			}
+
+			@Test
+			@DisplayName("should get field directly")
+			void shouldGetFieldDirectly() {
+				Object value = BeanUtils.getFieldWithAnnotation(testEntity, ContentId.class);
+				assertThat(value, is("a value"));
+			}
+
+			@Test
+			@DisplayName("should get field via its getter")
+			void shouldGetFieldViaItsGetter() {
+				Object value = BeanUtils.getFieldWithAnnotation(testEntity, ContentLength.class);
+				assertThat(value, is("b value"));
+			}
+
+			@Test
+			@DisplayName("should not fail when told to get on a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.getFieldWithAnnotation(testEntity, Override.class);
+				});
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("hasFieldWithAnnotation")
+	class HasFieldWithAnnotation {
+
+		@Nested
+		@DisplayName("given a simple, non-inheriting class")
+		class GivenSimpleClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new TestEntity();
+			}
+
+			@Test
+			@DisplayName("should return true for annotated public fields")
+			void shouldReturnTrueForAnnotatedPublicFields() {
+				assertThat(BeanUtils.hasFieldWithAnnotation(testEntity, ContentId.class), is(true));
+			}
+
+			@Test
+			@DisplayName("should return true for annotated private fields with getter")
+			void shouldReturnTrueForAnnotatedPrivateFieldsWithGetter() {
+				assertThat(BeanUtils.hasFieldWithAnnotation(testEntity, ContentLength.class), is(true));
+			}
+
+			@Test
+			@DisplayName("should not fail when about a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.hasFieldWithAnnotation(testEntity, Override.class);
+				});
+			}
+		}
+
+		@Nested
+		@DisplayName("given an inheriting class")
+		class GivenInheritingClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new InheritingTestEntity();
+			}
+
+			@Test
+			@DisplayName("should return true for annotated public fields")
+			void shouldReturnTrueForAnnotatedPublicFields() {
+				assertThat(BeanUtils.hasFieldWithAnnotation(testEntity, ContentId.class), is(true));
+			}
+
+			@Test
+			@DisplayName("should return true for annotated private fields with getter")
+			void shouldReturnTrueForAnnotatedPrivateFieldsWithGetter() {
+				assertThat(BeanUtils.hasFieldWithAnnotation(testEntity, ContentLength.class), is(true));
+			}
+
+			@Test
+			@DisplayName("should not fail when about a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.hasFieldWithAnnotation(testEntity, Override.class);
+				});
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("getFieldWithAnnotationType")
+	class GetFieldWithAnnotationType {
+
+		@Nested
+		@DisplayName("given a simple, non-inheriting class")
+		class GivenSimpleClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new TestEntity();
+			}
+
+			@Test
+			@DisplayName("should return true for annotated public fields")
+			void shouldReturnTrueForAnnotatedPublicFields() {
+				assertThat(BeanUtils.getFieldWithAnnotationType(testEntity, ContentId.class), is(equalTo(String.class)));
+			}
+
+			@Test
+			@DisplayName("should return true for annotated private fields with getter")
+			void shouldReturnTrueForAnnotatedPrivateFieldsWithGetter() {
+				assertThat(BeanUtils.getFieldWithAnnotationType(testEntity, ContentLength.class), is(equalTo(String.class)));
+			}
+
+			@Test
+			@DisplayName("should not fail when asked about a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.getFieldWithAnnotationType(testEntity, Override.class);
+				});
+			}
+		}
+
+		@Nested
+		@DisplayName("given an inheriting class")
+		class GivenInheritingClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new InheritingTestEntity();
+			}
+
+			@Test
+			@DisplayName("should return true for annotated public fields")
+			void shouldReturnTrueForAnnotatedPublicFields() {
+				assertThat(BeanUtils.getFieldWithAnnotationType(testEntity, ContentId.class), is(equalTo(String.class)));
+			}
+
+			@Test
+			@DisplayName("should return true for annotated private fields with getter")
+			void shouldReturnTrueForAnnotatedPrivateFieldsWithGetter() {
+				assertThat(BeanUtils.getFieldWithAnnotationType(testEntity, ContentLength.class), is(equalTo(String.class)));
+			}
+
+			@Test
+			@DisplayName("should not fail when asked about a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.getFieldWithAnnotationType(testEntity, Override.class);
+				});
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("findFieldWithAnnotation")
+	class FindFieldWithAnnotation {
+
+		@Nested
+		@DisplayName("given a simple, non-inheriting class")
+		class GivenSimpleClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new TestEntity();
+			}
+
+			@Test
+			@DisplayName("should find fields")
+			void shouldFindFields() {
+				assertThat(BeanUtils.findFieldWithAnnotation(testEntity, ContentId.class), is(not(nullValue())));
+			}
+
+			@Test
+			@DisplayName("should find fields with getters")
+			void shouldFindFieldsWithGetters() {
+				assertThat(BeanUtils.findFieldWithAnnotation(testEntity, ContentLength.class), is(not(nullValue())));
+			}
+
+			@Test
+			@DisplayName("should not fail when about a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.findFieldWithAnnotation(testEntity, Override.class);
+				});
+			}
+		}
+
+		@Nested
+		@DisplayName("given an inheriting class")
+		class GivenInheritingClass {
+
+			@BeforeEach
+			void setUp() {
+				testEntity = new InheritingTestEntity();
+			}
+
+			@Test
+			@DisplayName("should find fields")
+			void shouldFindFields() {
+				assertThat(BeanUtils.findFieldWithAnnotation(testEntity, ContentId.class), is(not(nullValue())));
+			}
+
+			@Test
+			@DisplayName("should find fields with getters")
+			void shouldFindFieldsWithGetters() {
+				assertThat(BeanUtils.findFieldWithAnnotation(testEntity, ContentLength.class), is(not(nullValue())));
+			}
+
+			@Test
+			@DisplayName("should not fail when about a missing field")
+			void shouldNotFailOnMissingField() {
+				assertDoesNotThrow(() -> {
+					BeanUtils.findFieldWithAnnotation(testEntity, Override.class);
+				});
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("findFieldsWithAnnotation")
+	class FindFieldsWithAnnotation {
+
+		@Test
+		@DisplayName("should find fields")
+		void shouldFindFields() {
+			assertThat(BeanUtils.findFieldsWithAnnotation(TestEntity2.class, MimeType.class, new BeanWrapperImpl(new TestEntity2())).length, is(1));
+		}
+	}
+
+	@Nested
+	@DisplayName("getFieldsWithAnnotation")
+	class GetFieldsWithAnnotation {
+
+		@Test
+		@DisplayName("should find fields")
+		void shouldFindFields() {
+			TestEntity2 t = new TestEntity2();
+			t.setContentId("100");
+			t.setOtherContentId("200");
+
+			assertThat(BeanUtils.getFieldsWithAnnotation(t, ContentId.class), is(new Object[]{"100", "200"}));
+		}
+	}
+
+	@Nested
+	@DisplayName("setFieldWithAnnotation (multiple matches)")
+	class SetFieldWithAnnotationMultipleMatches {
+
+		@Test
+		@DisplayName("should set the field matching the additional condition")
+		void shouldSetFieldMatchingCondition() {
+			TestEntity2 entity = new TestEntity2();
+			BeanUtils.setFieldWithAnnotationConditionally(entity, ContentId.class, "a value", new Condition() {
+				@Override
+				public boolean matches(Field field) {
+					return field.getName().equals("otherContentId");
+				}
 			});
-
-			Context("#setFieldWithAnnotationConditionally", () -> {
-				Context("given a simple, non-inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new TestEntity();
-					});
-					It("should set field if the condition matches", () -> {
-						BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-								ContentId.class, "a value", new MatchingCondition() {
-								});
-						assertThat(testEntity.fieldOnly, is("a value"));
-					});
-					It("should set field via its setter if the condition matches", () -> {
-						BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-								ContentLength.class, "b value", new MatchingCondition() {
-								});
-						assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
-					});
-					It("should not set field if the condition does not match", () -> {
-						BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-								ContentId.class, "a value", new UnmatchingCondition() {
-								});
-						assertThat(testEntity.fieldOnly, is(nullValue()));
-					});
-					It("should not set field via its setter if the condition does not match",
-							() -> {
-								BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-										ContentLength.class, "b value",
-										new UnmatchingCondition() {
-										});
-								assertThat(testEntity.getFieldWithGetterSetter(),
-										is(nullValue()));
-							});
-					It("should not fail when told to set on a missing field", () -> {
-						try {
-							BeanUtils.setFieldWithAnnotation(testEntity, Override.class,
-									"value");
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-				Context("given an inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new InheritingTestEntity();
-					});
-					It("should set field if the condition matches", () -> {
-						BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-								ContentId.class, "a value", new MatchingCondition() {
-								});
-						assertThat(testEntity.fieldOnly, is("a value"));
-					});
-					It("should set field via its setter if the condition matches", () -> {
-						BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-								ContentLength.class, "b value", new MatchingCondition() {
-								});
-						assertThat(testEntity.getFieldWithGetterSetter(), is("b value"));
-					});
-					It("should not set field if the condition does not match", () -> {
-						BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-								ContentId.class, "a value", new UnmatchingCondition() {
-								});
-						assertThat(testEntity.fieldOnly, is(nullValue()));
-					});
-					It("should not set field via its setter if the condition does not match",
-							() -> {
-								BeanUtils.setFieldWithAnnotationConditionally(testEntity,
-										ContentLength.class, "b value",
-										new UnmatchingCondition() {
-										});
-								assertThat(testEntity.getFieldWithGetterSetter(),
-										is(nullValue()));
-							});
-					It("should not fail when told to set on a missing field", () -> {
-						try {
-							BeanUtils.setFieldWithAnnotation(testEntity, Override.class,
-									"value");
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-			});
-
-			Context("#getFieldWithAnnotation", () -> {
-				Context("given a simple, non-inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new TestEntity();
-						testEntity.fieldOnly = "a value";
-						testEntity.setFieldWithGetterSetter("b value");
-					});
-					It("should get field directly", () -> {
-						Object value = BeanUtils.getFieldWithAnnotation(testEntity,
-								ContentId.class);
-						assertThat(value, is("a value"));
-					});
-					It("should get field via its getter", () -> {
-						Object value = BeanUtils.getFieldWithAnnotation(testEntity,
-								ContentLength.class);
-						assertThat(value, is("b value"));
-					});
-					It("should not fail when told to get on a missing field", () -> {
-						try {
-							BeanUtils.getFieldWithAnnotation(testEntity, Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-				Context("given an inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new InheritingTestEntity();
-						testEntity.fieldOnly = "a value";
-						testEntity.setFieldWithGetterSetter("b value");
-					});
-					It("should get field directly", () -> {
-						Object value = BeanUtils.getFieldWithAnnotation(testEntity,
-								ContentId.class);
-						assertThat(value, is("a value"));
-					});
-					It("should get field via its getter", () -> {
-						Object value = BeanUtils.getFieldWithAnnotation(testEntity,
-								ContentLength.class);
-						assertThat(value, is("b value"));
-					});
-					It("should not fail when told to get on a missing field", () -> {
-						try {
-							BeanUtils.getFieldWithAnnotation(testEntity, Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-			});
-
-			Context("#hasFieldWithAnnotation", () -> {
-				Context("given a simple, non-inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new TestEntity();
-					});
-					It("should return true for annotated public fields", () -> {
-						assertThat(BeanUtils.hasFieldWithAnnotation(testEntity,
-								ContentId.class), is(true));
-					});
-					It("should return true for annotated private fields with getter",
-							() -> {
-								assertThat(BeanUtils.hasFieldWithAnnotation(testEntity,
-										ContentLength.class), is(true));
-							});
-					It("should not fail when about a missing field", () -> {
-						try {
-							BeanUtils.hasFieldWithAnnotation(testEntity, Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-				Context("given an inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new InheritingTestEntity();
-					});
-					It("should return true for annotated public fields", () -> {
-						assertThat(BeanUtils.hasFieldWithAnnotation(testEntity,
-								ContentId.class), is(true));
-					});
-					It("should return true for annotated private fields with getter",
-							() -> {
-								assertThat(BeanUtils.hasFieldWithAnnotation(testEntity,
-										ContentLength.class), is(true));
-							});
-					It("should not fail when about a missing field", () -> {
-						try {
-							BeanUtils.hasFieldWithAnnotation(testEntity, Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-			});
-
-			Context("#getFieldWithAnnotationType", () -> {
-				Context("given a simple, non-inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new TestEntity();
-					});
-					It("should return true for annotated public fields", () -> {
-						assertThat(
-								BeanUtils.getFieldWithAnnotationType(testEntity,
-										ContentId.class),
-								is(CoreMatchers.<Class<?>>equalTo(String.class)));
-					});
-					It("should return true for annotated private fields with getter",
-							() -> {
-								assertThat(
-										BeanUtils.getFieldWithAnnotationType(testEntity,
-												ContentLength.class),
-										is(CoreMatchers.<Class<?>>equalTo(String.class)));
-							});
-					It("should not fail when asked about a missing field", () -> {
-						try {
-							BeanUtils.getFieldWithAnnotationType(testEntity,
-									Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-				Context("given an inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new InheritingTestEntity();
-					});
-					It("should return true for annotated public fields", () -> {
-						assertThat(
-								BeanUtils.getFieldWithAnnotationType(testEntity,
-										ContentId.class),
-								is(CoreMatchers.<Class<?>>equalTo(String.class)));
-					});
-					It("should return true for annotated private fields with getter",
-							() -> {
-								assertThat(
-										BeanUtils.getFieldWithAnnotationType(testEntity,
-												ContentLength.class),
-										is(CoreMatchers.<Class<?>>equalTo(String.class)));
-							});
-					It("should not fail when asked about a missing field", () -> {
-						try {
-							BeanUtils.getFieldWithAnnotationType(testEntity,
-									Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-			});
-
-			Context("#findFieldWithAnnotation", () -> {
-				Context("given a simple, non-inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new TestEntity();
-					});
-					It("should find fields", () -> {
-						assertThat(BeanUtils.findFieldWithAnnotation(testEntity,
-								ContentId.class), is(not(nullValue())));
-					});
-					It("should find fields with getters", () -> {
-						assertThat(BeanUtils.findFieldWithAnnotation(testEntity,
-								ContentLength.class), is(not(nullValue())));
-					});
-					It("should not fail when about a missing field", () -> {
-						try {
-							BeanUtils.findFieldWithAnnotation(testEntity, Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-				Context("given an inheriting class", () -> {
-					BeforeEach(() -> {
-						testEntity = new InheritingTestEntity();
-					});
-					It("should find fields", () -> {
-						assertThat(BeanUtils.findFieldWithAnnotation(testEntity,
-								ContentId.class), is(not(nullValue())));
-					});
-					It("should find fields with getters", () -> {
-						assertThat(BeanUtils.findFieldWithAnnotation(testEntity,
-								ContentLength.class), is(not(nullValue())));
-					});
-					It("should not fail when about a missing field", () -> {
-						try {
-							BeanUtils.findFieldWithAnnotation(testEntity, Override.class);
-						}
-						catch (Exception e) {
-							fail("should not fail");
-						}
-					});
-				});
-			});
-
-			Context("#findFieldsWithAnnotation", () -> {
-
-				It("should find fields", () -> {
-					assertThat(BeanUtils.findFieldsWithAnnotation(TestEntity2.class, MimeType.class, new BeanWrapperImpl(new TestEntity2())).length, is(1));
-				});
-			});
-
-			Context("#getFieldsWithAnnotation", () -> {
-
-				It("should find fields", () -> {
-					TestEntity2 t = new TestEntity2();
-					t.setContentId("100");
-					t.setOtherContentId("200");
-
-					assertThat(BeanUtils.getFieldsWithAnnotation(t, ContentId.class), is(new Object[]{"100", "200"}));
-				});
-			});
-		});
+			assertThat(entity.getContentId(), is(nullValue()));
+			assertThat(entity.getOtherContentId(), is("a value"));
+		}
 	}
 
 	public static class TestEntity {
@@ -405,15 +519,21 @@ public class BeanUtilsTest {
 		}
 	}
 
-	public static class InheritingTestEntity extends TestEntity {}
+	public static class InheritingTestEntity extends TestEntity {
+	}
 
 	public static class TestEntity2 {
-		@ContentId public String contentId;
-		@ContentLength private String contentLen;
-		@MimeType private String mimeType;
+		@ContentId
+		public String contentId;
+		@ContentLength
+		private String contentLen;
+		@MimeType
+		private String mimeType;
 
-		@ContentId public String otherContentId;
-		@ContentLength private String otherContentLen;
+		@ContentId
+		public String otherContentId;
+		@ContentLength
+		private String otherContentLen;
 
 		public String getContentId() {
 			return contentId;

@@ -1,15 +1,11 @@
 package internal.org.springframework.versions.jpa;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.versions.LockingAndVersioningException;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.FIt;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -17,7 +13,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(Ginkgo4jRunner.class)
+@DisplayName("JpaCloningServiceImpl")
 public class JpaCloningServiceImplTest {
 
     private JpaCloningServiceImpl cloner;
@@ -27,55 +23,86 @@ public class JpaCloningServiceImplTest {
 
     private Exception e;
 
-    {
-        Describe("JpaCloningServiceImpl", () -> {
-            JustBeforeEach(() -> {
-                cloner = new JpaCloningServiceImpl();
-            });
-            Context("#clone", () -> {
-                JustBeforeEach(() -> {
-                    try {
-                        result = cloner.clone(entity);
-                    } catch (Exception e) {
-                        this.e = e;
-                    }
-                });
-                Context("given an entity with a copy constructor", () -> {
-                    BeforeEach(() -> {
-                        entity = new TestEntity();
-                    });
-                    It("should clone the entity", () -> {
-                        assertThat(result, is(not(nullValue())));
-                        assertThat(result, is(not(entity)));
-                    });
-                });
-                Context("given an entity with a copy constructor", () -> {
-                    BeforeEach(() -> {
-                        entity = new NoCopyConstructorTestEntity();
-                    });
-                    It("should clone the entity", () -> {
-                        assertThat(e, is(instanceOf(LockingAndVersioningException.class)));
-                        assertThat(e.getMessage(), containsString("no copy constructor"));
-                    });
-                });
-                Context("given an entity with a failing copy constructor", () -> {
-                    BeforeEach(() -> {
-                        entity = new FailingCopyConstructorTestEntity();
-                    });
-                    It("should clone the entity", () -> {
-                        assertThat(e, is(instanceOf(LockingAndVersioningException.class)));
-                        assertThat(e.getMessage(), containsString("copy constructor failed"));
-                    });
-                });
-            });
-        });
+    @BeforeEach
+    void init() {
+        cloner = new JpaCloningServiceImpl();
+    }
+
+    @Nested
+    @DisplayName("#clone")
+    class Clone {
+
+        @Nested
+        @DisplayName("given an entity with a copy constructor")
+        class WithCopyConstructor {
+
+            @BeforeEach
+            void setupAndClone() {
+                entity = new TestEntity();
+                try {
+                    result = cloner.clone(entity);
+                } catch (Exception ex) {
+                    e = ex;
+                }
+            }
+
+            @Test
+            @DisplayName("should clone the entity")
+            void shouldCloneEntity() {
+                assertThat(result, is(not(nullValue())));
+                assertThat(result, is(not(entity)));
+            }
+        }
+
+        @Nested
+        @DisplayName("given an entity without a copy constructor")
+        class WithoutCopyConstructor {
+
+            @BeforeEach
+            void setupAndClone() {
+                entity = new NoCopyConstructorTestEntity();
+                try {
+                    result = cloner.clone(entity);
+                } catch (Exception ex) {
+                    e = ex;
+                }
+            }
+
+            @Test
+            @DisplayName("should throw LockingAndVersioningException")
+            void shouldThrowException() {
+                assertThat(e, is(instanceOf(LockingAndVersioningException.class)));
+                assertThat(e.getMessage(), containsString("no copy constructor"));
+            }
+        }
+
+        @Nested
+        @DisplayName("given an entity with a failing copy constructor")
+        class WithFailingCopyConstructor {
+
+            @BeforeEach
+            void setupAndClone() {
+                entity = new FailingCopyConstructorTestEntity();
+                try {
+                    result = cloner.clone(entity);
+                } catch (Exception ex) {
+                    e = ex;
+                }
+            }
+
+            @Test
+            @DisplayName("should throw LockingAndVersioningException")
+            void shouldThrowException() {
+                assertThat(e, is(instanceOf(LockingAndVersioningException.class)));
+                assertThat(e.getMessage(), containsString("copy constructor failed"));
+            }
+        }
     }
 
     public static class TestEntity {
         public TestEntity() {}
 
-        public TestEntity(TestEntity entity) {
-        }
+        public TestEntity(TestEntity entity) {}
     }
 
     public static class NoCopyConstructorTestEntity {

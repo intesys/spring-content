@@ -1,6 +1,5 @@
 //package internal.org.springframework.content.fs.store;
 //
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 //import static org.hamcrest.CoreMatchers.containsString;
 //import static org.hamcrest.CoreMatchers.instanceOf;
 //import static org.hamcrest.CoreMatchers.is;
@@ -41,8 +40,6 @@
 //import org.springframework.core.io.InputStreamResource;
 //import org.springframework.core.io.Resource;
 //import org.springframework.core.io.WritableResource;
-//
-//import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 //
 //@RunWith(Ginkgo4jRunner.class)
 //public class DefaultFilesystemStoresImplTest {

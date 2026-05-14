@@ -1,6 +1,5 @@
 //package org.springframework.versions.jpa.boot;
 //
-//import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 //import internal.org.springframework.content.jpa.boot.autoconfigure.ContentJpaDatabaseInitializer;
 //import internal.org.springframework.content.jpa.boot.autoconfigure.ContentJpaProperties;
 //import internal.org.springframework.versions.jpa.boot.autoconfigure.JpaVersionsDatabaseInitializer;
@@ -16,11 +15,6 @@
 //import java.sql.DatabaseMetaData;
 //import java.sql.Statement;
 //
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 //import static org.hamcrest.Matchers.containsString;
 //import static org.mockito.ArgumentMatchers.anyString;
 //import static org.mockito.Mockito.atLeastOnce;

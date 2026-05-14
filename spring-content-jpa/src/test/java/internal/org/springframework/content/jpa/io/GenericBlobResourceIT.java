@@ -11,7 +11,6 @@
 //
 //import javax.sql.DataSource;
 //
-//import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 //import org.apache.commons.io.IOUtils;
 //import org.junit.runner.RunWith;
 //
@@ -20,11 +19,6 @@
 //import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 //import org.springframework.transaction.PlatformTransactionManager;
 //
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 //import static org.hamcrest.CoreMatchers.is;
 //import static org.hamcrest.CoreMatchers.nullValue;
 //import static org.hamcrest.MatcherAssert.assertThat;

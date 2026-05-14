@@ -1,6 +1,5 @@
 //package internal.org.springframework.content.mongo.io;
 //
-//import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 //import com.mongodb.client.gridfs.model.GridFSFile;
 //import org.apache.commons.io.IOUtils;
 //import org.junit.runner.RunWith;
@@ -14,7 +13,6 @@
 //import java.io.OutputStream;
 //import java.util.Date;
 //
-//import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 //import static org.hamcrest.CoreMatchers.*;
 //import static org.hamcrest.MatcherAssert.assertThat;
 //import static org.mockito.ArgumentMatchers.any;
