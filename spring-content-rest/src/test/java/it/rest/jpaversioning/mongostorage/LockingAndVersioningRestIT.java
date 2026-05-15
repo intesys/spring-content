@@ -330,7 +330,8 @@ public class LockingAndVersioningRestIT {
             http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/admin/**").hasRole("ADMIN"))
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .anyRequest().authenticated())
                 .httpBasic(hb -> hb
                     .realmName(REALM)
                     .authenticationEntryPoint(getBasicAuthEntryPoint()))

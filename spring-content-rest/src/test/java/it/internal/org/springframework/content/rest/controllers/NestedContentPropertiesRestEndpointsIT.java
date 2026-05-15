@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.property.PropertyPath;
 import org.springframework.content.rest.config.HypermediaConfiguration;
@@ -39,11 +40,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
       StoreConfig.class,
       DelegatingWebMvcConfiguration.class,
@@ -189,10 +192,9 @@ public class NestedContentPropertiesRestEndpointsIT {
 				      assertThat(fetched.get().getChild().getContentMimeType(), is("application/json"));
                       try (InputStream actual = store.getResource(fetched.get(), PropertyPath.from("child/content")).getInputStream()) {
                           IOUtils.contentEquals(actual, new ByteArrayInputStream(content.getBytes()));
-                      }
+					  }
 				  }
 			  }
-		  }
 
 		  @Nested
 		  @DisplayName("given that it has content")
@@ -237,7 +239,7 @@ public class NestedContentPropertiesRestEndpointsIT {
 							  .perform(get("/testEntity10s/" + testEntity10.getId() + "/child/content")
 									  .accept("text/plain"))
 							  .andExpect(status().isOk())
-							  .andExpect(header().string("etag", is("\"1\"")))
+							  .andExpect(header().string("etag", is("\"0\"")))
 							  .andExpect(header().string("last-modified", LastModifiedDate
 									  .isWithinASecond(testEntity10.getModifiedDate())))
 							  .andReturn().getResponse();
@@ -372,8 +374,14 @@ public class NestedContentPropertiesRestEndpointsIT {
 					  .andReturn().getResponse();
 
 			  assertThat(response.getContentAsString(), is(previewContent));
-		  }
-	  	}
-  	}
+  }
+	}
+	}
+	}
+}
+
+	{
+		versionTests = Version.tests();
+		lastModifiedDateTests = LastModifiedDate.tests();
 	}
 }

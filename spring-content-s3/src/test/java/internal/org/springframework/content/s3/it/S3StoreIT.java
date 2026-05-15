@@ -36,7 +36,9 @@ import org.springframework.content.commons.store.SetContentParams;
 import org.springframework.content.commons.store.UnsetContentParams;
 import org.springframework.content.s3.config.EnableS3Stores;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -667,6 +669,8 @@ public class S3StoreIT {
     @SpringBootApplication()
     @EnableJpaRepositories(considerNestedRepositories = true)
     @EnableS3Stores
+    @ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
+            pattern = "internal\\.org\\.springframework\\.content\\.s3\\.it\\.S3StoreWithEntityConverterIT\\$TestConfig"))
     static class Application {
         public static void main(String[] args) {
             SpringApplication.run(Application.class, args);

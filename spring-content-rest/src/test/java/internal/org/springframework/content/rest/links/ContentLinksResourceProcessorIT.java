@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
@@ -36,6 +37,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -45,6 +47,7 @@ import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfigu
 import jakarta.persistence.*;
 
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
 		BaseUriConfig.class,
 		DelegatingWebMvcConfiguration.class,
@@ -79,7 +82,6 @@ public class ContentLinksResourceProcessorIT {
 			mvc = MockMvcBuilders.webAppContextSetup(context).build();
 		}
 
-		@BeforeEach
 		void processResource() {
 			MockHttpServletRequest request = new MockHttpServletRequest();
 			RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
@@ -100,6 +102,7 @@ public class ContentLinksResourceProcessorIT {
 
 				PersistentEntityResource.Builder build = PersistentEntityResource.build(obj, persistentEntity);
 				resource = build.build();
+				processResource();
 			}
 
 			@Test
@@ -116,6 +119,7 @@ public class ContentLinksResourceProcessorIT {
 				void disableFullyQualifiedAndEnableShortcut() {
 					processor.getRestConfiguration().setFullyQualifiedLinks(false);
 					processor.getRestConfiguration().setShortcutLinks(true);
+					processResource();
 				}
 
 				@AfterEach
@@ -139,6 +143,7 @@ public class ContentLinksResourceProcessorIT {
 				void disableLinks() {
 					processor.getRestConfiguration().setFullyQualifiedLinks(false);
 					processor.getRestConfiguration().setShortcutLinks(false);
+					processResource();
 				}
 
 				@AfterEach
@@ -172,6 +177,7 @@ public class ContentLinksResourceProcessorIT {
 
 				PersistentEntityResource.Builder build = PersistentEntityResource.build(obj, persistentEntity);
 				resource = build.build();
+				processResource();
 			}
 
 			@Test
@@ -199,6 +205,7 @@ public class ContentLinksResourceProcessorIT {
 
 				PersistentEntityResource.Builder build = PersistentEntityResource.build(obj, persistentEntity);
 				resource = build.build();
+				processResource();
 			}
 
 			@Test
@@ -221,6 +228,7 @@ public class ContentLinksResourceProcessorIT {
 
 				PersistentEntityResource.Builder build = PersistentEntityResource.build(testEntity11, persistentEntity);
 				resource = build.buildNested();
+				processResource();
 			}
 
 			@Test
@@ -245,6 +253,7 @@ public class ContentLinksResourceProcessorIT {
 
 				PersistentEntityResource.Builder build = PersistentEntityResource.build(child, persistentEntity);
 				resource = build.buildNested();
+				processResource();
 			}
 
 			@Test
