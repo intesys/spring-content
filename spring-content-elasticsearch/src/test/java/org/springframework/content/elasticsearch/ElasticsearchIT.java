@@ -451,6 +451,12 @@ public class ElasticsearchIT {
         }
     }
 
+    /**
+     * Helper method to wait for the eventual consistency of Elasticsearch.
+     * It retries the given assertion periodically until it passes or the timeout is reached.
+     *
+     * @param assertion the code to execute periodically until it succeeds
+     */
     private static void eventually(Runnable assertion) {
         long deadline = System.currentTimeMillis() + POLL_TIMEOUT_MS;
         Throwable last = null;
