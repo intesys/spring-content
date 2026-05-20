@@ -206,4 +206,7 @@ buildNumber.properties
 # docx
 *.fo
 
+# Junie
+.junie/
+
 # End of https://www.gitignore.io/api/macos,maven,eclipse,intellij
