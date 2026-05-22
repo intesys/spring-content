@@ -1,11 +1,5 @@
 package internal.org.springframework.content.jpa;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,11 +11,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.content.commons.io.DeletableResource;
 import org.springframework.content.jpa.config.EnableJpaStores;
@@ -44,13 +42,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.util.Assert;
-
 
 import internal.org.springframework.content.jpa.testsupport.stores.DocumentStore;
 import net.bytebuddy.utility.RandomString;
-
-
 
 public class StoreIT {
 
@@ -62,163 +56,101 @@ public class StoreIT {
 
 	private TransactionStatus status;
 
-	@Nested
-	@DisplayName("Store")
-	class Store {
+	record DbConfig(
+		Class<?> configClass,
+		String name
+	) {}
 
-		@Nested
-		@DisplayName("H2")
-		class WithH2 {
+	static Stream<Arguments> configs() {
+		return Stream.of(
+			Arguments.of(H2Config.class, "H2"),
+			Arguments.of(HSQLConfig.class, "HSQL"),
+			Arguments.of(MySqlConfig.class, "MySQL"),
+			Arguments.of(PostgresConfig.class, "Postgres"),
+			Arguments.of(SqlServerConfig.class, "SQLServer"),
+			Arguments.of(OracleConfig.class, "Oracle"));
+	}
 
-			@BeforeEach
-			void setUp() throws Exception {
-				AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-				context.register(TestConfig.class);
-				context.register(H2Config.class);
-				context.refresh();
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("configs")
+	void storeTests(Class<?> configClass, String name)
+        throws IOException {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		context.register(TestConfig.class);
+		context.register(configClass);
+		context.refresh();
 
-				ptm = context.getBean(PlatformTransactionManager.class);
-				store = context.getBean(DocumentStore.class);
+		ptm = context.getBean(PlatformTransactionManager.class);
+		store = context.getBean(DocumentStore.class);
 
-				if (ptm == null) {
-					ptm = mock(PlatformTransactionManager.class);
-				}
+		if (ptm == null) {
+			ptm = mock(PlatformTransactionManager.class);
+		}
 
-				if (ptm == null) {
-					ptm = mock(PlatformTransactionManager.class);
-				}
+		if (ptm == null) {
+			ptm = mock(PlatformTransactionManager.class);
+		}
 
-				status = ptm.getTransaction(new DefaultTransactionDefinition());
+		status = ptm.getTransaction(new DefaultTransactionDefinition());
+
+		try {
+			Resource r = store.getResource(getId());
+
+			assertThat(r.exists(), is(false));
+
+			InputStream is = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
+			OutputStream os = ((WritableResource) r).getOutputStream();
+			IOUtils.copy(is, os);
+			is.close();
+			os.close();
+
+			assertThat(r.exists(), is(true));
+
+			boolean matches = false;
+			InputStream expected = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
+			InputStream actual = null;
+			try {
+				actual = r.getInputStream();
+				matches = IOUtils.contentEquals(expected, actual);
+			} catch (IOException e) {
+			} finally {
+				IOUtils.closeQuietly(expected);
+				IOUtils.closeQuietly(actual);
+			}
+			assertThat(matches, Matchers.is(true));
+
+			is = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
+			os = ((WritableResource) r).getOutputStream();
+			IOUtils.copy(is, os);
+			is.close();
+			os.close();
+
+			assertThat(r.exists(), is(true));
+
+			matches = false;
+			expected = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
+			actual = null;
+			try {
+				actual = r.getInputStream();
+				matches = IOUtils.contentEquals(expected, actual);
+			} catch (IOException e) {
+			} finally {
+				IOUtils.closeQuietly(expected);
+				IOUtils.closeQuietly(actual);
+			}
+			assertThat(matches, Matchers.is(true));
+
+			try {
+				((DeletableResource) r).delete();
+			} catch (Exception ex) {
+				e = ex;
 			}
 
-			@AfterEach
-			void tearDown() throws Exception {
-				ptm.commit(status);
-			}
-
-			@Nested
-			@DisplayName("within a transaction")
-			class WithinATransaction {
-
-				@Nested
-				@DisplayName("given a new resource")
-				class GivenANewResource {
-
-					@BeforeEach
-					void setUp() throws Exception {
-						r = store.getResource(getId());
-					}
-
-					@Test
-					@DisplayName("should not exist")
-					void shouldNotExist() throws Exception {
-						assertThat(r.exists(), is(false));
-					}
-
-					@Nested
-					@DisplayName("given content is added to that resource")
-					class GivenContentIsAddedToThatResource {
-
-						@BeforeEach
-						void setUp() throws Exception {
-							InputStream is = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
-							OutputStream os = ((WritableResource) r).getOutputStream();
-
-							try {
-								IOUtils.copy(is, os);
-							} finally {
-								is.close();
-								os.close();
-							}
-						}
-
-						@AfterEach
-						void tearDown() throws Exception {
-							try {
-								((DeletableResource) r).delete();
-							} catch (Exception e) {
-							}
-						}
-
-						@Test
-						@DisplayName("should store that content")
-						void shouldStoreThatContent() throws Exception {
-							try {
-								assertThat(r.exists(), is(true));
-							} catch (Throwable t) {
-								t.printStackTrace();
-								throw t;
-							}
-
-							boolean matches = false;
-							InputStream expected = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
-							InputStream actual = null;
-							try {
-								actual = r.getInputStream();
-								matches = IOUtils.contentEquals(expected, actual);
-							} catch (IOException e) {
-							} finally {
-								IOUtils.closeQuietly(expected);
-								IOUtils.closeQuietly(actual);
-							}
-							assertThat(matches, Matchers.is(true));
-						}
-
-						@Nested
-						@DisplayName("given that resource is then updated")
-						class GivenThatResourceIsThenUpdated {
-
-							@BeforeEach
-							void setUp() throws Exception {
-								InputStream is = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
-								OutputStream os = ((WritableResource) r).getOutputStream();
-								IOUtils.copy(is, os);
-								is.close();
-								os.close();
-							}
-
-							@Test
-							@DisplayName("should store that updated content")
-							void shouldStoreThatUpdatedContent() throws Exception {
-								assertThat(r.exists(), is(true));
-
-								boolean matches = false;
-								InputStream expected = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
-								InputStream actual = null;
-								try {
-									actual = r.getInputStream();
-									matches = IOUtils.contentEquals(expected, actual);
-								} catch (IOException e) {
-								} finally {
-									IOUtils.closeQuietly(expected);
-									IOUtils.closeQuietly(actual);
-								}
-								assertThat(matches, Matchers.is(true));
-							}
-						}
-
-						@Nested
-						@DisplayName("given that resource is then deleted")
-						class GivenThatResourceIsThenDeleted {
-
-							@BeforeEach
-							void setUp() throws Exception {
-								try {
-									((DeletableResource) r).delete();
-								} catch (Exception ex) {
-									e = ex;
-								}
-							}
-
-							@Test
-							@DisplayName("should not exist")
-							void shouldNotExist() throws Exception {
-								assertThat(e, is(nullValue()));
-							}
-						}
-					}
-				}
-			}
+			assertThat(e, is(nullValue()));
+		}
+		finally {
+			ptm.commit(status);
+			context.close();
 		}
 	}
 
@@ -389,7 +321,7 @@ public class StoreIT {
 
 			factory.setJpaVendorAdapter(vendorAdapter);
 			HashMap<String, Object> properties = new HashMap<>();
-			properties.put("hibernate.dialect","org.hibernate.dialect.MySQL55Dialect");
+			properties.put("hibernate.dialect","org.hibernate.dialect.MySQLDialect");
 			factory.setJpaPropertyMap(properties);
 
 			return factory;

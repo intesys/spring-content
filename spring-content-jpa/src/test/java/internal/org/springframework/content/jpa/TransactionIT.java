@@ -1,11 +1,5 @@
 package internal.org.springframework.content.jpa;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -14,6 +8,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.stream.Stream;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +17,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.repository.ContentStore;
 import org.springframework.content.jpa.config.EnableJpaStores;
@@ -34,13 +32,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import internal.org.springframework.content.jpa.StoreIT.H2Config;
-import internal.org.springframework.content.jpa.StoreIT.TestConfig;
+import internal.org.springframework.content.jpa.StoreIT.HSQLConfig;
+import internal.org.springframework.content.jpa.StoreIT.MySqlConfig;
+import internal.org.springframework.content.jpa.StoreIT.PostgresConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-public class TransactionIT {
+class TransactionIT {
 
 	private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
@@ -52,61 +51,48 @@ public class TransactionIT {
 
 	private TestEntity te = null;
 
-	@Nested
-	@DisplayName("TransactionTest")
-	class Transactiontest {
-
-		@Nested
-		@DisplayName("given a context with a repository and a store")
-		class GivenAContextWithARepositoryAndAStore {
-
-			@BeforeEach
-			void setUp() throws Exception {
-				context = new AnnotationConfigApplicationContext();
-				context.register(TestConfig.class);
-				context.register(H2Config.class);
-				context.refresh();
-
-				repo = context.getBean(TestEntityRepository.class);
-				store = context.getBean(TestEntityContentRepository.class);
-				dbService = context.getBean(DbService.class);
-				ptm = context.getBean(PlatformTransactionManager.class);
-
-				te = new TestEntity();
-				te = repo.save(te);
-				assertThat(te.getId(), is(not(nullValue())));
-				assertThat(te.getContentId(), is(nullValue()));
-			}
-
-			@AfterEach
-			void tearDown() throws Exception {
-				context.close();
-			}
-
-			@Nested
-			@DisplayName("given an exception is thrown causing a rollback")
-			class GivenAnExceptionIsThrownCausingARollback {
-
-				@Test
-				@DisplayName("should not commit changes to content")
-				void shouldNotCommitChangesToContent() throws Exception {
-					try {
-						te = dbService.doSomeDbStuff(store, te);
-					} catch (Exception e) {
-						ContentStoreIT.doInTransaction(ptm, () -> {
-							try (InputStream result = store.getContent(te)) {
-								assertThat(result, is(nullValue()));
-							} catch (IOException e1) {}
-							return null;
-						});
-					}
-				}
-			}
-		}
+	static Stream<Arguments> configs() {
+		return Stream.of(
+			Arguments.of(H2Config.class, "H2"),
+			Arguments.of(HSQLConfig.class, "HSQL"),
+			Arguments.of(MySqlConfig.class, "MySQL"),
+			Arguments.of(PostgresConfig.class, "Postgres"));
+			//Arguments.of(StoreIT.SqlServerConfig.class, "SQLServer"),
+			//Arguments.of(StoreIT.OracleConfig.class, "Oracle"));
 	}
 
-	private static String getContextName(Class<?> configClass) {
-		return configClass.getSimpleName().replaceAll("Config", "");
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("configs")
+	void transactionTest(Class<?> configClass, String name) {
+		context = new AnnotationConfigApplicationContext();
+		context.register(TestConfig.class);
+		context.register(configClass);
+		context.refresh();
+
+		repo = context.getBean(TestEntityRepository.class);
+		store = context.getBean(TestEntityContentRepository.class);
+		dbService = context.getBean(DbService.class);
+		ptm = context.getBean(PlatformTransactionManager.class);
+
+		te = new TestEntity();
+		te = repo.save(te);
+		assertThat(te.getId(), is(not(nullValue())));
+		assertThat(te.getContentId(), is(nullValue()));
+
+		try {
+			try {
+				te = dbService.doSomeDbStuff(store, te);
+			} catch (Exception e) {
+				ContentStoreIT.doInTransaction(ptm, () -> {
+					try (InputStream result = store.getContent(te)) {
+						assertThat(result, is(nullValue()));
+					} catch (IOException e1) {}
+					return null;
+				});
+			}
+		} finally {
+			context.close();
+		}
 	}
 
 	@Configuration
