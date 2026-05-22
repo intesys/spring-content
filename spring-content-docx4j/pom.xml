@@ -7,14 +7,14 @@
 	<parent>
 		<groupId>it.intesys</groupId>
 		<artifactId>spring-content</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 	
 	<dependencies>
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-commons</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -32,10 +32,20 @@
 			<artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
 			<version>8.3.9</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.1</version>
+		</dependency>
 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

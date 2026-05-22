@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.rest.config.HypermediaConfiguration;
 import org.springframework.content.rest.config.RestConfiguration;
@@ -86,6 +87,12 @@ public class EntityContentLinksIT {
 				contentLinkTests.setUrl("/testEntity3s/" + testEntity3.getId());
 				contentLinkTests.setLinkRel("content");
 				contentLinkTests.setExpectedLinkRegex(String.format("http://localhost/testEntity3s/%s/content", testEntity3.getId()));
+			}
+
+			@Test
+			@DisplayName("should provide a response with a content link")
+			void shouldProvideContentLink() throws Exception {
+				contentLinkTests.getRequestShouldProvideContentLink();
 			}
 		}
 	}

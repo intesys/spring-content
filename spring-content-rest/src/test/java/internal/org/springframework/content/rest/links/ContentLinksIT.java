@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.property.PropertyPath;
 import org.springframework.content.rest.config.HypermediaConfiguration;
@@ -115,6 +116,12 @@ public class ContentLinksIT {
 				contentLinkTests.setLinkRel("testEntity3");
 				contentLinkTests.setExpectedLinkRegex("http://localhost/api/testEntity3s/" + testEntity3.getId());
 			}
+
+			@Test
+			@DisplayName("should provide a response with a content link")
+			void shouldProvideContentLink() throws Exception {
+				contentLinkTests.getRequestShouldProvideContentLink();
+			}
 		}
 
 		@Nested
@@ -135,6 +142,12 @@ public class ContentLinksIT {
 				contentLinkTests.setUrl("/api/testEntity5s/" + testEntity5.getId());
 				contentLinkTests.setLinkRel("content");
 				contentLinkTests.setExpectedLinkRegex(format("http://localhost/contentApi/testEntity5s/%s/content", testEntity5.getId()));
+			}
+
+			@Test
+			@DisplayName("should provide a response with a content link")
+			void shouldProvideContentLink() throws Exception {
+				contentLinkTests.getRequestShouldProvideContentLink();
 			}
 		}
 
@@ -157,6 +170,12 @@ public class ContentLinksIT {
 				contentLinkTests.setUrl("/api/files/" + testEntity2.getId());
 				contentLinkTests.setLinkRel("child");
 				contentLinkTests.setExpectedLinkRegex(format("http://localhost/contentApi/files/%s/child", testEntity2.getId()));
+			}
+
+			@Test
+			@DisplayName("should provide a response with a content link")
+			void shouldProvideContentLink() throws Exception {
+				contentLinkTests.getRequestShouldProvideContentLink();
 			}
 		}
 
@@ -182,6 +201,12 @@ public class ContentLinksIT {
 				contentLinkTests.setUrl("/api/testEntity10s/" + testEntity10.getId());
 				contentLinkTests.setLinkRel("child/content");
 				contentLinkTests.setExpectedLinkRegex(format("http://localhost/contentApi/testEntity10s/%s/child/content", testEntity10.getId()));
+			}
+
+			@Test
+			@DisplayName("should provide a response with a content link")
+			void shouldProvideContentLink() throws Exception {
+				contentLinkTests.getRequestShouldProvideContentLink();
 			}
 		}
 	}

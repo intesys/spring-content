@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.renditions.RenditionProvider;
 import org.springframework.content.fs.config.EnableFilesystemStores;
@@ -89,6 +90,12 @@ public class ContextPathContentLinksIT {
 				contentLinkTests.setContextPath("/contextPath");
 				contentLinkTests.setLinkRel("testEntity3");
 				contentLinkTests.setExpectedLinkRegex("http://localhost/contextPath/testEntity3s/" + testEntity3.getId());
+			}
+
+			@Test
+			@DisplayName("should provide a response with a content link")
+			void shouldProvideContentLink() throws Exception {
+				contentLinkTests.getRequestShouldProvideContentLink();
 			}
 		}
 	}
