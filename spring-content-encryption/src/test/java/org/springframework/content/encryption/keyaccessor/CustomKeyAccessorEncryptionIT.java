@@ -1,6 +1,6 @@
 package org.springframework.content.encryption.keyaccessor;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.content.commons.mappingcontext.ContentProperty;
@@ -19,8 +19,10 @@ import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -47,12 +49,10 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(Ginkgo4jSpringRunner.class)
 @SpringBootTest(classes = CustomKeyAccessorEncryptionIT.Application.class, webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CustomKeyAccessorEncryptionIT {
 
@@ -71,66 +71,82 @@ public class CustomKeyAccessorEncryptionIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private FsFile f;
+    @Nested
+    @DisplayName("Client-side encryption with custom key storage")
+    class ClientSideEncryptionWithCustomKeyStorage {
 
-    {
-        Describe("Client-side encryption with custom key storage", () -> {
-            BeforeEach(() -> {
-                RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+        private FsFile f;
 
-                f = repo.save(new FsFile());
-            });
-            Context("given content", () -> {
-                BeforeEach(() -> {
+        @BeforeEach
+        void setup() {
+            RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+            f = repo.save(new FsFile());
+        }
+
+        @Nested
+        @DisplayName("given content")
+        class GivenContent {
+
+            @BeforeEach
+            void setup() {
+                given()
+                        .contentType("text/plain")
+                        .body("Hello Client-side encryption World!")
+                        .when()
+                        .post("/fsFiles/" + f.getId() + "/content")
+                        .then()
+                        .statusCode(HttpStatus.SC_CREATED);
+            }
+
+            @Test
+            @DisplayName("should be stored encrypted")
+            void shouldBeStoredEncrypted()
+                throws IOException {
+                Optional<FsFile> fetched = repo.findById(f.getId());
+                assertThat(fetched.isPresent(), is(true));
+                f = fetched.get();
+
+                String contents = IOUtils.toString(new FileInputStream(new java.io.File(filesystemRoot, f.getContentId().toString())));
+                assertThat(contents, is(not("Hello Client-side encryption World!")));
+
+                assertThat(contentEncryptionKeyRepository.findById(f.getContentId()).isPresent(), is(true));
+            }
+
+            @Test
+            @DisplayName("should be retrieved decrypted")
+            void shouldBeRetrievedDecrypted() {
+                given()
+                        .header("accept", "text/plain")
+                        .get("/fsFiles/" + f.getId() + "/content")
+                        .then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .assertThat()
+                        .contentType(Matchers.startsWith("text/plain"))
+                        .body(Matchers.equalTo("Hello Client-side encryption World!"));
+            }
+
+            @Nested
+            @DisplayName("when the content is unset")
+            class WhenContentIsUnset {
+
+                @Test
+                @DisplayName("it should remove the content and clear the content key")
+                void shouldRemoveContentAndClearContentKey() {
+                    f = repo.findById(f.getId()).get();
+                    String contentId = f.getContentId().toString();
+
                     given()
-                            .contentType("text/plain")
-                            .body("Hello Client-side encryption World!")
-                            .when()
-                            .post("/fsFiles/" + f.getId() + "/content")
+                            .delete("/fsFiles/" + f.getId() + "/content")
                             .then()
-                            .statusCode(HttpStatus.SC_CREATED);
-                });
-                It("should be stored encrypted", () -> {
-                    Optional<FsFile> fetched = repo.findById(f.getId());
-                    assertThat(fetched.isPresent(), is(true));
-                    f = fetched.get();
+                            .statusCode(HttpStatus.SC_NO_CONTENT);
 
-                    String contents = IOUtils.toString(new FileInputStream(new java.io.File(filesystemRoot, f.getContentId().toString())));
-                    assertThat(contents, is(not("Hello Client-side encryption World!")));
-
-                    assertThat(contentEncryptionKeyRepository.findById(f.getContentId()).isPresent(), is(true));
-                });
-                It("should be retrieved decrypted", () -> {
-                    given()
-                            .header("accept", "text/plain")
-                            .get("/fsFiles/" + f.getId() + "/content")
-                            .then()
-                            .statusCode(HttpStatus.SC_OK)
-                            .assertThat()
-                            .contentType(Matchers.startsWith("text/plain"))
-                            .body(Matchers.equalTo("Hello Client-side encryption World!"));
-                });
-                Context("when the content is unset", () -> {
-                    It("it should remove the content and clear the content key", () -> {
-                        f = repo.findById(f.getId()).get();
-                        String contentId = f.getContentId().toString();
-
-                        given()
-                                .delete("/fsFiles/" + f.getId() + "/content")
-                                .then()
-                                .statusCode(HttpStatus.SC_NO_CONTENT);
-
-                        f = repo.findById(f.getId()).get();
-                        assertThat(contentEncryptionKeyRepository.findById(UUID.fromString(contentId)).isEmpty(), is(true));
-                        assertThat(new java.io.File(filesystemRoot, contentId).exists(), is(false));
-                    });
-                });
-            });
-        });
+                    f = repo.findById(f.getId()).get();
+                    assertThat(contentEncryptionKeyRepository.findById(UUID.fromString(contentId)).isEmpty(), is(true));
+                    assertThat(new java.io.File(filesystemRoot, contentId).exists(), is(false));
+                }
+            }
+        }
     }
-
-    @Test
-    public void noop() {}
 
     @SpringBootApplication(exclude={S3ContentAutoConfiguration.class})
     @ImportAutoConfiguration(ContentRestAutoConfiguration.class)
@@ -191,7 +207,6 @@ public class CustomKeyAccessorEncryptionIT {
 
     public interface ContentEncryptionKeyRepository extends CrudRepository<ContentEncryptionKey, UUID> {
 
-
     }
 
     @Entity
@@ -241,7 +256,6 @@ public class CustomKeyAccessorEncryptionIT {
             }
 
             var dataEncryptionKey = maybeDataEncryptionKey.get();
-
 
             var encryptionKeyEntity = contentEncryptionKeyRepository.findById(contentId)
                     .orElseGet(() -> {

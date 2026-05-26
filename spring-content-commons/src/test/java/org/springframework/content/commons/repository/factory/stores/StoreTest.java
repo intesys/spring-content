@@ -1,18 +1,13 @@
 package org.springframework.content.commons.repository.factory.stores;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.io.Serializable;
 import java.net.URI;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.repository.AssociativeStore;
 import org.springframework.content.commons.repository.ContentStore;
@@ -21,46 +16,60 @@ import org.springframework.content.commons.repository.factory.testsupport.Enable
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import internal.org.springframework.content.commons.repository.AnnotatedStoreEventInvoker;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = StoreTest.StoreTestConfiguration.class)
 public class StoreTest {
 
 	@Autowired
 	private ApplicationContext context;
 
-	{
-		Describe("given a store definition", () -> {
+	@Nested
+	@DisplayName("given a store definition")
+	class GivenAStoreDefinition {
 
-			Context("given the application context", () -> {
+		@Nested
+		@DisplayName("given the application context")
+		class GivenTheApplicationContext {
 
-				It("should have a store bean", () -> {
-					assertThat(context.getBean(TestContentRepository.class), is(not(nullValue())));
-				});
+			@Test
+			@DisplayName("should have a store bean")
+			void shouldHaveAStoreBean() throws Exception {
+				assertThat(context.getBean(TestContentRepository.class), is(not(nullValue())));
+			}
 
-				It("should have the core spring content service beans", () -> {
-					assertThat(context.getBean(AnnotatedStoreEventInvoker.class), is(not(nullValue())));
-				});
+			@Test
+			@DisplayName("should have the core spring content service beans")
+			void shouldHaveTheCoreSpringContentServiceBeans() throws Exception {
+				assertThat(context.getBean(AnnotatedStoreEventInvoker.class), is(not(nullValue())));
+			}
 
-				It("should have a TestStore bean", () -> {
-					assertThat(context.getBean(TestStore.class), is(not(nullValue())));
-				});
+			@Test
+			@DisplayName("should have a TestStore bean")
+			void shouldHaveATeststoreBean() throws Exception {
+				assertThat(context.getBean(TestStore.class), is(not(nullValue())));
+			}
 
-				It("should have an TestAssociativeStore bean", () -> {
-					assertThat(context.getBean(TestAssociativeStore.class), is(not(nullValue())));
-				});
+			@Test
+			@DisplayName("should have an TestAssociativeStore bean")
+			void shouldHaveAnTestassociativestoreBean() throws Exception {
+				assertThat(context.getBean(TestAssociativeStore.class), is(not(nullValue())));
+			}
 
-				It("should have an TestAssociativeAndContentStore bean", () -> {
-					assertThat(context.getBean(TestAssociativeAndContentStore.class), is(not(nullValue())));
-				});
-			});
-		});
+			@Test
+			@DisplayName("should have an TestAssociativeAndContentStore bean")
+			void shouldHaveAnTestassociativeandcontentstoreBean() throws Exception {
+				assertThat(context.getBean(TestAssociativeAndContentStore.class), is(not(nullValue())));
+			}
+		}
 	}
 
 	@Configuration
@@ -78,9 +87,5 @@ public class StoreTest {
 	}
 
 	public interface TestAssociativeAndContentStore extends ContentStore<Object, URI> {
-	}
-
-	@Test
-	public void noop() {
 	}
 }

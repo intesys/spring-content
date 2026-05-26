@@ -16,8 +16,9 @@ specific language governing permissions and limitations
 under the License. */
 package internal.org.springframework.content.commons.metadataextraction;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.content.commons.metadataextraction.MetadataExtractor;
 
@@ -32,9 +33,11 @@ import java.util.Map;
  *
  * @author marcobelligoli
  */
+@DisplayName("MetadataExtractionServiceImpl")
 public class MetadataExtractionServiceImplTest {
 
     @Test
+    @DisplayName("should extract metadata with a single extractor")
     public void testExtractMetadataWithSingleExtractor() {
 
         File mockFile = Mockito.mock(File.class);
@@ -47,12 +50,13 @@ public class MetadataExtractionServiceImplTest {
 
         Map<String, Object> result = service.extractMetadata(mockFile);
 
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals("John Doe", result.get("author"));
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("John Doe", result.get("author"));
         Mockito.verify(mockExtractor).extractMetadata(mockFile);
     }
 
     @Test
+    @DisplayName("should extract metadata with multiple extractors")
     public void testExtractMetadataWithMultipleExtractors() {
 
         File mockFile = Mockito.mock(File.class);
@@ -70,14 +74,15 @@ public class MetadataExtractionServiceImplTest {
 
         Map<String, Object> result = service.extractMetadata(mockFile);
 
-        Assert.assertEquals(2, result.size());
-        Assert.assertEquals("John Doe", result.get("author"));
-        Assert.assertEquals("Sample Document", result.get("title"));
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertEquals("John Doe", result.get("author"));
+        Assertions.assertEquals("Sample Document", result.get("title"));
         Mockito.verify(mockExtractor1).extractMetadata(mockFile);
         Mockito.verify(mockExtractor2).extractMetadata(mockFile);
     }
 
     @Test
+    @DisplayName("should override metadata when there are conflicting keys")
     public void testExtractMetadataWithConflictingKeys() {
 
         File mockFile = Mockito.mock(File.class);
@@ -95,13 +100,14 @@ public class MetadataExtractionServiceImplTest {
 
         Map<String, Object> result = service.extractMetadata(mockFile);
 
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals("value2", result.get("key")); // Last extractor's value overrides
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("value2", result.get("key")); // Last extractor's value overrides
         Mockito.verify(mockExtractor1).extractMetadata(mockFile);
         Mockito.verify(mockExtractor2).extractMetadata(mockFile);
     }
 
     @Test
+    @DisplayName("should return empty map when there are no extractors")
     public void testExtractMetadataWithNoExtractors() {
 
         File mockFile = Mockito.mock(File.class);
@@ -109,10 +115,11 @@ public class MetadataExtractionServiceImplTest {
 
         Map<String, Object> result = service.extractMetadata(mockFile);
 
-        Assert.assertTrue(result.isEmpty());
+        Assertions.assertTrue(result.isEmpty());
     }
 
     @Test
+    @DisplayName("should return empty map when extractor returns empty metadata")
     public void testExtractMetadataWithEmptyMetadataFromExtractor() {
 
         File mockFile = Mockito.mock(File.class);
@@ -123,7 +130,7 @@ public class MetadataExtractionServiceImplTest {
 
         Map<String, Object> result = service.extractMetadata(mockFile);
 
-        Assert.assertTrue(result.isEmpty());
+        Assertions.assertTrue(result.isEmpty());
         Mockito.verify(mockExtractor).extractMetadata(mockFile);
     }
 }

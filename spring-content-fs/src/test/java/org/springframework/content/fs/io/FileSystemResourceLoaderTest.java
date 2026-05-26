@@ -1,10 +1,5 @@
 package org.springframework.content.fs.io;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,15 +10,13 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.io.DeletableResource;
 import org.springframework.core.io.Resource;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 public class FileSystemResourceLoaderTest {
 
 	private FileSystemResourceLoader loader = null;
@@ -37,73 +30,115 @@ public class FileSystemResourceLoaderTest {
 
 	private Exception ex;
 
-	{
-		Describe("FileSystemResourceLoader", () -> {
-			Context("#FileSystemResourceLoader", () -> {
-				JustBeforeEach(() -> {
-					try {
-						loader = new FileSystemResourceLoader(path);
-					}
-					catch (Exception e) {
-						ex = e;
-					}
-				});
-				Context("given well formed path (has a trailing slash)", () -> {
-					BeforeEach(() -> path = Paths.get("some", "well-formed", "path") + File.separator);
-					It("succeeds", () -> {
-						assertThat(ex, is(nullValue()));
+	@Nested
+	@DisplayName("FileSystemResourceLoader")
+	class Filesystemresourceloader {
 
-						File expected = Paths.get(path, "something").toFile();
-						File actual = loader.getResource("/something").getFile();
+		@Nested
+		@DisplayName("#FileSystemResourceLoader")
+		class FilesystemresourceloaderConstructor {
 
-						assertThat(actual.getAbsolutePath(), is(expected.getAbsolutePath()));
-						assertThat(loader.getResource("/something"),
-								   instanceOf(DeletableResource.class));
-					});
-				});
+			private void createLoader() {
+				try {
+					loader = new FileSystemResourceLoader(path);
+				}
+				catch (Exception e) {
+					ex = e;
+				}
+			}
 
-				Context("given malformed path without a trailing slash)", () -> {
-					BeforeEach(() -> path = Paths.get("some", "malformed", "path").toString());
-					It("succeeds", () -> {
-						assertThat(ex, is(nullValue()));
+			@Nested
+			@DisplayName("given well formed path (has a trailing slash)")
+			class GivenWellFormedPathHasATrailingSlash {
 
-						File expected = Paths.get(path, "something").toFile();
-						File actual = loader.getResource("/something").getFile();
+				@BeforeEach
+				void setUp() throws Exception {
+					path = Paths.get("some", "well-formed", "path") + File.separator;
+				}
 
-						assertThat(actual.getAbsolutePath(), is(expected.getAbsolutePath()));
-						assertThat(loader.getResource("/something"),
-								   instanceOf(DeletableResource.class));
-					});
-				});
-			});
-		});
+				@Test
+				@DisplayName("succeeds")
+				void succeeds() throws Exception {
+					createLoader();
+					assertThat(ex, is(nullValue()));
 
-		Describe("DeletableResource", () -> {
-			Context("#delete", () -> {
-				BeforeEach(() -> {
+					File expected = Paths.get(path, "something").toFile();
+					File actual = loader.getResource("/something").getFile();
+
+					assertThat(actual.getAbsolutePath(), is(expected.getAbsolutePath()));
+					assertThat(loader.getResource("/something"),
+							   instanceOf(DeletableResource.class));
+				}
+			}
+
+			@Nested
+			@DisplayName("given malformed path without a trailing slash)")
+			class GivenMalformedPathWithoutATrailingSlash {
+
+				@BeforeEach
+				void setUp() throws Exception {
+					path = Paths.get("some", "malformed", "path").toString();
+				}
+
+				@Test
+				@DisplayName("succeeds")
+				void succeeds() throws Exception {
+					createLoader();
+					assertThat(ex, is(nullValue()));
+
+					File expected = Paths.get(path, "something").toFile();
+					File actual = loader.getResource("/something").getFile();
+
+					assertThat(actual.getAbsolutePath(), is(expected.getAbsolutePath()));
+					assertThat(loader.getResource("/something"),
+							   instanceOf(DeletableResource.class));
+				}
+			}
+		}
+
+		@Nested
+		@DisplayName("DeletableResource")
+		class Deletableresource {
+
+			@Nested
+			@DisplayName("#delete")
+			class Delete {
+
+				@BeforeEach
+				void setUp() throws Exception {
 					parent = new File(Paths
 							.get(System.getProperty("java.io.tmpdir"),
 									UUID.randomUUID().toString())
 							.toAbsolutePath().toString());
-				});
-				JustBeforeEach(() -> {
+				}
+
+				private void executeDelete() throws Exception {
 					loader = new FileSystemResourceLoader(parent.getPath() + File.separator);
 					Resource resource = loader.getResource(location);
 					assertThat(resource, instanceOf(DeletableResource.class));
 					((DeletableResource) resource).delete();
-				});
-				Context("given a file resource that exists", () -> {
-					BeforeEach(() -> {
+				}
+
+				@Nested
+				@DisplayName("given a file resource that exists")
+				class GivenAFileResourceThatExists {
+
+					@BeforeEach
+					void setUp() throws Exception {
 						location = "FileSystemResourceLoaderTest.tmp";
 						file = new File(parent, location);
 						FileUtils.touch(file);
 						assertThat(file.exists(), is(true));
-					});
-					It("should delete the underlying file", () -> {
+					}
+
+					@Test
+					@DisplayName("should delete the underlying file")
+					void shouldDeleteTheUnderlyingFile() throws Exception {
+						executeDelete();
 						assertThat(file.exists(), is(false));
-					});
-				});
-			});
-		});
+					}
+				}
+			}
+		}
 	}
 }

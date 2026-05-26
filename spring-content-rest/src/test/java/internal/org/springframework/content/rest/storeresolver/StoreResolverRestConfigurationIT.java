@@ -1,13 +1,13 @@
 package internal.org.springframework.content.rest.storeresolver;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.rest.support.TestEntity2;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -16,13 +16,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.InputStream;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads=1)
 @SpringBootTest(classes = Application.class, webEnvironment=WebEnvironment.RANDOM_PORT)
 public class StoreResolverRestConfigurationIT {
 
@@ -41,53 +38,54 @@ public class StoreResolverRestConfigurationIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private Application.TEntity tEntity;
+    @Nested
+    @DisplayName("JpaRest")
+    class JpaRestTests {
 
-    private TestEntity2 existingClaim;
+        private Application.TEntity tEntity;
 
-    {
-        Describe("JpaRest", () -> {
+        @BeforeEach
+        void setup() {
+            RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+        }
 
-            BeforeEach(() -> {
-                RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
-            });
+        @Nested
+        @DisplayName("given that claim has existing content")
+        class GivenClaimHasExistingContent {
 
-            Context("given that claim has existing content", () -> {
-                BeforeEach(() -> {
-                    tEntity = new Application.TEntity();
-                    tEntity = repo.save(tEntity);
-                });
-                It("should return the content from the correct store", () -> {
+            @BeforeEach
+            void init() {
+                tEntity = new Application.TEntity();
+                tEntity = repo.save(tEntity);
+            }
 
-                    assertThat(jpaStore, is(not(nullValue())));
-                    assertThat(fsStore, is(not(nullValue())));
-                    assertThat(repo, is(not(nullValue())));
+            @Test
+            @DisplayName("should return the content from the correct store")
+	void shouldReturnContentFromCorrectStore() throws Exception {
+                assertThat(jpaStore, is(not(nullValue())));
+                assertThat(fsStore, is(not(nullValue())));
+                assertThat(repo, is(not(nullValue())));
 
-                    String newContent = "This is some new content";
+                String newContent = "This is some new content";
 
-                    given()
-                            .contentType("text/plain")
-                            .body(newContent.getBytes())
-                            .when()
-                            .post("/tEntities/" + tEntity.getId())
-                            .then()
-                            .statusCode(HttpStatus.SC_CREATED);
+                given()
+                        .contentType("text/plain")
+                        .body(newContent.getBytes())
+                        .when()
+                        .post("/tEntities/" + tEntity.getId())
+                        .then()
+                        .statusCode(HttpStatus.SC_CREATED);
 
-                    // refetch
-                    tEntity = repo.findById(tEntity.getId()).get();
+                tEntity = repo.findById(tEntity.getId()).get();
 
-                    try (InputStream is = fsStore.getContent(tEntity)) {
-                        assertThat(IOUtils.toString(is), is(newContent));
-                    }
+                try (InputStream is = fsStore.getContent(tEntity)) {
+                    assertThat(IOUtils.toString(is), is(newContent));
+                }
 
-                    try (InputStream is = jpaStore.getContent(tEntity)) {
-                        assertThat(is, is(nullValue()));
-                    }
-                });
-            });
-        });
+                try (InputStream is = jpaStore.getContent(tEntity)) {
+                    assertThat(is, is(nullValue()));
+                }
+            }
+        }
     }
-
-    @Test
-    public void noop() {}
 }

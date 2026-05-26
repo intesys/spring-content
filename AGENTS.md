@@ -34,8 +34,6 @@ Key module families:
 
 ## Testing
 
-- **Framework**: [ginkgo4j](https://github.com/paulcwarren/ginkgo4j) BDD (not plain JUnit).  
-  Tests run via a custom `JUnitRunListener` (`com.github.paulcwarren.ginkgo4j.maven.JUnitRunListener`).
 - **Unit tests**: `*Test.java` — run by default.
 - **Integration tests**: `*IT.java` and `*Tests.java` — **only run with `-P tests`**.
 - Many ITs use Testcontainers / LocalStack / embedded DBs; Docker availability matters for a full `-P tests` pass.

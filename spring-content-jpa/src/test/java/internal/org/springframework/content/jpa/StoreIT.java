@@ -1,10 +1,5 @@
 package internal.org.springframework.content.jpa;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.AfterEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,12 +11,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.content.commons.io.DeletableResource;
 import org.springframework.content.jpa.config.EnableJpaStores;
@@ -44,183 +42,136 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.util.Assert;
-
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 
 import internal.org.springframework.content.jpa.testsupport.stores.DocumentStore;
 import net.bytebuddy.utility.RandomString;
 
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 public class StoreIT {
 
-	private static Class<?>[] CONFIG_CLASSES = new Class[]{
-			H2Config.class,
-			HSQLConfig.class,
-			MySqlConfig.class,
-			PostgresConfig.class
-//			SqlServerConfig.class,
-//			OracleConfig.class
-	};
+	private PlatformTransactionManager ptm;
+	private DocumentStore store;
 
-	private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-	
-	// for postgres (large object api operations must be in a transaction)
-    private PlatformTransactionManager ptm;
+	private Resource r;
+	private Exception e;
 
-    private DocumentStore store;
+	private TransactionStatus status;
 
-    private Resource r;
-    private Exception e;
+	record DbConfig(
+		Class<?> configClass,
+		String name
+	) {}
 
-    private TransactionStatus status;
+	static Stream<Arguments> configs() {
+		return Stream.of(
+			Arguments.of(H2Config.class, "H2"),
+			Arguments.of(HSQLConfig.class, "HSQL"),
+			Arguments.of(MySqlConfig.class, "MySQL"),
+			Arguments.of(PostgresConfig.class, "Postgres"),
+			Arguments.of(SqlServerConfig.class, "SQLServer"),
+			Arguments.of(OracleConfig.class, "Oracle"));
+	}
 
-    {
-        Describe("Store", () -> {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("configs")
+	void storeTests(Class<?> configClass, String name)
+        throws IOException {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		context.register(TestConfig.class);
+		context.register(configClass);
+		context.refresh();
 
-			for (Class<?> configClass : CONFIG_CLASSES) {
-				
-				Context(getContextName(configClass), () -> {
-			
-					BeforeEach(() -> {
-						context = new AnnotationConfigApplicationContext();
-						context.register(TestConfig.class);
-						context.register(configClass);
-						context.refresh();
-						
-						ptm = context.getBean(PlatformTransactionManager.class);
-						store = context.getBean(DocumentStore.class);
-						
-						if (ptm == null) {
-							ptm = mock(PlatformTransactionManager.class);
-						}
-					});
-		
-		            Context("within a transaction", () -> {
-		                BeforeEach(() -> {
-		                    if (ptm == null) {
-		                        ptm = mock(PlatformTransactionManager.class);
-		                    }
-		
-		                    status = ptm.getTransaction(new DefaultTransactionDefinition());
-		                });
-		                AfterEach(() -> {
-		                    ptm.commit(status);
-		                });
-		                Context("given a new resource", () -> {
-		                    BeforeEach(() -> {
-		                        r = store.getResource(getId());
-		                    });
-		                    It("should not exist", () -> {
-		                        assertThat(r.exists(), is(false));
-		                    });
-		                    Context("given content is added to that resource", () -> {
-		                        BeforeEach(() -> {
-		                            InputStream is = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
-		                            OutputStream os = ((WritableResource) r).getOutputStream();
-		
-		                            try {
-		                                IOUtils.copy(is, os);
-		                            } finally {
-		                                is.close();
-		                                os.close();
-		                            }
-		                        });
-		                        AfterEach(() -> {
-		                            try {
-		                                ((DeletableResource) r).delete();
-		                            } catch (Exception e) {
-		                                // do nothing
-		                            }
-		                        });
-		                        It("should store that content", () -> {
-		                            try {
-		                                assertThat(r.exists(), is(true));
-		                            } catch (Throwable t) {
-		                                t.printStackTrace();
-		
-		                                throw t;
-		                            }
-		
-		                            boolean matches = false;
-		                            InputStream expected = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
-		                            InputStream actual = null;
-		                            try {
-		                                actual = r.getInputStream();
-		                                matches = IOUtils.contentEquals(expected, actual);
-		                            } catch (IOException e) {
-		                            } finally {
-		                                IOUtils.closeQuietly(expected);
-		                                IOUtils.closeQuietly(actual);
-		                            }
-		                            assertThat(matches, Matchers.is(true));
-		
-		                        });
-		                        Context("given that resource is then updated", () -> {
-		                            BeforeEach(() -> {
-		                                InputStream is = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
-		                                OutputStream os = ((WritableResource)r).getOutputStream();
-		                                IOUtils.copy(is, os);
-		                                is.close();
-		                                os.close();
-		                            });
-		                            It("should store that updated content", () -> {
-		                                assertThat(r.exists(), is(true));
-		
-		                                boolean matches = false;
-		                                InputStream expected = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
-		                                InputStream actual = null;
-		                                try {
-		                                    actual = r.getInputStream();
-		                                    matches = IOUtils.contentEquals(expected, actual);
-		                                } catch (IOException e) {
-		                                } finally {
-		                                    IOUtils.closeQuietly(expected);
-		                                    IOUtils.closeQuietly(actual);
-		                                }
-		                                assertThat(matches, Matchers.is(true));
-		                            });
-		                        });
-		                        Context("given that resource is then deleted", () -> {
-		                            BeforeEach(() -> {
-		                                try {
-		                                    ((DeletableResource) r).delete();
-		                                } catch (Exception e) {
-		                                    this.e = e;
-		                                }
-		                            });
-		                            It("should not exist", () -> {
-		                                assertThat(e, is(nullValue()));
-		                            });
-		                        });
-		                    });
-		                });
-		            });
-				});
+		ptm = context.getBean(PlatformTransactionManager.class);
+		store = context.getBean(DocumentStore.class);
+
+		if (ptm == null) {
+			ptm = mock(PlatformTransactionManager.class);
+		}
+
+		if (ptm == null) {
+			ptm = mock(PlatformTransactionManager.class);
+		}
+
+		status = ptm.getTransaction(new DefaultTransactionDefinition());
+
+		try {
+			Resource r = store.getResource(getId());
+
+			assertThat(r.exists(), is(false));
+
+			InputStream is = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
+			OutputStream os = ((WritableResource) r).getOutputStream();
+			IOUtils.copy(is, os);
+			is.close();
+			os.close();
+
+			assertThat(r.exists(), is(true));
+
+			boolean matches = false;
+			InputStream expected = new ByteArrayInputStream("Hello Spring Content World!".getBytes());
+			InputStream actual = null;
+			try {
+				actual = r.getInputStream();
+				matches = IOUtils.contentEquals(expected, actual);
+			} catch (IOException e) {
+			} finally {
+				IOUtils.closeQuietly(expected);
+				IOUtils.closeQuietly(actual);
 			}
-        });
-    }
+			assertThat(matches, Matchers.is(true));
 
-    protected String getId() {
-        RandomString random  = new RandomString(5);
-        return "/store-tests/" + random.nextString();
-    }
-    
+			is = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
+			os = ((WritableResource) r).getOutputStream();
+			IOUtils.copy(is, os);
+			is.close();
+			os.close();
+
+			assertThat(r.exists(), is(true));
+
+			matches = false;
+			expected = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes());
+			actual = null;
+			try {
+				actual = r.getInputStream();
+				matches = IOUtils.contentEquals(expected, actual);
+			} catch (IOException e) {
+			} finally {
+				IOUtils.closeQuietly(expected);
+				IOUtils.closeQuietly(actual);
+			}
+			assertThat(matches, Matchers.is(true));
+
+			try {
+				((DeletableResource) r).delete();
+			} catch (Exception ex) {
+				e = ex;
+			}
+
+			assertThat(e, is(nullValue()));
+		}
+		finally {
+			ptm.commit(status);
+			context.close();
+		}
+	}
+
+	protected String getId() {
+		RandomString random = new RandomString(5);
+		return "/store-tests/" + random.nextString();
+	}
+
 	public static String getContextName(Class<?> configClass) {
 		return configClass.getSimpleName().replaceAll("Config", "");
 	}
-	
+
 	@Configuration
 	@EnableJpaRepositories(considerNestedRepositories=true)
 	@EnableJpaStores
 	public static class TestConfig {}
-	
+
 	@Configuration
 	@EnableTransactionManagement
 	public static class H2Config {
-		
+
 	    @Value("/org/springframework/content/jpa/schema-drop-h2.sql")
 	    private Resource dropReopsitoryTables;
 
@@ -241,7 +192,7 @@ public class StoreIT {
 
 	        return initializer;
 	    }
-	    
+
 		@Bean
 		public DataSource dataSource() {
 			EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
@@ -273,7 +224,7 @@ public class StoreIT {
 	@Configuration
 	@EnableTransactionManagement
 	public static class HSQLConfig {
-		
+
 	    @Value("/org/springframework/content/jpa/schema-drop-hsqldb.sql")
 	    private Resource dropReopsitoryTables;
 
@@ -294,7 +245,7 @@ public class StoreIT {
 
 	        return initializer;
 	    }
-	    
+
 		@Bean
 		public DataSource dataSource() {
 			EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
@@ -322,11 +273,11 @@ public class StoreIT {
 			return txManager;
 		}
 	}
-	
+
 	@Configuration
 	@EnableTransactionManagement
 	public static class MySqlConfig {
-		
+
 	    @Value("/org/springframework/content/jpa/schema-drop-mysql.sql")
 	    private Resource dropReopsitoryTables;
 
@@ -370,7 +321,7 @@ public class StoreIT {
 
 			factory.setJpaVendorAdapter(vendorAdapter);
 			HashMap<String, Object> properties = new HashMap<>();
-			properties.put("hibernate.dialect","org.hibernate.dialect.MySQL55Dialect");
+			properties.put("hibernate.dialect","org.hibernate.dialect.MySQLDialect");
 			factory.setJpaPropertyMap(properties);
 
 			return factory;
@@ -385,11 +336,11 @@ public class StoreIT {
 			return txManager;
 		}
 	}
-	
+
 	@Configuration
 	@EnableTransactionManagement
 	public static class PostgresConfig {
-		
+
 	    @Value("/org/springframework/content/jpa/schema-drop-postgresql.sql")
 	    private Resource dropReopsitoryTables;
 
@@ -445,7 +396,7 @@ public class StoreIT {
 	@Configuration
 	@EnableTransactionManagement
 	public static class SqlServerConfig {
-		
+
 	    @Value("/org/springframework/content/jpa/schema-drop-sqlserver.sql")
 	    private Resource dropReopsitoryTables;
 
@@ -525,7 +476,6 @@ public class StoreIT {
 
 		@Bean
 		public DataSource dataSource() {
-			// Timezone is not set in github containers, need this for connections to work
 			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 
 			DriverManagerDataSource ds = new DriverManagerDataSource();

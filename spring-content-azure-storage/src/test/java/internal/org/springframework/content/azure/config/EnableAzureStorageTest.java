@@ -1,21 +1,19 @@
 package internal.org.springframework.content.azure.config;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.AfterEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.content.azure.config.AzureStorageConfigurer;
 import org.springframework.content.azure.config.BlobId;
@@ -31,12 +29,9 @@ import org.springframework.core.convert.converter.ConverterRegistry;
 
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-
 import internal.org.springframework.content.azure.it.Azurite;
 import lombok.Data;
 
-@RunWith(Ginkgo4jRunner.class)
 public class EnableAzureStorageTest {
 
     private static final BlobServiceClientBuilder builder = Azurite.getBlobServiceClientBuilder();
@@ -52,79 +47,94 @@ public class EnableAzureStorageTest {
 
 	private AnnotationConfigApplicationContext context;
 
-	// mocks
 	static AzureStorageConfigurer configurer;
 
-	{
-		Describe("EnableAzureStorage", () -> {
+	@Nested
+	@DisplayName("EnableAzureStorage")
+	class Enableazurestorage {
 
-			Context("given a context and a configuration with an Azure ContentStore",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(TestConfig.class);
-							context.refresh();
-						});
+		@Nested
+		@DisplayName("given a context and a configuration with an Azure ContentStore")
+		class GivenAContextAndAConfigurationWithAnAzureContentstore {
 
-						AfterEach(() -> {
-							context.close();
-						});
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(TestConfig.class);
+				context.refresh();
+			}
 
-						It("should have a ContentStore bean", () -> {
-							assertThat(context.getBean(TestEntityContentStore.class), is(not(nullValue())));
-						});
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
 
-						It("should have an Placement Service", () -> {
-							assertThat(context.getBean("azureStoragePlacementService"), is(not(nullValue())));
-						});
-					});
+			@Test
+			@DisplayName("should have a ContentStore bean")
+			void shouldHaveAContentStoreBean() throws Exception {
+				assertThat(context.getBean(TestEntityContentStore.class), is(not(nullValue())));
+			}
 
-			Context("given a context with a configurer", () -> {
+			@Test
+			@DisplayName("should have an Placement Service")
+			void shouldHaveAnPlacementService() throws Exception {
+				assertThat(context.getBean("azureStoragePlacementService"), is(not(nullValue())));
+			}
+		}
 
-				BeforeEach(() -> {
-					configurer = mock(AzureStorageConfigurer.class);
+		@Nested
+		@DisplayName("given a context with a configurer")
+		class GivenAContextWithAConfigurer {
 
-					context = new AnnotationConfigApplicationContext();
-					context.register(ConverterConfig.class);
-					context.refresh();
-				});
+			@BeforeEach
+			void setUp() throws Exception {
+				configurer = mock(AzureStorageConfigurer.class);
 
-				AfterEach(() -> {
-					context.close();
-				});
+				context = new AnnotationConfigApplicationContext();
+				context.register(ConverterConfig.class);
+				context.refresh();
+			}
 
-				It("should call that configurer to help setup the store", () -> {
-					verify(configurer).configureAzureStorageConverters(any(ConverterRegistry.class));
-				});
-			});
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
 
-			Context("given a context with an empty configuration", () -> {
+			@Test
+			@DisplayName("should call that configurer to help setup the store")
+			void shouldCallThatConfigurerToHelpSetupTheStore() throws Exception {
+				verify(configurer).configureAzureStorageConverters(any(ConverterRegistry.class));
+			}
+		}
 
-				BeforeEach(() -> {
-					context = new AnnotationConfigApplicationContext();
-					context.register(EmptyConfig.class);
-					context.refresh();
-				});
+		@Nested
+		@DisplayName("given a context with an empty configuration")
+		class GivenAContextWithAnEmptyConfiguration {
 
-				AfterEach(() -> {
-					context.close();
-				});
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(EmptyConfig.class);
+				context.refresh();
+			}
 
-				It("should not contains any Azure Storage beans", () -> {
-					try {
-						context.getBean(TestEntityContentStore.class);
-						fail("expected no such bean");
-					}
-					catch (NoSuchBeanDefinitionException e) {
-						assertThat(true, is(true));
-					}
-				});
-			});
-		});
-	}
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
 
-	@Test
-	public void noop() {
+			@Test
+			@DisplayName("should not contains any Azure Storage beans")
+			void shouldNotContainsAnyAzureStorageBeans() throws Exception {
+				try {
+					context.getBean(TestEntityContentStore.class);
+					fail("expected no such bean");
+				}
+				catch (NoSuchBeanDefinitionException e) {
+					assertThat(true, is(true));
+				}
+			}
+		}
 	}
 
 	@Configuration

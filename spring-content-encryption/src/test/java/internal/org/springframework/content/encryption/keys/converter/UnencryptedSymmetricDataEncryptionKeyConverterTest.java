@@ -2,13 +2,14 @@ package internal.org.springframework.content.encryption.keys.converter;
 
 
 import jakarta.xml.bind.DatatypeConverter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.encryption.keys.StoredDataEncryptionKey.EncryptedSymmetricDataEncryptionKey;
 import org.springframework.content.encryption.keys.StoredDataEncryptionKey.UnencryptedSymmetricDataEncryptionKey;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class UnencryptedSymmetricDataEncryptionKeyConverterTest {
+
     @Test
     public void encodesAndDecodes() {
         var key = new UnencryptedSymmetricDataEncryptionKey(

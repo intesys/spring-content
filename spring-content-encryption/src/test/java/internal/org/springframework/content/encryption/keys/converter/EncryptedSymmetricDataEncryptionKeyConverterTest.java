@@ -6,11 +6,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import jakarta.xml.bind.DatatypeConverter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.encryption.keys.StoredDataEncryptionKey.EncryptedSymmetricDataEncryptionKey;
 import org.springframework.content.encryption.keys.StoredDataEncryptionKey.UnencryptedSymmetricDataEncryptionKey;
 
 public class EncryptedSymmetricDataEncryptionKeyConverterTest {
+
     @Test
     public void encodesAndDecodes() {
         var encryptedKey = new EncryptedSymmetricDataEncryptionKey(

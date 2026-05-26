@@ -1,10 +1,13 @@
 package internal.org.springframework.content.rest.utils;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+
 import internal.org.springframework.content.commons.storeservice.StoreInfoImpl;
 import internal.org.springframework.content.rest.annotations.ContentStoreRestResource;
 import internal.org.springframework.content.rest.support.TestEntity;
-import org.junit.runner.RunWith;
 import org.springframework.content.commons.renditions.Renderable;
 import org.springframework.content.commons.repository.ContentStore;
 import org.springframework.content.commons.repository.Store;
@@ -13,100 +16,159 @@ import org.springframework.content.rest.StoreRestResource;
 
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
 @SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
-@RunWith(Ginkgo4jRunner.class)
 public class StoreUtilsTest {
 
 	private StoreInfo info;
 	private String storePath;
 
-	{
-		Context("#storePath", () -> {
-			JustBeforeEach(() -> {
+	@Nested
+	@DisplayName("#storePath")
+	class Storepath {
+
+		@Nested
+		@DisplayName("given a content store with no annotation")
+		class GivenAContentStoreWithNoAnnotation {
+			@BeforeEach
+			void setUp() throws Exception {
+				ContentStore storeImpl = mock(TestContentStore.class);
+				info = new StoreInfoImpl(TestContentStore.class, TestEntity.class, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return return 'testEntities'")
+			void shouldReturnReturnTestentities() throws Exception {
 				storePath = StoreUtils.storePath(info);
-			});
-			Context("given a content store with no annotation", () -> {
-				BeforeEach(() -> {
-					ContentStore storeImpl = mock(TestContentStore.class);
-					info = new StoreInfoImpl(TestContentStore.class, TestEntity.class, storeImpl);
-				});
-				It("should return return 'testEntities'", () -> {
-					assertThat(storePath, is("testEntities"));
-				});
-			});
-			Context("given a content store with a deprecated ContentStoreRestResource annotation", () -> {
-				BeforeEach(() -> {
-					ContentStore storeImpl = mock(ContentStoreWithDeprecatedAnnotation.class);
-					info = new StoreInfoImpl(
-							ContentStoreWithDeprecatedAnnotation.class,
-							TestEntity.class, storeImpl);
-				});
-				It("should return return the specified path", () -> {
-					assertThat(storePath, is("testEntities"));
-				});
-			});
-			Context("given a content store with a deprecated ContentStoreRestResource annotation that specifies a path", () -> {
-				BeforeEach(() -> {
-					ContentStore storeImpl = mock(ContentStoreWithPath.class);
-					info = new StoreInfoImpl(ContentStoreWithPath.class,
-							TestEntity.class, storeImpl);
-				});
-				It("should return return the specified path", () -> {
-					assertThat(storePath, is("some-path"));
-				});
-			});
-			Context("given a content store with a StoreRestResource annotation", () -> {
-				BeforeEach(() -> {
-					ContentStore storeImpl = mock(ContentStoreWithAnnotation.class);
-					info = new StoreInfoImpl(ContentStoreWithAnnotation.class,
-							TestEntity.class, storeImpl);
-				});
-				It("should return return the specified path", () -> {
-					assertThat(storePath, is("testEntities"));
-				});
-			});
-			Context("given a content store with a StoreRestResource annotation that specifies a path", () -> {
-				BeforeEach(() -> {
-					ContentStore storeImpl = mock(ContentStoreWithAnotherPath.class);
-					info = new StoreInfoImpl(ContentStoreWithAnotherPath.class, TestEntity.class, storeImpl);
-				});
-				It("should return return the specified path", () -> {
-					assertThat(storePath, is("some-other-path"));
-				});
-			});
-			Context("given a Store with no annotations", () -> {
-				BeforeEach(() -> {
-					Store storeImpl = mock(TestStore.class);
-					info = new StoreInfoImpl(TestStore.class, null, storeImpl);
-				});
-				It("should return 'tests'", () -> {
-					assertThat(storePath, is("tests"));
-				});
-			});
-			Context("given a Store with a StoreRestResource annotation", () -> {
-				BeforeEach(() -> {
-					Store storeImpl = mock(TestStoreWithAnnotation.class);
-					info = new StoreInfoImpl(TestStoreWithAnnotation.class, null, storeImpl);
-				});
-				It("should return 'tests'", () -> {
-					assertThat(storePath, is("testWithAnnotations"));
-				});
-			});
-			Context("given a Store with a StoreRestResource annotation with a path of 'foo'", () -> {
-				BeforeEach(() -> {
-					Store storeImpl = mock(TestStoreWithPath.class);
-					info = new StoreInfoImpl(TestStoreWithPath.class, null, storeImpl);
-				});
-				It("should return 'tests'", () -> {
-					assertThat(storePath, is("foo"));
-				});
-			});
-		});
+				assertThat(storePath, is("testEntities"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a content store with a deprecated ContentStoreRestResource annotation")
+		class GivenAContentStoreWithADeprecatedContentstorerestresourceAnnotation {
+			@BeforeEach
+			void setUp() throws Exception {
+				ContentStore storeImpl = mock(ContentStoreWithDeprecatedAnnotation.class);
+				info = new StoreInfoImpl(
+						ContentStoreWithDeprecatedAnnotation.class,
+						TestEntity.class, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return return the specified path")
+			void shouldReturnReturnTheSpecifiedPath() throws Exception {
+				storePath = StoreUtils.storePath(info);
+				assertThat(storePath, is("testEntities"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a content store with a deprecated ContentStoreRestResource annotation that specifies a path")
+		class GivenAContentStoreWithADeprecatedContentstorerestresourceAnnotationThatSpecifiesAPath {
+			@BeforeEach
+			void setUp() throws Exception {
+				ContentStore storeImpl = mock(ContentStoreWithPath.class);
+				info = new StoreInfoImpl(ContentStoreWithPath.class,
+						TestEntity.class, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return return the specified path")
+			void shouldReturnReturnTheSpecifiedPath() throws Exception {
+				storePath = StoreUtils.storePath(info);
+				assertThat(storePath, is("some-path"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a content store with a StoreRestResource annotation")
+		class GivenAContentStoreWithAStorerestresourceAnnotation {
+			@BeforeEach
+			void setUp() throws Exception {
+				ContentStore storeImpl = mock(ContentStoreWithAnnotation.class);
+				info = new StoreInfoImpl(ContentStoreWithAnnotation.class,
+						TestEntity.class, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return return the specified path")
+			void shouldReturnReturnTheSpecifiedPath() throws Exception {
+				storePath = StoreUtils.storePath(info);
+				assertThat(storePath, is("testEntities"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a content store with a StoreRestResource annotation that specifies a path")
+		class GivenAContentStoreWithAStorerestresourceAnnotationThatSpecifiesAPath {
+			@BeforeEach
+			void setUp() throws Exception {
+				ContentStore storeImpl = mock(ContentStoreWithAnotherPath.class);
+				info = new StoreInfoImpl(ContentStoreWithAnotherPath.class, TestEntity.class, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return return the specified path")
+			void shouldReturnReturnTheSpecifiedPath() throws Exception {
+				storePath = StoreUtils.storePath(info);
+				assertThat(storePath, is("some-other-path"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a Store with no annotations")
+		class GivenAStoreWithNoAnnotations {
+			@BeforeEach
+			void setUp() throws Exception {
+				Store storeImpl = mock(TestStore.class);
+				info = new StoreInfoImpl(TestStore.class, null, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return 'tests'")
+			void shouldReturnTests() throws Exception {
+				storePath = StoreUtils.storePath(info);
+				assertThat(storePath, is("tests"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a Store with a StoreRestResource annotation")
+		class GivenAStoreWithAStorerestresourceAnnotation {
+			@BeforeEach
+			void setUp() throws Exception {
+				Store storeImpl = mock(TestStoreWithAnnotation.class);
+				info = new StoreInfoImpl(TestStoreWithAnnotation.class, null, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return 'tests'")
+			void shouldReturnTests() throws Exception {
+				storePath = StoreUtils.storePath(info);
+				assertThat(storePath, is("testWithAnnotations"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a Store with a StoreRestResource annotation with a path of 'foo'")
+		class GivenAStoreWithAStorerestresourceAnnotationWithAPathOfFoo {
+			@BeforeEach
+			void setUp() throws Exception {
+				Store storeImpl = mock(TestStoreWithPath.class);
+				info = new StoreInfoImpl(TestStoreWithPath.class, null, storeImpl);
+			}
+
+			@Test
+			@DisplayName("should return 'tests'")
+			void shouldReturnTests() throws Exception {
+				storePath = StoreUtils.storePath(info);
+				assertThat(storePath, is("foo"));
+			}
+		}
 	}
 
 	public interface TestStore extends Store<String> {}

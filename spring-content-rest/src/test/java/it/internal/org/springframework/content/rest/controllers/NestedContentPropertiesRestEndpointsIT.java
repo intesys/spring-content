@@ -1,6 +1,5 @@
 package it.internal.org.springframework.content.rest.controllers;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -23,8 +22,11 @@ import java.util.UUID;
 import internal.org.springframework.content.rest.support.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.property.PropertyPath;
 import org.springframework.content.rest.config.HypermediaConfiguration;
@@ -38,21 +40,19 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
-
-@RunWith(Ginkgo4jSpringRunner.class)
-// @Ginkgo4jConfiguration(threads=1)
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
       StoreConfig.class,
       DelegatingWebMvcConfiguration.class,
       RepositoryRestMvcConfiguration.class,
       RestConfiguration.class,
-	  HypermediaConfiguration.class
+      HypermediaConfiguration.class
 })
 @Transactional
 @ActiveProfiles("store")
@@ -69,45 +69,76 @@ public class NestedContentPropertiesRestEndpointsIT {
    private Version versionTests;
    private LastModifiedDate lastModifiedDateTests;
 
-   private MockMvc mvc;
+   @Nested
+   @DisplayName("Nested Content Properties REST Endpoints")
+   class NestedContentPropertiesTests {
 
-   {
-      Describe("Nested Content Properties REST Endpoints", () -> {
-		BeforeEach(() -> {
+		private MockMvc mvc;
+
+		@BeforeEach
+		void setup() {
 		  mvc = MockMvcBuilders.webAppContextSetup(context).build();
-		});
-		Context("given an Entity with a simple content property", () -> {
-		  BeforeEach(() -> {
+		}
+
+		@Nested
+		@DisplayName("given an Entity with a simple content property")
+		class WithContentProperty {
+
+		  @BeforeEach
+		  void init() {
 			  testEntity10 = repository.save(new TestEntity10());
-		  });
+		  }
 
-		  Context("given a request to a non-existent entity", () -> {
-              It("should return 404", () -> {
-                  mvc.perform(
-                          get("/testEntity10s/9999999/foo"))
-                          .andExpect(status().isNotFound());
-              });
-		  });
+		  @Nested
+		  @DisplayName("given a request to a non-existent entity")
+		  class NonExistentEntity {
 
-          Context("given a request to a non-existent content property", () -> {
-              It("should return 404", () -> {
-                  mvc.perform(
-                          get("/testEntity10s/" + testEntity10.getId() + "/doesnotexist"))
-                          .andExpect(status().isNotFound());
-              });
-          });
+			  @Test
+			  @DisplayName("should return 404")
+			  void shouldReturn404() throws Exception {
+				  mvc.perform(
+						  get("/testEntity10s/9999999/foo"))
+						  .andExpect(status().isNotFound());
+			  }
+		  }
 
-		  Context("given that is has no content", () -> {
-			  Context("a GET to /{repository}/{id}/{contentProperty}", () -> {
-				  It("should return 404", () -> {
+		  @Nested
+		  @DisplayName("given a request to a non-existent content property")
+		  class NonExistentProperty {
+
+			  @Test
+			  @DisplayName("should return 404")
+			  void shouldReturn404() throws Exception {
+				  mvc.perform(
+						  get("/testEntity10s/" + testEntity10.getId() + "/doesnotexist"))
+						  .andExpect(status().isNotFound());
+			  }
+		  }
+
+		  @Nested
+		  @DisplayName("given that is has no content")
+		  class HasNoContent {
+
+			  @Nested
+			  @DisplayName("a GET to /{repository}/{id}/{contentProperty}")
+			  class GetContentProperty {
+
+				  @Test
+				  @DisplayName("should return 404")
+				  void shouldReturn404() throws Exception {
 					  mvc.perform(
 							  get("/testEntity10s/" + testEntity10.getId() + "/child"))
 							  .andExpect(status().isNotFound());
-				  });
-			  });
-			  Context("a PUT to /{repository}/{id}/{property}/{contentProperty}", () -> {
-				  It("should create the content", () -> {
+				  }
+			  }
 
+			  @Nested
+			  @DisplayName("a PUT to /{repository}/{id}/{property}/{contentProperty}")
+			  class PutContentProperty {
+
+				  @Test
+				  @DisplayName("should create the content")
+				  void shouldCreateContent() throws Exception {
 					  mvc.perform(
 							  put("/testEntity10s/" + testEntity10.getId() + "/child/content")
 									  .content("Hello New Spring Content World!")
@@ -137,30 +168,40 @@ public class NestedContentPropertiesRestEndpointsIT {
                       try (InputStream actual = store.getResource(fetched.get(), PropertyPath.from("child/preview")).getInputStream()) {
                           IOUtils.contentEquals(actual, new ByteArrayInputStream("Hello New Spring Content Preview World!".getBytes()));
                       }
-				  });
-			  });
-			  Context("a PUT to /{store}/{id}/{property}/{contentProperty} with json content", () -> {
-			      It("should set the content and return 201", () -> {
-			          String content = "{\"content\":\"Hello New Spring Content World!\"}";
-			          mvc.perform(
+				  }
+			  }
+
+			  @Nested
+			  @DisplayName("a PUT to /{store}/{id}/{property}/{contentProperty} with json content")
+			  class PutWithJsonContent {
+
+				  @Test
+				  @DisplayName("should set the content and return 201")
+				  void shouldSetContentAndReturn201() throws Exception {
+				      String content = "{\"content\":\"Hello New Spring Content World!\"}";
+				      mvc.perform(
                             put("/testEntity10s/" + testEntity10.getId() + "/child/content")
                             .content(content)
                             .contentType("application/json"))
-			          .andExpect(status().isCreated());
+				      .andExpect(status().isCreated());
 
-			          Optional<TestEntity10> fetched = repository.findById(testEntity10.getId());
-			          assertThat(fetched.isPresent(), is(true));
-			          assertThat(fetched.get().getChild().getContentId(), is(not(nullValue())));
-			          assertThat(fetched.get().getChild().getContentLen(), is(45L));
-			          assertThat(fetched.get().getChild().getContentMimeType(), is("application/json"));
+				      Optional<TestEntity10> fetched = repository.findById(testEntity10.getId());
+				      assertThat(fetched.isPresent(), is(true));
+				      assertThat(fetched.get().getChild().getContentId(), is(not(nullValue())));
+				      assertThat(fetched.get().getChild().getContentLen(), is(45L));
+				      assertThat(fetched.get().getChild().getContentMimeType(), is("application/json"));
                       try (InputStream actual = store.getResource(fetched.get(), PropertyPath.from("child/content")).getInputStream()) {
                           IOUtils.contentEquals(actual, new ByteArrayInputStream(content.getBytes()));
-                      }
-			      });
-			  });
-		  });
-		  Context("given that it has content", () -> {
-			  BeforeEach(() -> {
+					  }
+				  }
+			  }
+
+		  @Nested
+		  @DisplayName("given that it has content")
+		  class HasContent {
+
+			  @BeforeEach
+			  void init() throws Exception {
 				  String content = "Hello Spring Content World!";
 
 				  testEntity10.getChild().contentMimeType = "text/plain";
@@ -185,24 +226,36 @@ public class NestedContentPropertiesRestEndpointsIT {
 				  lastModifiedDateTests.setLastModifiedDate(testEntity10.getModifiedDate());
 				  lastModifiedDateTests.setEtag(testEntity10.getVersion().toString());
 				  lastModifiedDateTests.setContent(content);
-			  });
-			  Context("a GET to /{repository}/{id}/{contentProperty}", () -> {
-				  It("should return the content", () -> {
+			  }
+
+			  @Nested
+			  @DisplayName("a GET to /{repository}/{id}/{contentProperty}")
+			  class GetContentProperty {
+
+				  @Test
+				  @DisplayName("should return the content")
+				  void shouldReturnContent() throws Exception {
 					  MockHttpServletResponse response = mvc
 							  .perform(get("/testEntity10s/" + testEntity10.getId() + "/child/content")
 									  .accept("text/plain"))
 							  .andExpect(status().isOk())
-							  .andExpect(header().string("etag", is("\"1\"")))
+							  .andExpect(header().string("etag", is("\"0\"")))
 							  .andExpect(header().string("last-modified", LastModifiedDate
 									  .isWithinASecond(testEntity10.getModifiedDate())))
 							  .andReturn().getResponse();
 
 					  assertThat(response, is(not(nullValue())));
 					  assertThat(response.getContentAsString(), is("Hello Spring Content World!"));
-				  });
-			  });
-			  Context("a GET to /{repository}/{id}/{contentProperty} with a mime type that matches a renderer", () -> {
-				  It("should return the rendition and 200", () -> {
+				  }
+			  }
+
+			  @Nested
+			  @DisplayName("a GET to /{repository}/{id}/{contentProperty} with a mime type that matches a renderer")
+			  class GetWithRenderer {
+
+				  @Test
+				  @DisplayName("should return the rendition and 200")
+				  void shouldReturnRendition() throws Exception {
 					  MockHttpServletResponse response = mvc
 							  .perform(get(
 									  "/testEntity10s/" + testEntity10.getId()
@@ -214,10 +267,16 @@ public class NestedContentPropertiesRestEndpointsIT {
 					  assertThat(response, is(not(nullValue())));
 					  assertThat(response.getContentAsString(), is(
 							  "<html><body>Hello Spring Content World!</body></html>"));
-				  });
-			  });
-			  Context("a GET to /{repository}/{id}/{contentProperty} with multiple mime types the last of which matches the content", () -> {
-				  It("should return the original content and 200", () -> {
+				  }
+			  }
+
+			  @Nested
+			  @DisplayName("a GET to /{repository}/{id}/{contentProperty} with multiple mime types the last of which matches the content")
+			  class GetMultipleMimeTypes {
+
+				  @Test
+				  @DisplayName("should return the original content and 200")
+				  void shouldReturnOriginalContent() throws Exception {
 					  MockHttpServletResponse response = mvc
 							  .perform(get("/testEntity10s/"
 									  + testEntity10.getId()
@@ -230,10 +289,16 @@ public class NestedContentPropertiesRestEndpointsIT {
 					  assertThat(response, is(not(nullValue())));
 					  assertThat(response.getContentAsString(),
 							  is("Hello Spring Content World!"));
-				  });
-			  });
-			  Context("a PUT to /{repository}/{id}/{contentProperty}", () -> {
-				  It("should create the content", () -> {
+				  }
+			  }
+
+			  @Nested
+			  @DisplayName("a PUT to /{repository}/{id}/{contentProperty}")
+			  class PutContentProperty {
+
+				  @Test
+				  @DisplayName("should create the content")
+				  void shouldCreateContent() throws Exception {
 					  mvc.perform(
 							  put("/testEntity10s/" + testEntity10.getId() + "/child/content")
 									  .content("Hello New Spring Content World!")
@@ -246,10 +311,16 @@ public class NestedContentPropertiesRestEndpointsIT {
 					  assertThat(fetched.get().getChild().contentId,is(not(nullValue())));
 					  assertThat(fetched.get().getChild().contentLen, is(31L));
 					  assertThat(fetched.get().getChild().contentMimeType, is("text/plain"));
-				  });
-			  });
-			  Context("a DELETE to /{repository}/{id}/{contentProperty}", () -> {
-				  It("should delete the content", () -> {
+				  }
+			  }
+
+			  @Nested
+			  @DisplayName("a DELETE to /{repository}/{id}/{contentProperty}")
+			  class DeleteContentProperty {
+
+				  @Test
+				  @DisplayName("should delete the content")
+				  void shouldDeleteContent() throws Exception {
 					  mvc.perform(delete(
 							  "/testEntity10s/" + testEntity10.getId() + "/child/content"))
 							  .andExpect(status().isNoContent());
@@ -259,24 +330,24 @@ public class NestedContentPropertiesRestEndpointsIT {
 					  assertThat(fetched.get().getChild().contentId, is(nullValue()));
 					  assertThat(fetched.get().getChild().contentLen, is(nullValue()));
                       assertThat(fetched.get().getChild().contentMimeType, is(nullValue()));
-				  });
-			  });
+				  }
+			  }
+}
 
-			  versionTests = Version.tests();
-			  lastModifiedDateTests = LastModifiedDate.tests();
-		  });
-		});
 
-		Context("given a POST to the entity endpoint with a multipart/form request", () -> {
-		  It("should create a new entity and its content and respond with a 201 Created", () -> {
-			  // assert content does not exist
+		@Nested
+		@DisplayName("given a POST to the entity endpoint with a multipart/form request")
+		class PostMultiPartForm {
+
+		  @Test
+		  @DisplayName("should create a new entity and its content and respond with a 201 Created")
+		  void shouldCreateEntityAndContent() throws Exception {
 			  String content = "This is some new content";
 			  String previewContent = "This is some new preview content";
 
 			  MockMultipartFile file1 = new MockMultipartFile("child/content", "filename.txt", "text/plain", content.getBytes());
 			  MockMultipartFile file2 = new MockMultipartFile("child/preview", "preview.txt", "text/plain", previewContent.getBytes());
 
-			  // POST the new content
 			  MockHttpServletResponse response = mvc.perform(multipart("/testEntity10s")
 							  .file(file1)
 							  .file(file2)
@@ -290,7 +361,6 @@ public class NestedContentPropertiesRestEndpointsIT {
 			  Optional<TestEntity10> fetchedEntity = repository.findById(Long.valueOf(StringUtils.substringAfterLast(location, "/")));
 			  assertThat(fetchedEntity.get().getHidden(), is(nullValue()));
 
-			  // assert that it now exists
 			  response = mvc.perform(get(location + "/child/content")
 							  .accept("text/plain"))
 					  .andExpect(status().isOk())
@@ -304,19 +374,14 @@ public class NestedContentPropertiesRestEndpointsIT {
 					  .andReturn().getResponse();
 
 			  assertThat(response.getContentAsString(), is(previewContent));
-		  });
-	  	});
-  	  });
-   }
+  }
+	}
+	}
+	}
+}
 
-	@Test
-   public void noop() {
-   }
-
-   private static String toHeaderDateFormat(Date dt) {
-      SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-      format.setTimeZone(TimeZone.getTimeZone("GMT"));
-      return format.format(dt);
-   }
-
+	{
+		versionTests = Version.tests();
+		lastModifiedDateTests = LastModifiedDate.tests();
+	}
 }

@@ -1,10 +1,5 @@
 package internal.org.springframework.content.commons.store.factory;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -16,60 +11,62 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.repository.ContentStore;
 import org.springframework.context.ApplicationEventPublisher;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-
-@RunWith(Ginkgo4jRunner.class)
+@DisplayName("StoreImpl")
 public class StoreImplTest {
 
     private StoreImpl stores;
 
     private ContentStore store;
     private ApplicationEventPublisher publisher;
-    private String tmpDir;
     private Path contentCopyPathRoot;
 
-    {
-        Describe("StoreImpl", () -> {
+    @BeforeEach
+    void setUp() throws Exception {
+        store = mock(ContentStore.class);
+        publisher = mock(ApplicationEventPublisher.class);
+        contentCopyPathRoot = Files.createTempDirectory("storeimpltest");
 
-            BeforeEach(() -> {
-                store = mock(ContentStore.class);
-                publisher = mock(ApplicationEventPublisher.class);
+        File[] files = contentCopyPathRoot.toFile().listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.getName().endsWith(".tmp")) {
+                    f.delete();
+                }
+            }
+        }
 
-            });
-            JustBeforeEach(() -> {
-                contentCopyPathRoot = Files.createTempDirectory("storeimpltest");
+        stores = new StoreImpl(ContentStore.class, store, publisher, contentCopyPathRoot);
+    }
 
-                for (File f : contentCopyPathRoot.toFile().listFiles()) {
+    @Nested
+    @DisplayName("#setContent - inputstream")
+    class SetContentInputStream {
+
+        @BeforeEach
+        void setUp() {
+            when(store.setContent(any(Object.class), any(InputStream.class))).thenReturn(new Object());
+        }
+
+        @Test
+        @DisplayName("should delete the content copy file")
+        void shouldDeleteCopyFile() throws Exception {
+            stores.setContent(new Object(), new ByteArrayInputStream("foo".getBytes()));
+
+            File[] files = contentCopyPathRoot.toFile().listFiles();
+            if (files != null) {
+                for (File f : files) {
                     if (f.getName().endsWith(".tmp")) {
-                        f.delete(); // may fail mysteriously - returns boolean you may want to check
+                        fail("Found orphaned content copy path");
                     }
                 }
-
-                stores = new StoreImpl(ContentStore.class, store, publisher, contentCopyPathRoot);
-            });
-
-            Context("#setContent - inputstream", () -> {
-
-                BeforeEach(() -> {
-                    when(store.setContent(any(Object.class), any(InputStream.class))).thenReturn(new Object());
-                });
-
-                JustBeforeEach(() -> {
-                    stores.setContent(new Object(), new ByteArrayInputStream("foo".getBytes()));
-                });
-
-                It("should delete the content copy file", () -> {
-                    for (File f : contentCopyPathRoot.toFile().listFiles()) {
-                        if (f.getName().endsWith(".tmp")) {
-                            fail("Found orphaned content copy path");
-                        }
-                    }
-                });
-            });
-        });
+            }
+        }
     }
 }

@@ -1,11 +1,12 @@
 package org.springframework.content.renditions.renderers;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.renditions.RenditionProvider;
 import org.springframework.content.renditions.RenditionException;
 import org.springframework.renditions.poi.PDFService;
@@ -15,11 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.JustBeforeEach;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItemInArray;
@@ -34,96 +30,154 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 public class PdfToJpegRendererTest {
 
-	private PDFService pdf;
-	private PDDocument doc;
-	private PDFRenderer pdfRenderer;
+	@Nested
+	@DisplayName("WordToJpegRenderer")
+	class WordToJpegRendererTests {
 
-	private RenditionProvider renderer;
+		private PDFService pdf;
+		private RenditionProvider renderer;
 
-	private InputStream input;
-	private String mimeType;
+		@BeforeEach
+		void init() {
+			pdf = mock(PDFService.class);
+			renderer = new PdfToJpegRenderer(pdf);
+		}
 
-	private Exception e;
+		@Nested
+		@DisplayName("#consumes")
+		class Consumes {
 
-	{
-		Describe("WordToJpegRenderer", () -> {
-			BeforeEach(() -> {
-				pdf = mock(PDFService.class);
-				renderer = new PdfToJpegRenderer(pdf);
-			});
-			Context("#consumes", () -> {
-				It("should return word ml mimetype", () -> {
-					assertThat(renderer.consumes(), is(
-							"application/pdf"));
-				});
-			});
-			Context("#produces", () -> {
-				It("should return jpeg mimetype", () -> {
-					assertThat(renderer.produces(), hasItemInArray("image/jpg"));
-				});
-			});
-			Context("#convert", () -> {
-				JustBeforeEach(() -> {
-					try {
-						renderer.convert(input, mimeType);
+			@Test
+			@DisplayName("should return word ml mimetype")
+			void shouldReturnWordMlMimetype() {
+				assertThat(renderer.consumes(), is("application/pdf"));
+			}
+		}
+
+		@Nested
+		@DisplayName("#produces")
+		class Produces {
+
+			@Test
+			@DisplayName("should return jpeg mimetype")
+			void shouldReturnJpegMimetype() {
+				assertThat(renderer.produces(), hasItemInArray("image/jpg"));
+			}
+		}
+
+		@Nested
+		@DisplayName("#convert")
+		class Convert {
+
+			private PDDocument doc;
+			private PDFRenderer pdfRenderer;
+			private InputStream input;
+			private String mimeType;
+			private Exception e;
+
+			private void whenConverting() {
+				try {
+					renderer.convert(input, mimeType);
+				} catch (Exception ex) {
+					this.e = ex;
+				}
+			}
+
+			@Nested
+			@DisplayName("given an input stream and a mimetype")
+			class GivenInputStreamAndMimetype {
+
+				@BeforeEach
+				void init() throws Exception {
+					doc = mock(PDDocument.class);
+					when(pdf.load(anyObject())).thenReturn(doc);
+					pdfRenderer = mock(PDFRenderer.class);
+					when(pdf.renderer(doc)).thenReturn(pdfRenderer);
+
+					input = new ByteArrayInputStream("".getBytes());
+				}
+
+				@Nested
+				@DisplayName("when the pdf has more than one page")
+				class WhenPdfHasMoreThanOnePage {
+
+					@BeforeEach
+					void init() {
+						when(doc.getNumberOfPages()).thenReturn(1);
 					}
-					catch (Exception e) {
-						this.e = e;
-					}
-				});
-				Context("given an input stream and a mimetype", () -> {
-					BeforeEach(() -> {
-						doc = mock(PDDocument.class);
-						when(pdf.load(anyObject())).thenReturn(doc);
-						pdfRenderer = mock(PDFRenderer.class);
-						when(pdf.renderer(doc)).thenReturn(pdfRenderer);
 
-						input = new ByteArrayInputStream("".getBytes());
-					});
-					Context("when the pdf has more than one page", () -> {
-						BeforeEach(() -> {
-							when(doc.getNumberOfPages()).thenReturn(1);
-						});
-						It("should get the embedded thumbnail from the XWPFDocument's properties", () -> {
-							verify(pdfRenderer).renderImageWithDPI(0, 300, ImageType.RGB);
-						});
-						It("should output the rendered image", () -> {
-							verify(pdf).writeImage(anyObject(), eq("jpeg"), isA(OutputStream.class));
-						});
-						Context("when the pdf document fails to return a thumbnail", () -> {
-							BeforeEach(() -> {
-								doThrow(IOException.class).when(pdfRenderer).renderImageWithDPI(0, 300, ImageType.RGB);
-							});
-							It("should throw a RenditionException", () -> {
-								assertThat(e, is(not(nullValue())));
-								assertThat(e, is(instanceOf(RenditionException.class)));
-							});
-							It("should close the document", () -> {
-								verify(doc).close();
-							});
-						});
-					});
-					Context("when the input stream is not a valid pdf file", () -> {
-						BeforeEach(() -> {
-							doThrow(IOException.class).when(pdf).load(anyObject());
-						});
-						It("should throw a RenditionException", () -> {
+					@Test
+					@DisplayName("should get the embedded thumbnail from the XWPFDocument's properties")
+					void shouldGetEmbeddedThumbnail() throws Exception {
+						whenConverting();
+						verify(pdfRenderer).renderImageWithDPI(0, 300, ImageType.RGB);
+					}
+
+					@Test
+					@DisplayName("should output the rendered image")
+					void shouldOutputRenderedImage() throws Exception {
+						whenConverting();
+						verify(pdf).writeImage(anyObject(), eq("jpeg"), isA(OutputStream.class));
+					}
+
+					@Nested
+					@DisplayName("when the pdf document fails to return a thumbnail")
+					class WhenPdfFailsToReturnThumbnail {
+
+						@BeforeEach
+						void init() throws Exception {
+							doThrow(IOException.class).when(pdfRenderer).renderImageWithDPI(0, 300, ImageType.RGB);
+						}
+
+						@Test
+						@DisplayName("should throw a RenditionException")
+						void shouldThrowRenditionException() throws Exception {
+							whenConverting();
 							assertThat(e, is(not(nullValue())));
 							assertThat(e, is(instanceOf(RenditionException.class)));
-						});
-					});
-				});
-				Context("given a null input stream", () -> {
-					It("should get the embedded thumbnail from the XWPFDocument's properties",
-							() -> {
-								assertThat(e, is(not(nullValue())));
-							});
-				});
-			});
-		});
+						}
+
+						@Test
+						@DisplayName("should close the document")
+						void shouldCloseDocument() throws Exception {
+							whenConverting();
+							verify(doc).close();
+						}
+					}
+				}
+
+				@Nested
+				@DisplayName("when the input stream is not a valid pdf file")
+				class WhenNotValidPdfFile {
+
+					@BeforeEach
+					void init() throws Exception {
+						doThrow(IOException.class).when(pdf).load(anyObject());
+					}
+
+					@Test
+					@DisplayName("should throw a RenditionException")
+					void shouldThrowRenditionException() throws Exception {
+						whenConverting();
+						assertThat(e, is(not(nullValue())));
+						assertThat(e, is(instanceOf(RenditionException.class)));
+					}
+				}
+			}
+
+			@Nested
+			@DisplayName("given a null input stream")
+			class GivenNullInputStream {
+
+				@Test
+				@DisplayName("should get the embedded thumbnail from the XWPFDocument's properties")
+				void shouldGetEmbeddedThumbnail() throws Exception {
+					whenConverting();
+					assertThat(e, is(not(nullValue())));
+				}
+			}
+		}
 	}
 }

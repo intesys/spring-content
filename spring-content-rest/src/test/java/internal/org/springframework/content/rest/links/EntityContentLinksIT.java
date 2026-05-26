@@ -1,7 +1,5 @@
 package internal.org.springframework.content.rest.links;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.rest.support.StoreConfig;
 import internal.org.springframework.content.rest.support.TestEntity;
 import internal.org.springframework.content.rest.support.TestEntity3;
@@ -9,10 +7,13 @@ import internal.org.springframework.content.rest.support.TestEntity3ContentRepos
 import internal.org.springframework.content.rest.support.TestEntity3Repository;
 import internal.org.springframework.content.rest.support.TestEntityContentRepository;
 import internal.org.springframework.content.rest.support.TestEntityRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.rest.config.HypermediaConfiguration;
 import org.springframework.content.rest.config.RestConfiguration;
@@ -23,19 +24,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
 import java.io.ByteArrayInputStream;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
 		StoreConfig.class,
 		DelegatingWebMvcConfiguration.class,
@@ -58,41 +55,45 @@ public class EntityContentLinksIT {
 	@Autowired
 	private WebApplicationContext context;
 
-	private MockMvc mvc;
+	@Nested
+	@DisplayName("EntityLinks")
+	class EntityLinksTests {
 
-	private TestEntity testEntity;
-	private TestEntity3 testEntity3;
+		private MockMvc mvc;
 
-	private ContentLinkTests contentLinkTests;
+		@BeforeEach
+		void setup() {
+			mvc = MockMvcBuilders.webAppContextSetup(context).build();
+		}
 
-	{
-		Describe("EntityLinks", () -> {
+		@Nested
+		@DisplayName("when entity links are enabled")
+		class WhenEntityLinksEnabled {
 
-			BeforeEach(() -> {
-				mvc = MockMvcBuilders.webAppContextSetup(context).build();
-			});
+			private TestEntity3 testEntity3;
+			private ContentLinkTests contentLinkTests;
 
-			Context("when entity links are enabled", () -> {
+			@BeforeEach
+			void init() {
+				testEntity3 = new TestEntity3();
+				contentRepository3.setContent(testEntity3, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
+				testEntity3 = repository3.save(testEntity3);
 
-				BeforeEach(() -> {
-					testEntity3 = new TestEntity3();
-					contentRepository3.setContent(testEntity3, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
-					testEntity3 = repository3.save(testEntity3);
-
-					contentLinkTests.setMvc(mvc);
-					contentLinkTests.setRepository(repository3);
-					contentLinkTests.setStore(contentRepository3);
-					contentLinkTests.setTestEntity(testEntity3);
-					contentLinkTests.setUrl("/testEntity3s/" + testEntity3.getId());
-					contentLinkTests.setLinkRel("content");
-					contentLinkTests.setExpectedLinkRegex(String.format("http://localhost/testEntity3s/%s/content", testEntity3.getId()));
-				});
 				contentLinkTests = new ContentLinkTests();
-			});
-		});
-	}
+				contentLinkTests.setMvc(mvc);
+				contentLinkTests.setRepository(repository3);
+				contentLinkTests.setStore(contentRepository3);
+				contentLinkTests.setTestEntity(testEntity3);
+				contentLinkTests.setUrl("/testEntity3s/" + testEntity3.getId());
+				contentLinkTests.setLinkRel("content");
+				contentLinkTests.setExpectedLinkRegex(String.format("http://localhost/testEntity3s/%s/content", testEntity3.getId()));
+			}
 
-	@Test
-	public void noop() {
+			@Test
+			@DisplayName("should provide a response with a content link")
+			void shouldProvideContentLink() throws Exception {
+				contentLinkTests.getRequestShouldProvideContentLink();
+			}
+		}
 	}
 }
