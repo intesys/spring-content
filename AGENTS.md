@@ -46,7 +46,7 @@ Key module families:
 
 - Use **Spring Framework code format** via `eclipse/eclipse-code-formatter.xml`.
 - New `.java` files need:
-  - ASF license header (copy from an existing file)
+  - GPLv3 license header (copy from `HEADER.txt`); pre-existing ASF-headered files keep their original header
   - Javadoc class comment with at least `@author`
 - Add `@author` to files you modify substantially.
 - Commit messages: follow [standard git conventions](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html); append `Fixes gh-XXXX` when applicable.

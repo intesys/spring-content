@@ -82,8 +82,13 @@ Content step-by-step:
   can be configured.
 
 ## License
-Spring Content is Open Source software released under the
-[Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).
+Spring Content is Free Software released under the
+[GNU General Public License, Version 3](https://www.gnu.org/licenses/gpl-3.0.html).
+
+This project is a fork of the original [Spring Content](https://github.com/paulcwarren/spring-content/)
+by Paul Warren, which is licensed under the Apache License 2.0. Portions of this software
+remain under their original Apache 2.0 license; see the [NOTICE](NOTICE) file for attribution
+and details.
 
 ## Acknowledgements
 

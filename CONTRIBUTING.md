@@ -1,6 +1,6 @@
 # Contributing to Spring Content
 
-Spring Content is released under the Apache 2.0 license. If you would like to contribute
+Spring Content is released under the GNU General Public License, Version 3. If you would like to contribute
 something, or simply want to hack on the code this document should help you get started.
 
 ## Code of Conduct
@@ -41,8 +41,10 @@ added after the original pull request but before a merge.
 * Make sure all new `.java` files have a simple Javadoc class comment with at least an
   `@author` tag identifying you, and preferably at least a paragraph on what the class is
   for.
-* Add the ASF license header comment to all new `.java` files (copy from existing files
-  in the project)
+* Add the GPLv3 license header comment to all new `.java` files (copy from
+  [`HEADER.txt`](HEADER.txt)). Note: pre-existing files carrying the Apache Software
+  Foundation (ASF) header are derived from Apache-licensed code and must keep their
+  original header unchanged — see the [NOTICE](NOTICE) file.
 * Add yourself as an `@author` to the `.java` files that you modify substantially (more
   than cosmetic changes).
 * Add some Javadocs.
