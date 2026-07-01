@@ -44,8 +44,6 @@ Foundation (ASF) source header and are derived from or contributed under the
 Apache License, Version 2.0. These files retain their original license headers
 and remain licensed under the Apache License, Version 2.0:
 
-    - spring-content-autoconfigure
-    - spring-content-commons
     - spring-content-metadata-extraction
     - spring-content-renditions
 
