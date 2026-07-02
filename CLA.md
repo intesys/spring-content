@@ -53,6 +53,7 @@ are personally aware, and conspicuously marking the work as “Submitted on beha
 
 You agree to notify the Authors of any facts or circumstances of which you become aware that would make these representations inaccurate in any respect.
 
-This Agreement is governed by the laws of the State of California, without regard to its choice of law provisions, and by the laws of the United States. This
-Agreement sets forth the entire understanding and agreement between the parties, and supersedes any previous communications, representations or agreements,
-whether oral or written, regarding the subject matter herein.
+This Agreement is governed by and construed in accordance with the laws of Italy, without regard to its conflict of law provisions. Any dispute arising out of
+or in connection with this Agreement shall be subject to the exclusive jurisdiction of the competent courts of Italy. This Agreement sets forth the entire
+understanding and agreement between the parties, and supersedes any previous communications, representations or agreements, whether oral or written, regarding
+the subject matter herein.

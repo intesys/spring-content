@@ -130,7 +130,7 @@ mvn -B -P tests -Dmaven.javadoc.skip=true install
 
 - Format with `eclipse/eclipse-code-formatter.xml`.
 - **New `.java` files** must include:
-  - ASF license header (copy from any existing file in the same module).
+  - GPLv3 license header (copy from `HEADER.txt`). Pre-existing files with the ASF header keep it unchanged.
   - Javadoc class comment with at least `@author`.
 - Add `@author` to files you modify substantially.
 - Commit messages: follow standard git conventions; append `Fixes gh-XXXX` when applicable.
@@ -159,6 +159,6 @@ When writing code in a module, reference these typical dependencies:
 - Do unit tests pass (`./mvnw test -pl <module>`)?
 - Do integration tests pass (`./mvnw -P tests -pl <module> verify`)?
 - Is the code formatted with the Eclipse formatter?
-- Do new files carry the **ASF license header** and an `@author` Javadoc tag?
+- Do new files carry the **GPLv3 license header** (from `HEADER.txt`) and an `@author` Javadoc tag?
 - Are public APIs free of `internal.*` package imports?
 - Are starter/auto-config changes mirrored in both modern (`spring-content-*-boot-starter`) and legacy (`content-*-spring-boot-starter`) starter modules when applicable?

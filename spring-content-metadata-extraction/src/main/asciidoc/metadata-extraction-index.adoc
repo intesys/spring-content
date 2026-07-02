@@ -1,5 +1,5 @@
 = Spring Content Metadata Extraction - Reference Documentation
-Paul Warren, Marco Belligoli
+Paul Warren, Marco Belligoli, Intesys
 :revnumber: {version}
 :revdate: {localdate}
 :toc:

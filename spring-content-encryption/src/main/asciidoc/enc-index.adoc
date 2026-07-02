@@ -1,5 +1,5 @@
 = Spring Content Encryption (beta) - Reference Documentation
-Paul Warren, Peter Blum, Jeff Pak
+Paul Warren, Peter Blum, Jeff Pak, Intesys
 :revnumber: {version}
 :revdate: {localdate}
 :toc:
