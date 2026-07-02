@@ -57,7 +57,9 @@ public class SolrTestContainer extends SolrContainer {
                 Singleton.INSTANCE.getContainerIpAddress(),
                 Singleton.INSTANCE.getMappedPort(SolrContainer.SOLR_PORT));
 
-        return new HttpJdkSolrClient.Builder(solrUrl).build();
+        // Force HTTP/1.1: the JDK HttpClient's cleartext h2c upgrade against Solr's Jetty
+        // is flaky and intermittently fails with "RST_STREAM: Stream cancelled" (notably on CI).
+        return new HttpJdkSolrClient.Builder(solrUrl).useHttp1_1(true).build();
     }
 
     @SuppressWarnings("unused") // Serializable safe singleton usage
