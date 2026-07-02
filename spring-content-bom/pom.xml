@@ -28,11 +28,11 @@
                 <artifactId>spring-content-commons</artifactId>
                 <version>${spring-content.version}</version>
             </dependency>
-            <dependency>
-                <groupId>it.intesys</groupId>
-                <artifactId>spring-content-docx4j</artifactId>
-                <version>${spring-content.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>it.intesys</groupId>-->
+<!--                <artifactId>spring-content-docx4j</artifactId>-->
+<!--                <version>${spring-content.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>it.intesys</groupId>
                 <artifactId>spring-content-elasticsearch</artifactId>
@@ -70,6 +70,16 @@
             <dependency>
                 <groupId>it.intesys</groupId>
                 <artifactId>spring-content-jpa-boot-starter</artifactId>
+                <version>${spring-content.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.intesys</groupId>
+                <artifactId>spring-content-metadata-extraction</artifactId>
+                <version>${spring-content.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.intesys</groupId>
+                <artifactId>spring-content-metadata-extraction-boot-starter</artifactId>
                 <version>${spring-content.version}</version>
             </dependency>
             <dependency>
