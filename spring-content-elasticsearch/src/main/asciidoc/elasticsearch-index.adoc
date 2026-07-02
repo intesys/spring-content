@@ -1,5 +1,5 @@
 = Spring Content Elasticsearch - Reference Documentation
-Paul Warren
+Paul Warren, Intesys
 :revnumber: {version}
 :revdate: {localdate}
 :toc:
