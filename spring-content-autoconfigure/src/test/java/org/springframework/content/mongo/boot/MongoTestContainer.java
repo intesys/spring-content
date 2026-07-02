@@ -7,7 +7,7 @@ import org.testcontainers.containers.MongoDBContainer;
 
 public class MongoTestContainer extends MongoDBContainer {
 
-    private static final String DOCKER_IMAGE_NAME = "mongo:4.0.10";
+    private static final String DOCKER_IMAGE_NAME = "mongo:7.0";
 
     private MongoTestContainer() {
         super(DOCKER_IMAGE_NAME);
