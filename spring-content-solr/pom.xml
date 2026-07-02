@@ -5,7 +5,7 @@
     <parent>
         <artifactId>spring-content</artifactId>
         <groupId>it.intesys</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.1.0</version>
     </parent>
     <name>Spring Content Solr</name>
     <description>Spring Content Solr module of Spring Content.</description>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-commons</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.1.0</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -101,7 +101,7 @@
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-fs</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>3.1.0</version>
 			<scope>test</scope>
 		</dependency>
 		
