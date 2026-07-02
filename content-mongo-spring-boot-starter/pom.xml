@@ -6,6 +6,8 @@
 		<artifactId>spring-content</artifactId>
 		<version>3.2.0-SNAPSHOT</version>
 	</parent>
+	<name>Content Mongo Spring Boot Starter</name>
+	<description>Content Mongo Spring Boot Starter module of Spring Content.</description>
 	<artifactId>content-mongo-spring-boot-starter</artifactId>
 
 	<dependencies>

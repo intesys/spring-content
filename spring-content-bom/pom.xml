@@ -8,6 +8,8 @@
         <artifactId>spring-content</artifactId>
         <version>3.2.0-SNAPSHOT</version>
     </parent>
+    <name>Spring Content BOM</name>
+    <description>Spring Content BOM module of Spring Content.</description>
 
     <artifactId>spring-content-bom</artifactId>
     <packaging>pom</packaging>

@@ -15,6 +15,14 @@ Integrates with Spring Data, Spring Data REST and Apache Solr</description>
         <name>Intesys</name>
         <url>https://github.com/intesys</url>
     </organization>
+    <developers>
+        <developer>
+            <id>intesys</id>
+            <name>Intesys</name>
+            <organization>Intesys</organization>
+            <organizationUrl>https://github.com/intesys</organizationUrl>
+        </developer>
+    </developers>
     <issueManagement>
         <system>Github</system>
         <url>https://github.com/intesys/spring-content/issues</url>

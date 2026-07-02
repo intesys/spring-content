@@ -6,6 +6,8 @@
 		<artifactId>spring-content</artifactId>
 		<version>3.2.0-SNAPSHOT</version>
 	</parent>
+	<name>Content REST Spring Boot Starter</name>
+	<description>Content REST Spring Boot Starter module of Spring Content.</description>
 
 	<artifactId>content-rest-spring-boot-starter</artifactId>
 
