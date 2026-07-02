@@ -7,6 +7,8 @@
 		<artifactId>spring-content</artifactId>
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
+	<name>Spring Content Elasticsearch</name>
+	<description>Spring Content Elasticsearch module of Spring Content.</description>
 
 	<artifactId>spring-content-elasticsearch</artifactId>
 

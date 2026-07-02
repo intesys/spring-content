@@ -8,6 +8,8 @@
 		<artifactId>spring-content</artifactId>
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
+	<name>Spring Content JPA</name>
+	<description>Spring Content JPA module of Spring Content.</description>
 
 	<dependencies>
 		<dependency>

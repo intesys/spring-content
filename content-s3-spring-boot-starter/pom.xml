@@ -6,6 +6,8 @@
 		<artifactId>spring-content</artifactId>
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
+	<name>Content S3 Spring Boot Starter</name>
+	<description>Content S3 Spring Boot Starter module of Spring Content.</description>
 
 	<artifactId>content-s3-spring-boot-starter</artifactId>
 

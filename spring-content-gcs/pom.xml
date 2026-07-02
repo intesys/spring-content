@@ -8,6 +8,8 @@
 		<artifactId>spring-content</artifactId>
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
+	<name>Spring Content GCS</name>
+	<description>Spring Content GCS module of Spring Content.</description>
 
 	<dependencies>
 		<dependency>

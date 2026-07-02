@@ -8,6 +8,8 @@
 		<artifactId>spring-content</artifactId>
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
+	<name>Spring Content Azure Storage</name>
+	<description>Spring Content Azure Storage module of Spring Content.</description>
 
 	<dependencies>
 		<dependency>
