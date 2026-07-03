@@ -54,7 +54,7 @@ Key module families:
 ## CI / Release Notes
 
 - PRs run `CLAAssistant` (sign the CLA) + build with `-P tests` + validation against the `spring-content-gettingstarted` repo.
-- Tags trigger release build (`-P ci,docs deploy`), GPG signing, Maven Central publish, and docs publish to `gh-pages`.
+- Tags trigger release build (`-P ci,docs deploy`), GPG signing, Maven Central publish, and docs publish to GitHub Pages via the official `actions/upload-pages-artifact` + `actions/deploy-pages` flow (Pages Source must be set to "GitHub Actions"). The `gh-pages` branch is still pushed, but only as persistent storage so historical `refs/` accumulate across releases — it is no longer the deployment source.
 - Docs output path: `target/generated-docs/refs/dev/`
 
 ## Local Dev Tips

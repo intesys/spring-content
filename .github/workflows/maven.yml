@@ -9,6 +9,13 @@ on:
     - '.github/**'
     - '*.md'
   workflow_dispatch:
+
+# Required by the official GitHub Pages deployment (actions/deploy-pages).
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
 
   build:
@@ -143,12 +150,46 @@ jobs:
         mkdir -p /tmp/spring-content-gh-pages/refs/
         cp -R target/generated-docs/refs/* /tmp/spring-content-gh-pages/refs/
 
+        # Push to gh-pages purely as persistent storage so historical refs/
+        # accumulate across releases (Pages Source is now "GitHub Actions", so
+        # this push no longer triggers the flaky implicit branch deployment).
         pushd /tmp/spring-content-gh-pages
             git add .
             git commit -m "Publishing documentation for ${GITHUB_REF}"
             git push origin gh-pages
         popd
+
+        # Assemble a clean copy for the Pages artifact (drop .git) and disable
+        # Jekyll processing — the mkdocs/asciidoc output is already static HTML.
+        rsync -a --exclude='.git' /tmp/spring-content-gh-pages/ /tmp/site-public/
+        touch /tmp/site-public/.nojekyll
       env:
         CI_USERNAME: ${{ secrets.CI_USERNAME }}
         CI_EMAIL: ${{ secrets.CI_EMAIL }}
         CI_PRIVATE_KEY: ${{ secrets.CI_PRIVATE_KEY }}
+
+    - name: Configure Pages
+      uses: actions/configure-pages@v5
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: /tmp/site-public
+
+  deploy-docs:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Serialize deployments so overlapping runs don't fight over the rollout.
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      with:
+        timeout: 600000
+        error_count: 15
