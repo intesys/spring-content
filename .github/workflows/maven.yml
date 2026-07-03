@@ -87,7 +87,11 @@ jobs:
 
         # Version calculation
         POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "3.0.17")
+        # Highest version tag across the whole repo, regardless of whether it is
+        # reachable from the current branch. 'git describe' only sees tags that are
+        # ancestors of HEAD, so a release tag placed on a commit outside main's
+        # history would be missed and the GA version would fall back to a stale value.
+        LATEST_TAG=$(git tag --sort=-v:refname | head -n1)
 
         if [[ "${GITHUB_REF}" == *"tags"* ]]; then
             TAG="${GITHUB_REF#refs/tags/}"
