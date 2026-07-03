@@ -94,7 +94,12 @@ jobs:
             # ref: fetch it explicitly and read it via FETCH_HEAD.
             git fetch --depth=1 origin main
             git show FETCH_HEAD:pom.xml > /tmp/main-pom.xml
-            export SPRING_CONTENT_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f /tmp/main-pom.xml)
+            # -N (non-recursive): the extracted pom.xml is the multi-module
+            # aggregator, but its child modules aren't present next to it in
+            # /tmp. Without -N Maven fails reactor construction ("Child module
+            # ... does not exist") and that error text leaks into the captured
+            # value. -N evaluates only the aggregator, returning a clean version.
+            export SPRING_CONTENT_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/main-pom.xml)
         else
             export BUILD_TYPE=snapshot/"${GITHUB_REF#refs/heads/}"
             export SPRING_CONTENT_GA_VERSION="${LATEST_TAG}"
