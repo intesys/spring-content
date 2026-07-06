@@ -12,6 +12,8 @@ Two detailed guides already exist and are the source of truth — read them befo
 
 Spring Content is a multi-module Java 17 / Maven library (group `it.intesys`, Spring Boot 3.5.0) for managing binary content and associating it with Spring Data entities across pluggable storage backends. It is a **fork** of `paulcwarren/spring-content`, maintained by Intesys.
 
+**Two parallel release lines.** `main` targets Spring Boot 3.x (`3.x`/`3.x-SNAPSHOT`); `spring-boot-4` targets Spring Boot 4.x (`4.x`/`4.x-SNAPSHOT`). The two lines must keep **distinct artifact versions** or their snapshots collide on Maven Central. When changing anything version- or CI-related, remember both lines exist. Docs are published from the 3.x line only. See `AGENTS.md` → *CI / Release Notes* for details.
+
 ## Build & test essentials
 
 ```bash
