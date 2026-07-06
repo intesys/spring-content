@@ -1,9 +1,5 @@
 package it.rest.revisions;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -20,8 +16,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import org.hibernate.envers.Audited;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
@@ -43,19 +42,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
-
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 
 import internal.org.springframework.content.rest.support.config.JpaInfrastructureConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-// @Ginkgo4jConfiguration(threads=1)
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { RevisionPropertyRestEndpointsIT.TestConfig.class, DelegatingWebMvcConfiguration.class, RepositoryRestMvcConfiguration.class, RestConfiguration.class })
 public class RevisionPropertyRestEndpointsIT {
 
@@ -68,60 +65,69 @@ public class RevisionPropertyRestEndpointsIT {
     @Autowired
     private WebApplicationContext context;
 
-    private MockMvc mvc;
+    @Nested
+    @DisplayName("Revision Property REST Endpoints")
+    class RevisionPropertyTests {
 
-    private TEntity testEntity;
+        private MockMvc mvc;
 
-    {
-        Describe("Revision Property REST Endpoints", () -> {
-            BeforeEach(() -> {
-                mvc = MockMvcBuilders.webAppContextSetup(context).build();
-            });
-            Context("given an Entity with revisions", () -> {
-                BeforeEach(() -> {
-                    testEntity = repository.save(new TEntity());
-                    testEntity = store.setContent(testEntity, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
-                    testEntity.setMimeType("text/plain");
-                    testEntity = repository.save(testEntity);
+        @BeforeEach
+        void setup() {
+            mvc = MockMvcBuilders.webAppContextSetup(context).build();
+        }
 
-                    assertThat(repository.findRevisions(testEntity.getId()).toList().size(), is(2));
-                });
+        @Nested
+        @DisplayName("given an Entity with revisions")
+        class GivenEntityWithRevisions {
 
-                Context("a GET to /{repository}/{id}/revisions/1/content", () -> {
+            private TEntity testEntity;
 
-                    It("should return a 404", () -> {
+            @BeforeEach
+            void init() {
+                testEntity = repository.save(new TEntity());
+                testEntity = store.setContent(testEntity, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
+                testEntity.setMimeType("text/plain");
+                testEntity = repository.save(testEntity);
 
+                assertThat(repository.findRevisions(testEntity.getId()).toList().size(), is(2));
+            }
+
+            @Nested
+            @DisplayName("a GET to /{repository}/{id}/revisions/1/content")
+            class GetRevisionsOneContent {
+
+                @Test
+                @DisplayName("should return a 404")
+                void shouldReturn404() throws Exception {
+                    mvc.perform(
+                        get("/tEntities/" + testEntity.getId() + "/revisions/1/content").
+                            accept("text/plain")).
+                        andExpect(status().isNotFound());
+                }
+            }
+
+            @Nested
+            @DisplayName("a GET to /{repository}/{id}/revisions/<latest>/content")
+            class GetRevisionsLatestContent {
+
+                @Test
+                @DisplayName("should return the content")
+                void shouldReturnContent() throws Exception {
+                    Revisions<Integer, TEntity> revisions = repository.findRevisions(testEntity.getId());
+                    Integer revisionId = revisions.getLatestRevision().getRequiredRevisionNumber();
+
+                    MockHttpServletResponse response =
                         mvc.perform(
-                            get("/tEntities/" + testEntity.getId() + "/revisions/1/content").
+                            get("/tEntities/" + testEntity.getId() + "/revisions/" + revisionId + "/content").
                                 accept("text/plain")).
-                            andExpect(status().isNotFound());
-                    });
-                });
+                            andExpect(status().isOk()).
+                            andReturn().getResponse();
 
-                Context("a GET to /{repository}/{id}/revisions/<latest>/content", () -> {
-
-                    It("should return the content", () -> {
-
-                        Revisions<Integer, TEntity> revisions = repository.findRevisions(testEntity.getId());
-                        Integer revisionId = revisions.getLatestRevision().getRequiredRevisionNumber();
-
-                        MockHttpServletResponse response =
-                            mvc.perform(
-                                get("/tEntities/" + testEntity.getId() + "/revisions/" + revisionId + "/content").
-                                    accept("text/plain")).
-                                andExpect(status().isOk()).
-                                andReturn().getResponse();
-
-                        assertThat(response, is(not(nullValue())));
-                        assertThat(response.getContentAsString(), is("Hello Spring Content World!"));
-                    });
-                });
-            });
-        });
-    }
-
-    @Test
-    public void noop() {
+                    assertThat(response, is(not(nullValue())));
+                    assertThat(response.getContentAsString(), is("Hello Spring Content World!"));
+                }
+            }
+        }
     }
 
     @Configuration

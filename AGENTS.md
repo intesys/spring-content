@@ -4,8 +4,8 @@ High-signal facts to avoid guessing wrong in this multi-module Java/Maven repo.
 
 ## Project Basics
 
-- **Group**: `it.intesys` | **Java**: 17 | **Maven**: wrapper (`./mvnw`) uses 3.6.3
-- **Boot**: 3.5.0 | **Spring Cloud**: 2024.0.1 | **Jakarta Persistence**: 3.1.0
+- **Group**: `it.intesys` | **Java**: 21 | **Maven**: wrapper (`./mvnw`) uses 3.6.3
+- **Boot**: 4.0.5 | **Spring Cloud**: 2025.1.1
 - **Maintained by Intesys**; forked from `paulcwarren/spring-content`.
 
 ## Build Commands
@@ -34,8 +34,6 @@ Key module families:
 
 ## Testing
 
-- **Framework**: [ginkgo4j](https://github.com/paulcwarren/ginkgo4j) BDD (not plain JUnit).  
-  Tests run via a custom `JUnitRunListener` (`com.github.paulcwarren.ginkgo4j.maven.JUnitRunListener`).
 - **Unit tests**: `*Test.java` — run by default.
 - **Integration tests**: `*IT.java` and `*Tests.java` — **only run with `-P tests`**.
 - Many ITs use Testcontainers / LocalStack / embedded DBs; Docker availability matters for a full `-P tests` pass.

@@ -1,24 +1,21 @@
 package internal.org.springframework.content.s3.config;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.AfterEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.net.URISyntaxException;
 
-import internal.org.springframework.content.s3.it.LocalStack;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.annotations.ContentId;
@@ -37,13 +34,11 @@ import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-
+import internal.org.springframework.content.s3.it.LocalStack;
 import internal.org.springframework.content.s3.io.S3StoreResource;
 import lombok.Data;
 import software.amazon.awssdk.services.s3.S3Client;
 
-@RunWith(Ginkgo4jRunner.class)
 public class EnableS3StoresTest {
 
 	private static final String BUCKET = "aws-test-bucket";
@@ -55,115 +50,161 @@ public class EnableS3StoresTest {
 
 	private AnnotationConfigApplicationContext context;
 
-	// mocks
 	static S3StoreConfigurer configurer;
 	static S3Client client;
 
-	{
-		Describe("EnableS3Stores", () -> {
-			Context("given a context and a configuration with an S3 content repository bean",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(TestConfig.class);
-							context.refresh();
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						It("should have a Content Repository bean", () -> {
-							assertThat(context.getBean(TestEntityContentRepository.class),
-									is(not(nullValue())));
-						});
-						It("should have an Placement Service", () -> {
-							assertThat(context.getBean("s3StorePlacementService"),
-									is(not(nullValue())));
-						});
-					});
+	@Nested
+	@DisplayName("EnableS3Stores")
+	class EnableS3StoresTests {
 
-			Context("given a context with a configurer", () -> {
-				BeforeEach(() -> {
-					configurer = mock(S3StoreConfigurer.class);
+		@Nested
+		@DisplayName("given a context and a configuration with an S3 content repository bean")
+		class GivenContextWithS3ContentRepo {
 
-					context = new AnnotationConfigApplicationContext();
-					context.register(ConverterConfig.class);
-					context.refresh();
-				});
-				AfterEach(() -> {
-					context.close();
-				});
-				It("should call that configurer to help setup the store", () -> {
-					verify(configurer).configureS3StoreConverters(any(ConverterRegistry.class));
-				});
-			});
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(TestConfig.class);
+				context.refresh();
+			}
 
-			Context("given a context with an empty configuration", () -> {
-				BeforeEach(() -> {
-					context = new AnnotationConfigApplicationContext();
-					context.register(EmptyConfig.class);
-					context.refresh();
-				});
-				AfterEach(() -> {
-					context.close();
-				});
-				It("should not contains any S3 repository beans", () -> {
-					try {
-						context.getBean(TestEntityContentRepository.class);
-						fail("expected no such bean");
-					}
-					catch (NoSuchBeanDefinitionException e) {
-						assertThat(true, is(true));
-					}
-				});
-			});
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
 
-			Context("given a context with a multi-tenant configuration", () -> {
-				BeforeEach(() -> {
-					client = mock(S3Client.class);
+			@Test
+			@DisplayName("should have a Content Repository bean")
+			void shouldHaveContentRepositoryBean() throws Exception {
+				assertThat(context.getBean(TestEntityContentRepository.class),
+						is(not(nullValue())));
+			}
 
-					context = new AnnotationConfigApplicationContext();
-					context.register(MultiTenantConfig.class);
-					context.refresh();
-				});
-				AfterEach(() -> {
-					context.close();
-				});
-				It("should use the correct client", () -> {
-					TestEntityContentRepository repo = context.getBean(TestEntityContentRepository.class);
-					TestEntity tentity = new TestEntity();
-					tentity.setContentId("12345");
-					Resource r = repo.getResource(tentity);
-					assertThat(((S3StoreResource)r).getClient(), is(client));
-				});
-			});
+			@Test
+			@DisplayName("should have a Placement Service")
+			void shouldHavePlacementService() throws Exception {
+				assertThat(context.getBean("s3StorePlacementService"),
+						is(not(nullValue())));
+			}
+		}
 
-		});
+		@Nested
+		@DisplayName("given a context with a configurer")
+		class GivenContextWithConfigurer {
 
-		Describe("EnableS3ContentRepositories", () -> {
-			Context("given a context and a configuration with an S3 content repository bean",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(EnableS3ContentRepositoriesConfig.class);
-							context.refresh();
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						It("should have a Content Repository bean", () -> {
-							assertThat(context.getBean(TestEntityContentRepository.class),
-									is(not(nullValue())));
-						});
-						It("should have an Placement Service", () -> {
-							assertThat(context.getBean("s3StorePlacementService"),
-									is(not(nullValue())));
-						});
-					});
-		});
+			@BeforeEach
+			void setUp() throws Exception {
+				configurer = mock(S3StoreConfigurer.class);
+
+				context = new AnnotationConfigApplicationContext();
+				context.register(ConverterConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should call that configurer to help setup the store")
+			void shouldCallConfigurer() throws Exception {
+				verify(configurer).configureS3StoreConverters(any(ConverterRegistry.class));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a context with an empty configuration")
+		class GivenContextWithEmptyConfig {
+
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(EmptyConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should not contain any S3 repository beans")
+			void shouldNotContainS3RepoBeans() throws Exception {
+				try {
+					context.getBean(TestEntityContentRepository.class);
+					fail("expected no such bean");
+				} catch (NoSuchBeanDefinitionException e) {
+					assertThat(true, is(true));
+				}
+			}
+		}
+
+		@Nested
+		@DisplayName("given a context with a multi-tenant configuration")
+		class GivenContextWithMultiTenantConfig {
+
+			@BeforeEach
+			void setUp() throws Exception {
+				client = mock(S3Client.class);
+
+				context = new AnnotationConfigApplicationContext();
+				context.register(MultiTenantConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should use the correct client")
+			void shouldUseCorrectClient() throws Exception {
+				TestEntityContentRepository repo = context.getBean(TestEntityContentRepository.class);
+				TestEntity tentity = new TestEntity();
+				tentity.setContentId("12345");
+				Resource r = repo.getResource(tentity);
+				assertThat(((S3StoreResource) r).getClient(), is(client));
+			}
+		}
 	}
 
-	@Test
-	public void noop() {
+	@Nested
+	@DisplayName("EnableS3ContentRepositories")
+	class EnableS3ContentRepositoriesTests {
+
+		@Nested
+		@DisplayName("given a context and a configuration with an S3 content repository bean")
+		class GivenContextWithS3ContentRepo {
+
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(EnableS3ContentRepositoriesConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should have a Content Repository bean")
+			void shouldHaveContentRepositoryBean() throws Exception {
+				assertThat(context.getBean(TestEntityContentRepository.class),
+						is(not(nullValue())));
+			}
+
+			@Test
+			@DisplayName("should have a Placement Service")
+			void shouldHavePlacementService() throws Exception {
+				assertThat(context.getBean("s3StorePlacementService"),
+						is(not(nullValue())));
+			}
+		}
 	}
 
 	@Configuration
@@ -230,13 +271,13 @@ public class EnableS3StoresTest {
 	@Configuration
 	public static class InfrastructureConfig {
 
-        @Autowired
-        private Environment env;
+		@Autowired
+		private Environment env;
 
-        @Bean
-        public S3Client client() throws URISyntaxException {
+		@Bean
+		public S3Client client() throws URISyntaxException {
 			return LocalStack.getAmazonS3Client();
-        }
+		}
 	}
 
 	@Data

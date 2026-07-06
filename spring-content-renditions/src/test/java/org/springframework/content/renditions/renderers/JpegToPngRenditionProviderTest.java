@@ -14,28 +14,32 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.io.FileRemover;
 import org.springframework.content.commons.io.ObservableInputStream;
 import org.springframework.content.commons.renditions.RenditionProvider;
 
+@DisplayName("JpegToPngRenditionProvider")
 public class JpegToPngRenditionProviderTest {
 
 	private RenditionProvider service;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		service = new JpegToPngRenditionProvider();
 	}
 
 	@Test
+	@DisplayName("should consume image/jpeg and produce image/png")
 	public void testCanConvert() {
 		assertThat(service.consumes(), is("image/jpeg"));
 		assertThat(Arrays.asList(service.produces()), hasItems("image/png"));
 	}
 
 	@Test
+	@DisplayName("should convert jpeg to png")
 	public void testConvert() throws Exception {
 		InputStream converted = service.convert(this.getClass().getResourceAsStream("/sample.jpeg"), "image/png");
 

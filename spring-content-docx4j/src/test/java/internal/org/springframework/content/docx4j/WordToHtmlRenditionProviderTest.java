@@ -12,30 +12,34 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.io.FileRemover;
 import org.springframework.content.commons.io.ObservableInputStream;
 import org.springframework.content.commons.renditions.RenditionProvider;
 
 import internal.org.springframework.content.docx4j.WordToHtmlRenditionProvider;
 
+@DisplayName("WordToHtmlRenditionProvider")
 public class WordToHtmlRenditionProviderTest {
 
 	private RenditionProvider service;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		service = new WordToHtmlRenditionProvider();
 	}
 
 	@Test
+	@DisplayName("should consume docx and produce text/html")
 	public void testCanConvert() {
 		assertThat(service.consumes(), is("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
 		assertThat(Arrays.asList(service.produces()), hasItems("text/html"));
 	}
 
 	@Test
+	@DisplayName("should convert docx to html")
 	public void testConvert() throws Exception {
 		InputStream converted = service.convert(this.getClass().getResourceAsStream("/sample-docx.docx"), "text/html");
 

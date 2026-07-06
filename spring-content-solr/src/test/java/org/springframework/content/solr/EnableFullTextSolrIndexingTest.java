@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.fragments.SearchableImpl;
 import internal.org.springframework.content.solr.SolrFulltextIndexServiceImpl;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.repository.ContentStore;
@@ -23,38 +24,49 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
-@RunWith(Ginkgo4jSpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = EnableFullTextSolrIndexingTest.TestConfiguration.class)
 public class EnableFullTextSolrIndexingTest {
 
 	@Autowired
 	private ApplicationContext context;
 
-	{
-		Describe("EnableFullTextSolrIndexing", () -> {
-			It("should have a SolrProperties bean", () -> {
-				assertThat(context.getBean(SolrProperties.class), is(not(nullValue())));
-			});
-			It("should have a Solr indexing store event handler bean", () -> {
-				assertThat(context.getBean(SolrIndexerStoreEventHandler.class), is(not(nullValue())));
-			});
-			It("should have a Searchable implementation bean", () -> {
-				assertThat(context.getBeansOfType(SearchableImpl.class), is(not(nullValue())));
-			});
-			It("should have a solr-based fulltext index service bean", () -> {
-				assertThat(context.getBean(IndexService.class), is(instanceOf(SolrFulltextIndexServiceImpl.class)));
-			});
-		});
+	@Nested
+	@DisplayName("EnableFullTextSolrIndexing")
+	class Enablefulltextsolrindexing {
+
+		@Test
+		@DisplayName("should have a SolrProperties bean")
+		void shouldHaveASolrPropertiesBean() throws Exception {
+			assertThat(context.getBean(SolrProperties.class), is(not(nullValue())));
+		}
+
+		@Test
+		@DisplayName("should have a Solr indexing store event handler bean")
+		void shouldHaveASolrIndexingStoreEventHandlerBean() throws Exception {
+			assertThat(context.getBean(SolrIndexerStoreEventHandler.class), is(not(nullValue())));
+		}
+
+		@Test
+		@DisplayName("should have a Searchable implementation bean")
+		void shouldHaveASearchableImplementationBean() throws Exception {
+			assertThat(context.getBeansOfType(SearchableImpl.class), is(not(nullValue())));
+		}
+
+		@Test
+		@DisplayName("should have a solr-based fulltext index service bean")
+		void shouldHaveASolrBasedFulltextIndexServiceBean() throws Exception {
+			assertThat(context.getBean(IndexService.class), is(instanceOf(SolrFulltextIndexServiceImpl.class)));
+		}
 	}
 
 	@Configuration
@@ -64,7 +76,7 @@ public class EnableFullTextSolrIndexingTest {
 
 		@Bean
 		public SolrClient solrClient() {
-			SolrClient sc = new HttpSolrClient.Builder("http://some/url").build();
+			SolrClient sc = new HttpJdkSolrClient.Builder("http://some/url").build();
 			return sc;
 		}
 
@@ -73,7 +85,6 @@ public class EnableFullTextSolrIndexingTest {
 			return new FileSystemResourceLoader(Files.createTempDirectory("").toFile().getAbsolutePath());
 		}
 
-		// Developer bean - would usually be supplied by app developer
 		@Bean
 		public ConversionService contentConversionService() {
 			return mock(ConversionService.class);
@@ -81,9 +92,5 @@ public class EnableFullTextSolrIndexingTest {
 	}
 
 	public interface TContentStore extends ContentStore<Object, Serializable>, Searchable<Serializable> {}
-
-	@Test
-	public void noop() {
-	}
 
 }

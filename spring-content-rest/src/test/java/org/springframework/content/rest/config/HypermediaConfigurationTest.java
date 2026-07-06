@@ -1,9 +1,15 @@
 package org.springframework.content.rest.config;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+
 import java.io.IOException;
 import java.nio.file.Files;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
+
 import org.junit.runner.RunWith;
 
 import org.springframework.content.commons.annotations.ContentId;
@@ -21,24 +27,29 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
+
+
+
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(Ginkgo4jRunner.class)
+
 public class HypermediaConfigurationTest {
 
 	private AnnotationConfigWebApplicationContext context;
 
 	{
-		Describe("HypermediaConfiguration", () -> {
-			Context("given a context with a ContentRestConfiguration", () -> {
-				BeforeEach(() -> {
+		@Nested
+    @DisplayName("HypermediaConfiguration")
+    class Hypermediaconfiguration {
+			@Nested
+    @DisplayName("given a context with a ContentRestConfiguration")
+    class GivenAContextWithAContentrestconfiguration {
+				@BeforeEach
+        void setUp() throws Exception {
 					context = new AnnotationConfigWebApplicationContext();
 					context.setServletContext(new MockServletContext());
 					context.register(TestConfig.class,
@@ -46,13 +57,15 @@ public class HypermediaConfigurationTest {
 							RepositoryRestMvcConfiguration.class,
 							HypermediaConfiguration.class);
 					context.refresh();
-				});
+				}
 
-				It("should have a content links processor bean", () -> {
+				@Test
+        @DisplayName("should have a content links processor bean")
+        void shouldHaveAContentLinksProcessorBean() throws Exception {
 					assertThat(context.getBean("contentLinksProcessor"), is(not(nullValue())));
-				});
-			});
-		});
+				}
+			}
+		}
 	}
 
 	@Configuration

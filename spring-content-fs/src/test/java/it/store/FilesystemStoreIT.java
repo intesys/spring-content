@@ -1,7 +1,13 @@
 package it.store;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +15,6 @@ import lombok.NoArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
 import org.springframework.content.commons.io.DeletableResource;
@@ -40,7 +43,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -49,8 +51,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.*;
 
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads=1)
+
+
 public class FilesystemStoreIT {
 
 	private FilesystemStoreIT.TEntity entity;
@@ -67,10 +69,12 @@ public class FilesystemStoreIT {
 
 	private String resourceLocation;
 
-	{
-		Describe("DefaultFilesystemStoreImpl", () -> {
+	@Nested
+    @DisplayName("DefaultFilesystemStoreImpl")
+    class Defaultfilesystemstoreimpl {
 
-			BeforeEach(() -> {
+			@BeforeEach
+        void setUp() throws Exception {
 				context = new AnnotationConfigApplicationContext();
 				context.register(FilesystemStoreIT.TestConfig.class);
 				context.refresh();
@@ -83,43 +87,59 @@ public class FilesystemStoreIT {
 
 				embeddedRepo = context.getBean(EmbeddedRepository.class);
 				embeddedStore = context.getBean(EmbeddedStore.class);
-			});
+			}
 
-			AfterEach(() -> {
+			@AfterEach
+        void tearDown() throws Exception {
 				context.close();
-			});
+			}
 
-			Describe("Store", () -> {
+			@Nested
+    @DisplayName("Store")
+    class Store {
 
-				Context("#getResource", () -> {
+				@Nested
+    @DisplayName("#getResource")
+    class Getresource {
 
-					BeforeEach(() -> {
+					@BeforeEach
+        void setUp() throws Exception {
 						genericResource = store.getResource(resourceLocation);
-					});
+					}
 
-					AfterEach(() -> {
+					@AfterEach
+        void tearDown() throws Exception {
 						((DeletableResource)genericResource).delete();
-					});
+					}
 
-					It("should get Resource", () -> {
+					@Test
+        @DisplayName("should get Resource")
+        void shouldGetResource() throws Exception {
 						assertThat(genericResource, is(instanceOf(Resource.class)));
-					});
+					}
 
-					It("should not exist", () -> {
+					@Test
+        @DisplayName("should not exist")
+        void shouldNotExist() throws Exception {
 						assertThat(genericResource.exists(), is(false));
-					});
+					}
 
-					Context("given content is added to that resource", () -> {
+					@Nested
+    @DisplayName("given content is added to that resource")
+    class GivenContentIsAddedToThatResource {
 
-						BeforeEach(() -> {
+						@BeforeEach
+        void setUp() throws Exception {
 							try (InputStream is = new ByteArrayInputStream("Hello Spring Content World!".getBytes())) {
 								try (OutputStream os = ((WritableResource)genericResource).getOutputStream()) {
 									IOUtils.copy(is, os);
 								}
 							}
-						});
+						}
 
-						It("should store that content", () -> {
+						@Test
+        @DisplayName("should store that content")
+        void shouldStoreThatContent() throws Exception {
 							assertThat(genericResource.exists(), is(true));
 
 							boolean matches = false;
@@ -129,19 +149,24 @@ public class FilesystemStoreIT {
 									assertThat(matches, Matchers.is(true));
 								}
 							}
-						});
+						}
 
-						Context("given that resource is then updated", () -> {
+						@Nested
+    @DisplayName("given that resource is then updated")
+    class GivenThatResourceIsThenUpdated {
 
-							BeforeEach(() -> {
+							@BeforeEach
+        void setUp() throws Exception {
 								try (InputStream is = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes())) {
 									try (OutputStream os = ((WritableResource)genericResource).getOutputStream()) {
 										IOUtils.copy(is, os);
 									}
 								}
-							});
+							}
 
-							It("should store that updated content", () -> {
+							@Test
+        @DisplayName("should store that updated content")
+        void shouldStoreThatUpdatedContent() throws Exception {
 								assertThat(genericResource.exists(), is(true));
 
 								try (InputStream expected = new ByteArrayInputStream("Hello Updated Spring Content World!".getBytes())) {
@@ -149,136 +174,183 @@ public class FilesystemStoreIT {
 										assertThat(IOUtils.contentEquals(expected, actual), is(true));
 									}
 								}
-							});
-						});
+							}
+						}
 
-						Context("given that resource is then deleted", () -> {
+						@Nested
+    @DisplayName("given that resource is then deleted")
+    class GivenThatResourceIsThenDeleted {
 
-							BeforeEach(() -> {
+							@BeforeEach
+        void setUp() throws Exception {
 								try {
 									((DeletableResource) genericResource).delete();
-								} catch (Exception e) {
-									this.e = e;
+								} catch (Exception ex) {
+									e = ex;
 								}
-							});
+							}
 
-							It("should not exist", () -> {
+							@Test
+        @DisplayName("should not exist")
+        void shouldNotExist() throws Exception {
 								assertThat(e, is(nullValue()));
-							});
-						});
-					});
-				});
-			});
+							}
+						}
+					}
+				}
+			}
 
-			Describe("AssociativeStore", () -> {
+			@Nested
+    @DisplayName("AssociativeStore")
+    class Associativestore {
 
-				Context("given a new entity", () -> {
+				@Nested
+    @DisplayName("given a new entity")
+    class GivenANewEntity {
 
-					BeforeEach(() -> {
+					@BeforeEach
+        void setUp() throws Exception {
 						entity = new FilesystemStoreIT.TEntity();
 						entity = repo.save(entity);
-					});
+					}
 
-					It("should not have an associated resource", () -> {
+					@Test
+        @DisplayName("should not have an associated resource")
+        void shouldNotHaveAnAssociatedResource() throws Exception {
 						assertThat(entity.getContentId(), is(nullValue()));
 						assertThat(store.getResource(entity), is(nullValue()));
-					});
+					}
 
-					Context("given a resource", () -> {
+					@Nested
+    @DisplayName("given a resource")
+    class GivenAResource {
 
-						BeforeEach(() -> {
+						@BeforeEach
+        void setUp() throws Exception {
 							genericResource = store.getResource(resourceLocation);
-						});
+						}
 
-						Context("when the resource is associated", () -> {
+						@Nested
+    @DisplayName("when the resource is associated")
+    class WhenTheResourceIsAssociated {
 
-							BeforeEach(() -> {
+							@BeforeEach
+        void setUp() throws Exception {
 								store.associate(entity, resourceLocation);
 								store.associate(entity, PropertyPath.from("rendition"), resourceLocation);
-							});
+							}
 
-							It("should be recorded as such on the entity's @ContentId", () -> {
+							@Test
+        @DisplayName("should be recorded as such on the entity's @ContentId")
+        void shouldBeRecordedAsSuchOnTheEntitySContentid() throws Exception {
 								assertThat(entity.getContentId(), is(resourceLocation));
                                 assertThat(entity.getRenditionId(), is(resourceLocation));
-							});
+							}
 
-							Context("when the resource has content", () -> {
-								BeforeEach(() -> {
+							@Nested
+    @DisplayName("when the resource has content")
+    class WhenTheResourceHasContent {
+								@BeforeEach
+        void setUp() throws Exception {
 									try (OutputStream os = ((WritableResource)genericResource).getOutputStream()) {
 										os.write("Hello Client-side World!".getBytes());
 									}
-								});
+								}
 
-								It("should not honor byte ranges", () -> {
+								@Test
+        @DisplayName("should not honor byte ranges")
+        void shouldNotHonorByteRanges() throws Exception {
 									// relies on REST-layer to serve byte range
 									Resource r = store.getResource(entity, PropertyPath.from("content"), GetResourceParams.builder().range("5-10").build());
 									try (InputStream is = r.getInputStream()) {
 										assertThat(IOUtils.toString(is), is("Hello Client-side World!"));
 									}
-								});
-							});
+								}
+							}
 
-							Context("when the resource is unassociated", () -> {
+							@Nested
+    @DisplayName("when the resource is unassociated")
+    class WhenTheResourceIsUnassociated {
 
-								BeforeEach(() -> {
+								@BeforeEach
+        void setUp() throws Exception {
 									store.unassociate(entity);
                                     store.unassociate(entity, PropertyPath.from("rendition"));
-								});
+								}
 
-								It("should reset the entity's @ContentId", () -> {
+								@Test
+        @DisplayName("should reset the entity's @ContentId")
+        void shouldResetTheEntitySContentid() throws Exception {
 									assertThat(entity.getContentId(), is(nullValue()));
                                     assertThat(entity.getRenditionId(), is(nullValue()));
-								});
-							});
+								}
+							}
 
-                            Context("when a invalid property path is used to associate a resource", () -> {
-                                It("should throw an error", () -> {
+                            @Nested
+    @DisplayName("when a invalid property path is used to associate a resource")
+    class WhenAInvalidPropertyPathIsUsedToAssociateAResource {
+                                @Test
+        @DisplayName("should throw an error")
+        void shouldThrowAnError() throws Exception {
                                     try {
                                         store.associate(entity, PropertyPath.from("does.not.exist"), resourceLocation);
                                     } catch (Exception sae) {
-                                        this.e = sae;
+                                        e = sae;
                                     }
                                     assertThat(e, is(instanceOf(StoreAccessException.class)));
-                                });
-                            });
+                                }
+                            }
 
-                            Context("when a invalid property path is used to load a resource", () -> {
-                                It("should throw an error", () -> {
+                            @Nested
+    @DisplayName("when a invalid property path is used to load a resource")
+    class WhenAInvalidPropertyPathIsUsedToLoadAResource {
+                                @Test
+        @DisplayName("should throw an error")
+        void shouldThrowAnError() throws Exception {
                                     try {
                                         store.getResource(entity, PropertyPath.from("does.not.exist"));
                                     } catch (Exception sae) {
-                                        this.e = sae;
+                                        e = sae;
                                     }
                                     assertThat(e, is(instanceOf(StoreAccessException.class)));
-                                });
-                            });
+                                }
+                            }
 
-                            Context("when a invalid property path is used to unassociate a resource", () -> {
-                                It("should throw an error", () -> {
+                            @Nested
+    @DisplayName("when a invalid property path is used to unassociate a resource")
+    class WhenAInvalidPropertyPathIsUsedToUnassociateAResource {
+                                @Test
+        @DisplayName("should throw an error")
+        void shouldThrowAnError() throws Exception {
                                     try {
                                         store.unassociate(entity, PropertyPath.from("does.not.exist"));
                                     } catch (Exception sae) {
-                                        this.e = sae;
+                                        e = sae;
                                     }
                                     assertThat(e, is(instanceOf(StoreAccessException.class)));
-                                });
-                            });
-						});
-					});
-				});
-			});
+                                }
+                            }
+						}
+					}
+				}
+			}
 
-			Describe("ContentStore", () -> {
+			@Nested
+    @DisplayName("ContentStore")
+    class Contentstore {
 
-				BeforeEach(() -> {
+				@BeforeEach
+        void setUp() throws Exception {
 					entity = new FilesystemStoreIT.TEntity();
 					entity = repo.save(entity);
 
 					store.setContent(entity, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
 					store.setContent(entity, PropertyPath.from("rendition"), new ByteArrayInputStream("<html>Hello Spring Content World!</html>".getBytes()));
-				});
+				}
 
-				It("should be able to store new content", () -> {
+				@Test
+        @DisplayName("should be able to store new content")
+        void shouldBeAbleToStoreNewContent() throws Exception {
 					// content
 					try (InputStream content = store.getContent(entity)) {
 						assertThat(IOUtils.contentEquals(new ByteArrayInputStream("Hello Spring Content World!".getBytes()), content), is(true));
@@ -290,22 +362,28 @@ public class FilesystemStoreIT {
 						assertThat(IOUtils.contentEquals(new ByteArrayInputStream("<html>Hello Spring Content World!</html>".getBytes()), content), is(true));
 					} catch (IOException ioe) {
 					}
-				});
+				}
 
-				It("should have content metadata", () -> {
+				@Test
+        @DisplayName("should have content metadata")
+        void shouldHaveContentMetadata() throws Exception {
 					// content
 					assertThat(entity.getContentId(), is(notNullValue()));
 					assertThat(entity.getContentId().trim().length(), greaterThan(0));
-					Assert.assertEquals(entity.getContentLen(), Long.valueOf(27L));
+					assertEquals(Long.valueOf(27L), entity.getContentLen());
 
 					//rendition
 					assertThat(entity.getRenditionId(), is(notNullValue()));
 					assertThat(entity.getRenditionId().trim().length(), greaterThan(0));
-					Assert.assertEquals(entity.getRenditionLen(), 40L);
-				});
+					assertEquals(40L, entity.getRenditionLen());
+				}
 
-				Context("when content is updated", () -> {
-					It("should have the updated content", () -> {
+				@Nested
+    @DisplayName("when content is updated")
+    class WhenContentIsUpdated {
+					@Test
+        @DisplayName("should have the updated content")
+        void shouldHaveTheUpdatedContent() throws Exception {
 						FileSystemResourceLoader loader = context.getBean(FileSystemResourceLoader.class);
 						String contentId = entity.getContentId();
 						assertThat(new File(loader.getFilesystemRoot(), contentId).exists(), is(true));
@@ -336,16 +414,21 @@ public class FilesystemStoreIT {
 						assertThat(new File(loader.getFilesystemRoot(), entity.getRenditionId()).exists(), is(true));
 
 						int i=0;
-					});
-				});
+					}
+				}
 
-				Context("when content is updated with shorter content", () -> {
-					BeforeEach(() -> {
+				@Nested
+    @DisplayName("when content is updated with shorter content")
+    class WhenContentIsUpdatedWithShorterContent {
+					@BeforeEach
+        void setUp() throws Exception {
 						store.setContent(entity, new ByteArrayInputStream("Hello Spring World!".getBytes()));
 						store.setContent(entity, PropertyPath.from("rendition"), new ByteArrayInputStream("<html>Hello Spring World!</html>".getBytes()));
 						entity = repo.save(entity);
-					});
-					It("should store only the new content", () -> {
+					}
+					@Test
+        @DisplayName("should store only the new content")
+        void shouldStoreOnlyTheNewContent() throws Exception {
 						//content
 						boolean matches = false;
 						try (InputStream content = store.getContent(entity)) {
@@ -359,11 +442,15 @@ public class FilesystemStoreIT {
 							matches = IOUtils.contentEquals(new ByteArrayInputStream("<html>Hello Spring World!</html>".getBytes()), content);
 							assertThat(matches, is(true));
 						}
-					});
-				});
+					}
+				}
 
-				Context("when content is updated and not overwritten", () -> {
-					It("should have the updated content", () -> {
+				@Nested
+    @DisplayName("when content is updated and not overwritten")
+    class WhenContentIsUpdatedAndNotOverwritten {
+					@Test
+        @DisplayName("should have the updated content")
+        void shouldHaveTheUpdatedContent() throws Exception {
 						FileSystemResourceLoader loader = context.getBean(FileSystemResourceLoader.class);
 						String contentId = entity.getContentId();
 						assertThat(new File(loader.getFilesystemRoot(), contentId).exists(), is(true));
@@ -382,18 +469,23 @@ public class FilesystemStoreIT {
 						assertThat(entity.getContentId(), is(not(contentId)));
 
 						assertThat(new File(loader.getFilesystemRoot(), entity.getContentId()).exists(), is(true));
-					});
-				});
+					}
+				}
 
-				Context("when content is unset", () -> {
-					BeforeEach(() -> {
+				@Nested
+    @DisplayName("when content is unset")
+    class WhenContentIsUnset {
+					@BeforeEach
+        void setUp() throws Exception {
 						resourceLocation = entity.getContentId().toString();
 						entity = store.unsetContent(entity);
 						entity = store.unsetContent(entity, PropertyPath.from("rendition"));
 						entity = repo.save(entity);
-					});
+					}
 
-					It("should have no content", () -> {
+					@Test
+        @DisplayName("should have no content")
+        void shouldHaveNoContent() throws Exception {
 						//content
 						try (InputStream content = store.getContent(entity)) {
 							assertThat(content, is(Matchers.nullValue()));
@@ -412,17 +504,22 @@ public class FilesystemStoreIT {
 
 						FileSystemResourceLoader loader = context.getBean(FileSystemResourceLoader.class);
 						assertThat(new File(loader.getFilesystemRoot(), resourceLocation).exists(), is(false));
-					});
-				});
+					}
+				}
 
-				Context("when content is unset but kept", () -> {
-					BeforeEach(() -> {
+				@Nested
+    @DisplayName("when content is unset but kept")
+    class WhenContentIsUnsetButKept {
+					@BeforeEach
+        void setUp() throws Exception {
 						resourceLocation = entity.getContentId().toString();
 						entity = store.unsetContent(entity, PropertyPath.from("content"), UnsetContentParams.builder().disposition(UnsetContentParams.Disposition.Keep).build());
 						entity = repo.save(entity);
-					});
+					}
 
-					It("should have no content", () -> {
+					@Test
+        @DisplayName("should have no content")
+        void shouldHaveNoContent() throws Exception {
 						//content
 						try (InputStream content = store.getContent(entity)) {
 							assertThat(content, is(Matchers.nullValue()));
@@ -433,45 +530,61 @@ public class FilesystemStoreIT {
 
 						FileSystemResourceLoader loader = context.getBean(FileSystemResourceLoader.class);
 						assertThat(new File(loader.getFilesystemRoot(), resourceLocation).exists(), is(true));
-					});
-				});
+					}
+				}
 
-				Context("when an invalid property path is used to setContent", () -> {
-					It("should throw an error", () -> {
+				@Nested
+    @DisplayName("when an invalid property path is used to setContent")
+    class WhenAnInvalidPropertyPathIsUsedToSetcontent {
+					@Test
+        @DisplayName("should throw an error")
+        void shouldThrowAnError() throws Exception {
 						try {
 							store.setContent(entity, PropertyPath.from("does.not.exist"), new ByteArrayInputStream("foo".getBytes()));
 						} catch (Exception sae) {
-							this.e = sae;
+							e = sae;
 						}
 						assertThat(e, is(instanceOf(StoreAccessException.class)));
-					});
-				});
+					}
+				}
 
-				Context("when an invalid property path is used to getContent", () -> {
-					It("should throw an error", () -> {
+				@Nested
+    @DisplayName("when an invalid property path is used to getContent")
+    class WhenAnInvalidPropertyPathIsUsedToGetcontent {
+					@Test
+        @DisplayName("should throw an error")
+        void shouldThrowAnError() throws Exception {
 						try {
 							store.getContent(entity, PropertyPath.from("does.not.exist"));
 						} catch (Exception sae) {
-							this.e = sae;
+							e = sae;
 						}
 						assertThat(e, is(instanceOf(StoreAccessException.class)));
-					});
-				});
+					}
+				}
 
-				Context("when an invalid property path is used to unsetContent", () -> {
-					It("should throw an error", () -> {
+				@Nested
+    @DisplayName("when an invalid property path is used to unsetContent")
+    class WhenAnInvalidPropertyPathIsUsedToUnsetcontent {
+					@Test
+        @DisplayName("should throw an error")
+        void shouldThrowAnError() throws Exception {
 						try {
 							store.unsetContent(entity, PropertyPath.from("does.not.exist"));
 						} catch (Exception sae) {
-							this.e = sae;
+							e = sae;
 						}
 						assertThat(e, is(instanceOf(StoreAccessException.class)));
-					});
-				});
+					}
+				}
 
-				Context("when content is deleted and the id field is shared with javax id", () -> {
+				@Nested
+    @DisplayName("when content is deleted and the id field is shared with javax id")
+    class WhenContentIsDeletedAndTheIdFieldIsSharedWithJavaxId {
 
-					It("should not reset the id field", () -> {
+					@Test
+        @DisplayName("should not reset the id field")
+        void shouldNotResetTheIdField() throws Exception {
 						SharedIdRepository sharedIdRepository = context.getBean(SharedIdRepository.class);
 						SharedIdStore sharedIdStore = context.getBean(SharedIdStore.class);
 
@@ -483,40 +596,44 @@ public class FilesystemStoreIT {
 						sharedIdContentIdEntity = sharedIdStore.unsetContent(sharedIdContentIdEntity);
 						assertThat(sharedIdContentIdEntity.getContentId(), is(id));
 						assertThat(sharedIdContentIdEntity.getContentLen(), is(nullValue()));
-					});
-				});
+					}
+				}
 
-				Context("@Embedded content", () -> {
-					Context("given a entity with a null embedded content object", () -> {
-						It("should return null when content is fetched", () -> {
+				@Nested
+    @DisplayName("@Embedded content")
+    class EmbeddedContent {
+					@Nested
+    @DisplayName("given a entity with a null embedded content object")
+    class GivenAEntityWithANullEmbeddedContentObject {
+						@Test
+        @DisplayName("should return null when content is fetched")
+        void shouldReturnNullWhenContentIsFetched() throws Exception {
 							EntityWithEmbeddedContent entity = embeddedRepo.save(new EntityWithEmbeddedContent());
 							assertThat(embeddedStore.getContent(entity, PropertyPath.from("content")), is(nullValue()));
-						});
+						}
 
-						It("should be successful when content is set", () -> {
+						@Test
+        @DisplayName("should be successful when content is set")
+        void shouldBeSuccessfulWhenContentIsSet() throws Exception {
 							EntityWithEmbeddedContent entity = embeddedRepo.save(new EntityWithEmbeddedContent());
 							embeddedStore.setContent(entity, PropertyPath.from("content"), new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
 							try (InputStream is = embeddedStore.getContent(entity, PropertyPath.from("content"))) {
 								assertThat(IOUtils.contentEquals(is, new ByteArrayInputStream("Hello Spring Content World!".getBytes())), is(true));
 							}
-						});
+						}
 
-						It("should return null when content is unset", () -> {
+						@Test
+        @DisplayName("should return null when content is unset")
+        void shouldReturnNullWhenContentIsUnset() throws Exception {
 							EntityWithEmbeddedContent entity = embeddedRepo.save(new EntityWithEmbeddedContent());
 							EntityWithEmbeddedContent expected = new EntityWithEmbeddedContent(entity.getId(), entity.getContent());
 							assertThat(embeddedStore.unsetContent(entity, PropertyPath.from("content")), is(expected));
 							int i = 0;
-						});
-					});
-				});
-			});
-		});
-	}
-
-	@Test
-	public void test() {
-		// noop
-	}
+						}
+					}
+				}
+			}
+		}
 
 	@Configuration
 	@EnableJpaRepositories(considerNestedRepositories = true)

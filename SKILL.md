@@ -4,12 +4,11 @@ Guidelines for writing, modifying, and reviewing code across the **Spring Conten
 
 **Project coordinates**
 - **GroupId:** `it.intesys`
-- **Current version:** `3.1.0-SNAPSHOT`
-- **Java:** 17
+- **Current version:** `4.0.0-SNAPSHOT`
+- **Java:** 21
 - **Maven wrapper:** `./mvnw` (bundled Maven 3.6.3)
-- **Spring Boot:** 3.5.0
-- **Spring Cloud:** 2024.0.1
-- **Jakarta Persistence:** 3.1.0
+- **Spring Boot:** 4.0.5
+- **Spring Cloud:** 2025.1.1
 
 ## When to Use
 
@@ -120,10 +119,8 @@ mvn -B -P tests -Dmaven.javadoc.skip=true install
 
 ## Testing Conventions
 
-- **Framework:** [ginkgo4j](https://github.com/paulcwarren/ginkgo4j) BDD (`com.github.paulcwarren:ginkgo4j:1.0.15`).
 - **Unit tests:** classes named `*Test.java` — run by default.
 - **Integration tests:** classes named `*IT.java` or `*Tests.java` — **only run with `-P tests`**.
-- Some modules exclude JUnit Jupiter from `spring-boot-starter-test` to avoid conflicts with ginkgo4j; follow the existing `pom.xml` pattern.
 - Docker availability matters for ITs (Testcontainers, LocalStack, embedded dbs).
 
 ## Code Style Requirements

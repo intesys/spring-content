@@ -4,7 +4,7 @@ package internal.org.springframework.content.encryption.keys.converter;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.encryption.keys.StoredDataEncryptionKey;
 import org.springframework.content.encryption.keys.StoredDataEncryptionKey.EncryptedSymmetricDataEncryptionKey;
 import org.springframework.content.encryption.keys.StoredDataEncryptionKey.UnencryptedSymmetricDataEncryptionKey;
@@ -13,6 +13,7 @@ import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 public class StoredDataEncryptionKeyGenericConverterTest {
+
     private static final ConfigurableConversionService conversionService = new DefaultConversionService();
 
     static {

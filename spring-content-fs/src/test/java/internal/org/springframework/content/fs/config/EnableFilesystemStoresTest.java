@@ -1,9 +1,11 @@
 package internal.org.springframework.content.fs.config;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.content.commons.annotations.ContentId;
@@ -17,26 +19,20 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.convert.converter.ConverterRegistry;
 
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.AfterEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("deprecation")
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 public class EnableFilesystemStoresTest {
 
 	private AnnotationConfigApplicationContext context;
@@ -44,93 +40,116 @@ public class EnableFilesystemStoresTest {
 	// mocks
 	static FilesystemStoreConfigurer configurer;
 
-	{
-		Describe("EnableFilesystemStores", () -> {
+	@Nested
+	@DisplayName("EnableFilesystemStores")
+	class EnableFilesystemStoresTests {
 
-			Context("given a context and a configuartion with a filesystem content repository bean",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(TestConfig.class);
-							context.refresh();
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						It("should have a ContentRepository bean", () -> {
-							assertThat(context.getBean(TestEntityContentRepository.class),
-									is(not(nullValue())));
-						});
-						It("should have a filesystem placement service bean", () -> {
-							assertThat(context.getBean("filesystemStorePlacementService"),
-									is(not(nullValue())));
-						});
-						It("should have a FileSystemResourceLoader bean", () -> {
-							assertThat(context.getBean("fileSystemResourceLoader"),
-									is(not(nullValue())));
-						});
-					});
+		@Nested
+		@DisplayName("given a context and a configuartion with a filesystem content repository bean")
+		class GivenAContextAndAConfiguartionWithAFilesystemContentRepositoryBean {
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(TestConfig.class);
+				context.refresh();
+			}
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+			@Test
+			@DisplayName("should have a ContentRepository bean")
+			void shouldHaveAContentrepositoryBean() throws Exception {
+				assertThat(context.getBean(TestEntityContentRepository.class),
+						is(not(nullValue())));
+			}
+			@Test
+			@DisplayName("should have a filesystem placement service bean")
+			void shouldHaveAFilesystemPlacementServiceBean() throws Exception {
+				assertThat(context.getBean("filesystemStorePlacementService"),
+						is(not(nullValue())));
+			}
+			@Test
+			@DisplayName("should have a FileSystemResourceLoader bean")
+			void shouldHaveAFilesystemresourceloaderBean() throws Exception {
+				assertThat(context.getBean("fileSystemResourceLoader"),
+						is(not(nullValue())));
+			}
+		}
 
-			Context("given a context with a configurer", () -> {
-				BeforeEach(() -> {
-					configurer = mock(FilesystemStoreConfigurer.class);
+		@Nested
+		@DisplayName("given a context with a configurer")
+		class GivenAContextWithAConfigurer {
+			@BeforeEach
+			void setUp() throws Exception {
+				configurer = mock(FilesystemStoreConfigurer.class);
 
-					context = new AnnotationConfigApplicationContext();
-					context.register(ConverterConfig.class);
-					context.refresh();
-				});
-				AfterEach(() -> {
-					context.close();
-				});
-				It("should call that configurer to help customize the store", () -> {
-					verify(configurer).configureFilesystemStoreConverters(anyObject());
-				});
-			});
+				context = new AnnotationConfigApplicationContext();
+				context.register(ConverterConfig.class);
+				context.refresh();
+			}
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+			@Test
+			@DisplayName("should call that configurer to help customize the store")
+			void shouldCallThatConfigurerToHelpCustomizeTheStore() throws Exception {
+				verify(configurer).configureFilesystemStoreConverters(any(ConverterRegistry.class));
+			}
+		}
 
-			Context("given a context with an empty configuration", () -> {
-				BeforeEach(() -> {
-					context = new AnnotationConfigApplicationContext();
-					context.register(EmptyConfig.class);
-					context.refresh();
-				});
-				AfterEach(() -> {
-					context.close();
-				});
-				It("should not contain any filesystem repository beans", () -> {
-					try {
-						context.getBean(TestEntityContentRepository.class);
-						fail("expected no such bean");
-					}
-					catch (NoSuchBeanDefinitionException e) {
-						assertThat(true, is(true));
-					}
-				});
-			});
-		});
-
-		Describe("EnableFilesystemContentRepositories", () -> {
-
-			Context("given a context and a configuration with a filesystem content repository bean",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(BackwardCompatibilityConfig.class);
-							context.refresh();
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						It("should have a ContentRepository bean", () -> {
-							assertThat(context.getBean(TestEntityContentRepository.class),
-									is(not(nullValue())));
-						});
-					});
-		});
-
+		@Nested
+		@DisplayName("given a context with an empty configuration")
+		class GivenAContextWithAnEmptyConfiguration {
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(EmptyConfig.class);
+				context.refresh();
+			}
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+			@Test
+			@DisplayName("should not contain any filesystem repository beans")
+			void shouldNotContainAnyFilesystemRepositoryBeans() throws Exception {
+				try {
+					context.getBean(TestEntityContentRepository.class);
+					fail("expected no such bean");
+				}
+				catch (NoSuchBeanDefinitionException e) {
+					assertThat(true, is(true));
+				}
+			}
+		}
 	}
 
-	@Test
-	public void noop() {
+	@Nested
+	@DisplayName("EnableFilesystemContentRepositories")
+	class EnableFilesystemContentRepositoriesTests {
+
+		@Nested
+		@DisplayName("given a context and a configuration with a filesystem content repository bean")
+		class GivenAContextAndAConfigurationWithAFilesystemContentRepositoryBean {
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(BackwardCompatibilityConfig.class);
+				context.refresh();
+			}
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+			@Test
+			@DisplayName("should have a ContentRepository bean")
+			void shouldHaveAContentrepositoryBean() throws Exception {
+				assertThat(context.getBean(TestEntityContentRepository.class),
+						is(not(nullValue())));
+			}
+		}
 	}
 
 	@Configuration
@@ -206,3 +225,4 @@ public class EnableFilesystemStoresTest {
 			extends ContentStore<TestEntity, String> {
 	}
 }
+

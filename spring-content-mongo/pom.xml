@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>it.intesys</groupId>
 		<artifactId>spring-content</artifactId>
-		<version>3.2.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 	<name>Spring Content Mongo</name>
 	<description>Spring Content Mongo module of Spring Content.</description>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-commons</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -32,32 +32,13 @@
 
 		<!-- Test Dependencies -->
 		<dependency>
-			<groupId>com.github.paulcwarren</groupId>
-			<artifactId>ginkgo4j</artifactId>
-			<version>${ginkgo4j-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>${mockito.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>${powermock.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito2</artifactId>
-			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -71,7 +52,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mongodb</artifactId>
+			<artifactId>testcontainers-mongodb</artifactId>
 			<version>${test-containers.version}</version>
 			<scope>test</scope>
 		</dependency>

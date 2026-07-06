@@ -1,19 +1,18 @@
 package org.springframework.content.commons.io;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.util.Observable;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@RunWith(Ginkgo4jRunner.class)
+@DisplayName("ObservableInputStream")
 public class ObservableInputStreamTest {
 
     private ObservableInputStream ois;
@@ -21,37 +20,34 @@ public class ObservableInputStreamTest {
     private FileInputStream fis;
     private InputStreamObserver observer;
 
-    {
-        Describe("ObservableInputStream", () -> {
-            Context("when an input stream is observed", () -> {
-                BeforeEach(() -> {
-                    fis = mock(FileInputStream.class);
-                    observer = mock(InputStreamObserver.class);
+    @Nested
+    @DisplayName("when an input stream is observed")
+    class Observed {
+        @BeforeEach
+        void setUp() {
+            fis = mock(FileInputStream.class);
+            observer = mock(InputStreamObserver.class);
+            ois = new ObservableInputStream(fis, observer);
+        }
 
-                    ois = new ObservableInputStream(fis, observer);
-                });
-                Context("when the input stream has listeners", () -> {
-                    It("should return them", () -> {
-                        assertThat(ois.getObservers(), hasItem(observer));
-                    });
-                });
-                Context("when the input stream is read", () -> {
-                    JustBeforeEach(() -> {
-                        ois.read();
-                    });
-                    It("should delegate to the underlying input stream", () -> {
-                        verify(fis).read();
-                    });
-                });
-                Context("when the input stream is closed", () -> {
-                    JustBeforeEach(() -> {
-                        ois.close();
-                    });
-                    It("should call listeners on closed event handler", () -> {
-                        verify(observer).closed();
-                    });
-                });
-            });
-        });
+        @Test
+        @DisplayName("when the input stream has listeners should return them")
+        void returnListeners() {
+            assertThat(ois.getObservers(), hasItem(observer));
+        }
+
+        @Test
+        @DisplayName("when the input stream is read should delegate to the underlying input stream")
+        void delegateRead() throws Exception {
+            ois.read();
+            verify(fis).read();
+        }
+
+        @Test
+        @DisplayName("when the input stream is closed should call listeners on closed event handler")
+        void callListenersOnClose() throws Exception {
+            ois.close();
+            verify(observer).closed();
+        }
     }
 }

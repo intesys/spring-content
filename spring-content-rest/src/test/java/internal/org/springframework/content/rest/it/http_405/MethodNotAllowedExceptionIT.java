@@ -1,7 +1,5 @@
 package internal.org.springframework.content.rest.it.http_405;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.rest.it.SecurityConfiguration;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import jakarta.persistence.Entity;
@@ -10,15 +8,17 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoRepositoriesAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.content.commons.annotations.ContentId;
@@ -27,7 +27,6 @@ import org.springframework.content.commons.annotations.MimeType;
 import org.springframework.content.commons.property.PropertyPath;
 import org.springframework.content.commons.store.SetContentParams;
 import org.springframework.content.commons.store.UnsetContentParams;
-import org.springframework.content.commons.store.ContentStore;
 import org.springframework.content.fs.config.EnableFilesystemStores;
 import org.springframework.content.fs.io.FileSystemResourceLoader;
 import org.springframework.content.fs.store.FilesystemContentStore;
@@ -57,11 +56,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads=1)
 @SpringBootTest(classes = MethodNotAllowedExceptionIT.Application.class, webEnvironment=WebEnvironment.RANDOM_PORT)
 public class MethodNotAllowedExceptionIT {
 
@@ -80,102 +76,119 @@ public class MethodNotAllowedExceptionIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    {
-        Describe("when getContent method is not exported", () -> {
+    @Nested
+    @DisplayName("when getContent method is not exported")
+    class WhenGetContentNotExported {
 
-            BeforeEach(() -> {
-                RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
-            });
+        @BeforeEach
+        void setup() {
+            RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+        }
 
-            It("should throw a 405 Not Allowed", () -> {
+        @Test
+        @DisplayName("should throw a 405 Not Allowed")
+        void shouldThrow405() {
+            TEntity tentity = new TEntity();
+            tentity = store.setContent(tentity, new ByteArrayInputStream("some content".getBytes()));
+            tentity = repo.save(tentity);
 
-                TEntity tentity = new TEntity();
-                tentity = store.setContent(tentity, new ByteArrayInputStream("some content".getBytes()));
-                tentity = repo.save(tentity);
+            given()
+                .accept("text/plain")
+            .when()
+                .get("/tEntities/" + tentity.getId())
+            .then()
+                .statusCode(405);
+        }
+    }
 
-                given()
-                    .accept("text/plain")
-                .when()
-                    .get("/tEntities/" + tentity.getId())
-                .then()
-                    .statusCode(405);
-            });
-        });
+    @Nested
+    @DisplayName("when setContent methods are not exported")
+    class WhenSetContentNotExported {
 
-        Describe("when setContent methods are not exported", () -> {
+        @BeforeEach
+        void setup() {
+            RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+        }
 
-            BeforeEach(() -> {
-                RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
-            });
+        @Test
+        @DisplayName("should throw a 405 Not Allowed")
+        void shouldThrow405() {
+            TEntity tentity = new TEntity();
+            tentity = repo.save(tentity);
 
-            It("should throw a 405 Not Allowed", () -> {
+            given()
+                .contentType("text/plain")
+                .body("some content".getBytes())
+            .when()
+                .post("/tEntities/" + tentity.getId())
+            .then()
+                .statusCode(405);
+        }
+    }
 
-                TEntity tentity = new TEntity();
-                tentity = repo.save(tentity);
+    @Nested
+    @DisplayName("when unsetContent method are not exported")
+    class WhenUnsetContentNotExported {
 
-                given()
-                    .contentType("text/plain")
-                    .body("some content".getBytes())
-                .when()
-                    .post("/tEntities/" + tentity.getId())
-                .then()
-                    .statusCode(405);
-            });
-        });
+        @BeforeEach
+        void setup() {
+            RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+        }
 
-        Describe("when unsetContent method are not exported", () -> {
+        @Test
+        @DisplayName("should throw a 405 Not Allowed")
+        void shouldThrow405() {
+            TEntity tentity = new TEntity();
+            tentity = store.setContent(tentity, new ByteArrayInputStream("some content".getBytes()));
+            tentity = repo.save(tentity);
 
-            BeforeEach(() -> {
-                RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
-            });
+            given()
+                .accept("text/plain")
+            .when()
+                .delete("/tEntities/" + tentity.getId())
+            .then()
+                .statusCode(405);
+        }
+    }
 
-            It("should throw a 405 Not Allowed", () -> {
+    @Nested
+    @DisplayName("when a content property is not exported")
+    class WhenContentPropertyNotExported {
 
-                TEntity tentity = new TEntity();
-                tentity = store.setContent(tentity, new ByteArrayInputStream("some content".getBytes()));
-                tentity = repo.save(tentity);
+        @BeforeEach
+        void setup() {
+            RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+        }
 
-                given()
-                    .accept("text/plain")
-                .when()
-                    .delete("/tEntities/" + tentity.getId())
-                .then()
-                    .statusCode(405);
-            });
-        });
+        @Test
+        @DisplayName("should throw a 405 Not Allowed for all requests")
+        void shouldThrow405() {
+            TEntity2 tentity = new TEntity2();
+            tentity = store2.setContent(tentity, new ByteArrayInputStream("some content".getBytes()));
+            tentity = repo2.save(tentity);
 
-        Describe("when a content property is not exported", () -> {
-            BeforeEach(() -> {
-                RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
-            });
-            It("should throw a 405 Not Allowed for all requests", () -> {
-                TEntity2 tentity = new TEntity2();
-                tentity = store2.setContent(tentity, new ByteArrayInputStream("some content".getBytes()));
-                tentity = repo2.save(tentity);
+            given()
+                .accept("text/plain")
+            .when()
+                .get("/tEntity2s/" + tentity.getId() + "/content")
+            .then()
+                .statusCode(405);
 
-                given()
-                    .accept("text/plain")
-                .when()
-                    .get("/tEntity2s/" + tentity.getId() + "/content")
-                .then()
-                    .statusCode(405);
+            given()
+                .contentType("text/plain")
+                .body("some content".getBytes())
+            .when()
+                .post("/tEntity2s/" + tentity.getId() + "/content")
+            .then()
+                .statusCode(405);
 
-                given()
-                    .contentType("text/plain")
-                    .body("some content".getBytes())
-                .when()
-                    .post("/tEntity2s/" + tentity.getId() + "/content")
-                .then()
-                    .statusCode(405);
-
-                given()
-                    .accept("text/plain")
-                .when()
-                    .delete("/tEntity2s/" + tentity.getId() + "/content")
-                .then()
-                    .statusCode(405);
-            });
-        });
+            given()
+                .accept("text/plain")
+            .when()
+                .delete("/tEntity2s/" + tentity.getId() + "/content")
+            .then()
+                .statusCode(405);
+        }
     }
 
     public interface PreferResourceForPutsAndPostsRepository extends CrudRepository<TEntity, Long> {
@@ -230,9 +243,9 @@ public class MethodNotAllowedExceptionIT {
     public interface TestEntity2Store extends FilesystemContentStore<TEntity2, UUID> {}
 
     @SpringBootApplication(exclude = {
-            MongoAutoConfiguration.class,
-            MongoDataAutoConfiguration.class,
-            MongoRepositoriesAutoConfiguration.class
+        MongoAutoConfiguration.class,
+        DataMongoAutoConfiguration.class,
+        DataMongoRepositoriesAutoConfiguration.class
     })
     public static class Application {
 
@@ -298,9 +311,5 @@ public class MethodNotAllowedExceptionIT {
                 return new FileSystemResourceLoader(Files.createTempDirectory("").toFile().getAbsolutePath());
             }
         }
-    }
-
-    @Test
-    public void noop() {
     }
 }

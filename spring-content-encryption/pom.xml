@@ -7,7 +7,7 @@
     <parent>
         <artifactId>spring-content</artifactId>
         <groupId>it.intesys</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <name>Spring Content Encryption</name>
     <description>Spring Content Encryption module of Spring Content.</description>
@@ -22,12 +22,12 @@
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-commons</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.vault</groupId>
             <artifactId>spring-vault-core</artifactId>
-            <version>3.2.0</version>
+            <version>4.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -40,27 +40,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.github.paulcwarren</groupId>
-            <artifactId>ginkgo4j</artifactId>
-            <version>${ginkgo4j-version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -87,41 +70,42 @@
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-fs-boot-starter</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-jpa-boot-starter</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-s3-boot-starter</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-rest-boot-starter</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>spring-mock-mvc</artifactId>
+            <version>${spring-mock-mvc.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>vault</artifactId>
+            <artifactId>testcontainers-vault</artifactId>
             <version>${test-containers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>localstack</artifactId>
+            <artifactId>testcontainers-localstack</artifactId>
             <version>${test-containers.version}</version>
             <scope>test</scope>
         </dependency>

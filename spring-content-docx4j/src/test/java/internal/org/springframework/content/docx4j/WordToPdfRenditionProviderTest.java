@@ -7,8 +7,9 @@ import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.content.commons.io.FileRemover;
 import org.springframework.content.commons.io.ObservableInputStream;
@@ -18,16 +19,18 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
+@DisplayName("WordToPdfRenditionProvider")
 public class WordToPdfRenditionProviderTest {
 
 	private RenditionProvider service;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		service = new WordToPdfRenditionProvider();
 	}
 
 	@Test
+	@DisplayName("should consume docx and produce application/pdf")
 	public void testCanConvert() {
 		assertThat(service.consumes(), is(
 				"application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
@@ -35,6 +38,7 @@ public class WordToPdfRenditionProviderTest {
 	}
 
 	@Test
+	@DisplayName("should convert docx to pdf")
 	public void testConvert() throws Exception {
 		InputStream converted = service.convert(this.getClass().getResourceAsStream("/sample-docx2.docx"),"application/pdf");
 

@@ -4,13 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.UUID;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.rest.support.StoreConfig;
 import internal.org.springframework.content.rest.support.TestStore;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.rest.config.RestConfiguration;
@@ -24,15 +25,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.FIt;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -41,9 +38,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { StoreConfig.class, DelegatingWebMvcConfiguration.class,
 		RepositoryRestMvcConfiguration.class, RestConfiguration.class })
 @Transactional
@@ -56,198 +52,266 @@ public class StoreRestEndpointsIT {
 	@Autowired
 	private WebApplicationContext context;
 
-	private MockMvc mvc;
+	@Nested
+	@DisplayName("Store Rest Endpoints")
+	class StoreRestEndpointsTests {
 
-	private String path;
-	private String request;
+		private MockMvc mvc;
 
-	private LastModifiedDate lastModifiedDate;
+		@BeforeEach
+		void setup() {
+			mvc = MockMvcBuilders.webAppContextSetup(context).build();
+		}
 
-	{
-		Describe("Store Rest Endpoints", () -> {
-			BeforeEach(() -> {
-				mvc = MockMvcBuilders.webAppContextSetup(context).build();
-			});
+		@Nested
+		@DisplayName("given a root resource path")
+		class GivenRootResourcePath {
 
-			Context("given a root resource path", () -> {
-				BeforeEach(() -> {
-					path = "/" + UUID.randomUUID() + ".txt";
-					request = "/teststore" + path;
-				});
-				Context("given a GET request to that path", () -> {
-					It("should return 404", () -> {
-						mvc.perform(get(request)).andExpect(status().isNotFound());
-					});
-				});
-				Context("given a POST to that path with content", () -> {
-					It("should set the content and return 201", () -> {
+			private String path;
+			private String request;
 
-						String content = "New multi-part content";
+			@BeforeEach
+			void init() {
+				path = "/" + UUID.randomUUID() + ".txt";
+				request = "/teststore" + path;
+			}
 
-						mvc.perform(multipart(request).file(new MockMultipartFile("file",
-								"test-file.txt", "text/plain", content.getBytes())))
-								.andExpect(status().isCreated());
+			@Nested
+			@DisplayName("given a GET request to that path")
+			class GetRequest {
 
-						Resource r = store.getResource(path);
-						assertThat(IOUtils.contentEquals(
-								new ByteArrayInputStream("New multi-part content".getBytes()),
-								r.getInputStream()), is(true));
-						assertThat(r.contentLength(), equalTo(Long.valueOf(content.length())));
-					});
-				});
-				Context("given a DELETE request to that path", () -> {
-					It("should return a 404", () -> {
-						mvc.perform(delete(request)).andExpect(status().isNotFound());
-					});
-				});
-			});
+				@Test
+				@DisplayName("should return 404")
+				void shouldReturn404() throws Exception {
+					mvc.perform(get(request)).andExpect(status().isNotFound());
+				}
+			}
 
-			Context("given a root resource", () -> {
-				BeforeEach(() -> {
-					path = "/" + UUID.randomUUID() + ".txt";
-					request = "/teststore" + path;
-					Resource r = store.getResource(path);
-					if (r instanceof WritableResource) {
-						IOUtils.copy(
-								new ByteArrayInputStream("Existing content".getBytes()),
-								((WritableResource) r).getOutputStream());
-					}
+			@Nested
+			@DisplayName("given a POST to that path with content")
+			class PostWithContent {
 
-					lastModifiedDate.setMvc(mvc);
-					lastModifiedDate.setUrl("/teststore" + path);
-					lastModifiedDate.setLastModifiedDate(new Date(r.lastModified()));
-					lastModifiedDate.setContent("Existing content");
-				});
-				It("should return the resource's content", () -> {
-					MockHttpServletResponse response = mvc.perform(get(request))
-							.andExpect(status().isOk()).andReturn().getResponse();
+				@Test
+				@DisplayName("should set the content and return 201")
+				void shouldSetContentAndReturn201() throws Exception {
+					String content = "New multi-part content";
 
-					assertThat(response, is(not(nullValue())));
-					assertThat(response.getContentAsString(), is("Existing content"));
-
-				});
-				It("should return a byte range when requested", () -> {
-					MockHttpServletResponse response = mvc
-							.perform(get(request).header("range", "bytes=9-12"))
-							.andExpect(status().isPartialContent()).andReturn()
-							.getResponse();
-
-					assertThat(response, is(not(nullValue())));
-					assertThat(response.getContentAsString(), is("cont"));
-				});
-				It("should overwrite the resource's content", () -> {
-					mvc.perform(put(request).content("New Existing content")
-							.contentType("text/plain")).andExpect(status().isOk());
+					mvc.perform(multipart(request).file(new MockMultipartFile("file",
+							"test-file.txt", "text/plain", content.getBytes())))
+							.andExpect(status().isCreated());
 
 					Resource r = store.getResource(path);
 					assertThat(IOUtils.contentEquals(
-							new ByteArrayInputStream("New Existing content".getBytes()),
+							new ByteArrayInputStream("New multi-part content".getBytes()),
 							r.getInputStream()), is(true));
-				});
-				Context("a POST to /{store}/{path} with multi-part form-data ", () -> {
-					It("should overwrite the content and return 200", () -> {
+					assertThat(r.contentLength(), equalTo(Long.valueOf(content.length())));
+				}
+			}
 
-						String content = "New multi-part content";
+			@Nested
+			@DisplayName("given a DELETE request to that path")
+			class DeleteRequest {
 
-						mvc.perform(multipart(request).file(new MockMultipartFile("file",
-								"tests-file.txt", "text/plain", content.getBytes())))
-								.andExpect(status().isOk());
+				@Test
+				@DisplayName("should return a 404")
+				void shouldReturn404() throws Exception {
+					mvc.perform(delete(request)).andExpect(status().isNotFound());
+				}
+			}
+		}
 
-						Resource r = store.getResource(path);
-						assertThat(IOUtils.contentEquals(
-								new ByteArrayInputStream(
-										"New multi-part content".getBytes()),
-								r.getInputStream()), is(true));
-						assertThat(r.contentLength(), equalTo(Long.valueOf(content.length())));
-					});
-				});
-				It("should delete the resource", () -> {
-					mvc.perform(delete(request)).andExpect(status().isNoContent());
+		@Nested
+		@DisplayName("given a root resource")
+		class GivenRootResource {
 
-					Resource r = store.getResource(path);
-					assertThat(r.exists(), is(false));
-				});
+			private String path;
+			private String request;
+			private LastModifiedDate lastModifiedDate;
 
+			@BeforeEach
+			void init() throws Exception {
+				path = "/" + UUID.randomUUID() + ".txt";
+				request = "/teststore" + path;
+				Resource r = store.getResource(path);
+				if (r instanceof WritableResource) {
+					IOUtils.copy(
+							new ByteArrayInputStream("Existing content".getBytes()),
+							((WritableResource) r).getOutputStream());
+				}
 				lastModifiedDate = new LastModifiedDate();
-			});
+				lastModifiedDate.setMvc(mvc);
+				lastModifiedDate.setUrl("/teststore" + path);
+				lastModifiedDate.setLastModifiedDate(new Date(store.getResource(path).lastModified()));
+				lastModifiedDate.setContent("Existing content");
+			}
 
-			Context("given a nested resource", () -> {
-				BeforeEach(() -> {
-					path = "/a/b/" + UUID.randomUUID() + ".txt";
-					request = "/teststore" + path;
+			@Test
+			@DisplayName("should return the resource's content")
+			void shouldReturnContent() throws Exception {
+				MockHttpServletResponse response = mvc.perform(get(request))
+						.andExpect(status().isOk()).andReturn().getResponse();
+
+				assertThat(response, is(not(nullValue())));
+				assertThat(response.getContentAsString(), is("Existing content"));
+			}
+
+			@Test
+			@DisplayName("should return a byte range when requested")
+			void shouldReturnByteRange() throws Exception {
+				MockHttpServletResponse response = mvc
+						.perform(get(request).header("range", "bytes=9-12"))
+						.andExpect(status().isPartialContent()).andReturn()
+						.getResponse();
+
+				assertThat(response, is(not(nullValue())));
+				assertThat(response.getContentAsString(), is("cont"));
+			}
+
+			@Test
+			@DisplayName("should overwrite the resource's content")
+			void shouldOverwriteContent() throws Exception {
+				mvc.perform(put(request).content("New Existing content")
+						.contentType("text/plain")).andExpect(status().isOk());
+
+				Resource r = store.getResource(path);
+				assertThat(IOUtils.contentEquals(
+						new ByteArrayInputStream("New Existing content".getBytes()),
+						r.getInputStream()), is(true));
+			}
+
+			@Nested
+			@DisplayName("a POST to /{store}/{path} with multi-part form-data")
+			class PostMultiPart {
+
+				@Test
+				@DisplayName("should overwrite the content and return 200")
+				void shouldOverwriteAndReturn200() throws Exception {
+					String content = "New multi-part content";
+
+					mvc.perform(multipart(request).file(new MockMultipartFile("file",
+							"tests-file.txt", "text/plain", content.getBytes())))
+							.andExpect(status().isOk());
+
 					Resource r = store.getResource(path);
-					if (r instanceof WritableResource) {
-						IOUtils.copy(
-								new ByteArrayInputStream("Existing content".getBytes()),
-								((WritableResource) r).getOutputStream());
-					}
-				});
-				It("should return the resource's content", () -> {
-					MockHttpServletResponse response = mvc.perform(get(request))
+					assertThat(IOUtils.contentEquals(
+							new ByteArrayInputStream(
+									"New multi-part content".getBytes()),
+							r.getInputStream()), is(true));
+					assertThat(r.contentLength(), equalTo(Long.valueOf(content.length())));
+				}
+			}
+
+			@Test
+			@DisplayName("should delete the resource")
+			void shouldDeleteResource() throws Exception {
+				mvc.perform(delete(request)).andExpect(status().isNoContent());
+
+				Resource r = store.getResource(path);
+				assertThat(r.exists(), is(false));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a nested resource")
+		class GivenNestedResource {
+
+			private String path;
+			private String request;
+
+			@BeforeEach
+			void init() throws Exception {
+				path = "/a/b/" + UUID.randomUUID() + ".txt";
+				request = "/teststore" + path;
+				Resource r = store.getResource(path);
+				if (r instanceof WritableResource) {
+					IOUtils.copy(
+							new ByteArrayInputStream("Existing content".getBytes()),
+							((WritableResource) r).getOutputStream());
+				}
+			}
+
+			@Test
+			@DisplayName("should return the resource's content")
+			void shouldReturnContent() throws Exception {
+				MockHttpServletResponse response = mvc.perform(get(request))
+						.andExpect(status().isOk()).andReturn().getResponse();
+
+				assertThat(response, is(not(nullValue())));
+				assertThat(response.getContentAsString(), is("Existing content"));
+			}
+
+			@Test
+			@DisplayName("should return a byte range when requested")
+			void shouldReturnByteRange() throws Exception {
+				MockHttpServletResponse response = mvc
+						.perform(get(request).header("range", "bytes=9-12"))
+						.andExpect(status().isPartialContent()).andReturn()
+						.getResponse();
+
+				assertThat(response, is(not(nullValue())));
+				assertThat(response.getContentAsString(), is("cont"));
+			}
+
+			@Nested
+			@DisplayName("given a typical browser request")
+			class TypicalBrowserRequest {
+
+				@Test
+				@DisplayName("should return the resource's content")
+				void shouldReturnContent() throws Exception {
+					MockHttpServletResponse response = mvc
+							.perform(get(request).accept(new String[] { "text/html",
+									"application/xhtml+xml", "application/xml;q=0.9",
+									"image/webp", "image/apng", "*/*;q=0.8" }))
 							.andExpect(status().isOk()).andReturn().getResponse();
 
 					assertThat(response, is(not(nullValue())));
 					assertThat(response.getContentAsString(), is("Existing content"));
+				}
+			}
 
-				});
-				It("should return a byte range when requested", () -> {
-					MockHttpServletResponse response = mvc
-							.perform(get(request).header("range", "bytes=9-12"))
-							.andExpect(status().isPartialContent()).andReturn()
-							.getResponse();
+			@Test
+			@DisplayName("should overwrite the resource's content")
+			void shouldOverwriteContent() throws Exception {
+				mvc.perform(put(request).content("New Existing content")
+						.contentType("text/plain")).andExpect(status().isOk());
 
-					assertThat(response, is(not(nullValue())));
-					assertThat(response.getContentAsString(), is("cont"));
-				});
-				Context("given a typical browser request", () -> {
-					It("should return the resource's content", () -> {
-						MockHttpServletResponse response = mvc
-								.perform(get(request).accept(new String[] { "text/html",
-										"application/xhtml+xml", "application/xml;q=0.9",
-										"image/webp", "image/apng", "*/*;q=0.8" }))
-								.andExpect(status().isOk()).andReturn().getResponse();
+				Resource r = store.getResource(path);
+				assertThat(IOUtils.contentEquals(
+						new ByteArrayInputStream("New Existing content".getBytes()),
+						r.getInputStream()), is(true));
+			}
 
-						assertThat(response, is(not(nullValue())));
-						assertThat(response.getContentAsString(), is("Existing content"));
-					});
-				});
-				It("should overwrite the resource's content", () -> {
-					mvc.perform(put(request).content("New Existing content")
-							.contentType("text/plain")).andExpect(status().isOk());
+			@Nested
+			@DisplayName("a POST to /{store}/{path} with multi-part form-data")
+			class PostMultiPart {
+
+				@Test
+				@DisplayName("should overwrite the content and return 200")
+				void shouldOverwriteAndReturn200() throws Exception {
+					String content = "New multi-part content";
+
+					mvc.perform(multipart(request).file(new MockMultipartFile("file",
+							"tests-file.txt", "text/plain", content.getBytes())))
+							.andExpect(status().isOk());
 
 					Resource r = store.getResource(path);
 					assertThat(IOUtils.contentEquals(
-							new ByteArrayInputStream("New Existing content".getBytes()),
+							new ByteArrayInputStream(
+									"New multi-part content".getBytes()),
 							r.getInputStream()), is(true));
-				});
-				Context("a POST to /{store}/{path} with multi-part form-data ", () -> {
-					It("should overwrite the content and return 200", () -> {
+					assertThat(r.contentLength(), equalTo(Long.valueOf(content.length())));
+				}
+			}
 
-						String content = "New multi-part content";
+			@Test
+			@DisplayName("should delete the resource")
+			void shouldDeleteResource() throws Exception {
+				mvc.perform(delete(request)).andExpect(status().isNoContent());
 
-						mvc.perform(multipart(request).file(new MockMultipartFile("file",
-								"tests-file.txt", "text/plain", content.getBytes())))
-								.andExpect(status().isOk());
-
-						Resource r = store.getResource(path);
-						assertThat(IOUtils.contentEquals(
-								new ByteArrayInputStream(
-										"New multi-part content".getBytes()),
-								r.getInputStream()), is(true));
-						assertThat(r.contentLength(), equalTo(Long.valueOf(content.length())));
-					});
-				});
-				It("should delete the resource", () -> {
-					mvc.perform(delete(request)).andExpect(status().isNoContent());
-
-					Resource r = store.getResource(path);
-					assertThat(r.exists(), is(false));
-				});
-			});
-		});
-	}
-
-	@Test
-	public void noop() {
+				Resource r = store.getResource(path);
+				assertThat(r.exists(), is(false));
+			}
+		}
 	}
 }

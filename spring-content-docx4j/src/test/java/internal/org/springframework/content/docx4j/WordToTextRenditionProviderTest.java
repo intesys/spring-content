@@ -8,30 +8,34 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.io.FileRemover;
 import org.springframework.content.commons.io.ObservableInputStream;
 import org.springframework.content.commons.renditions.RenditionProvider;
 
 import internal.org.springframework.content.docx4j.WordToTextRenditionProvider;
 
+@DisplayName("WordToTextRenditionProvider")
 public class WordToTextRenditionProviderTest {
 
 	private RenditionProvider service;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		service = new WordToTextRenditionProvider();
 	}
 
 	@Test
+	@DisplayName("should consume docx and produce text/plain")
 	public void testCanConvert() {
 		assertThat(service.consumes(), is("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
 		assertThat(Arrays.asList(service.produces()), hasItems("text/plain"));
 	}
 
 	@Test
+	@DisplayName("should convert docx to text")
 	public void testConvert() throws Exception {
 		InputStream converted = service.convert(this.getClass().getResourceAsStream("/sample-docx2.docx"), "text/plain");
 

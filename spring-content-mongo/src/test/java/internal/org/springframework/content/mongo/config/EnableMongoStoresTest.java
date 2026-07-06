@@ -1,10 +1,20 @@
 package internal.org.springframework.content.mongo.config;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.UUID;
+
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.repository.ContentStore;
@@ -26,131 +36,155 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import java.util.UUID;
-
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-
-@RunWith(Ginkgo4jRunner.class)
 public class EnableMongoStoresTest {
 
 	private AnnotationConfigApplicationContext context;
-	{
-		Describe("EnableMongoStores", () -> {
-			Context("given an enabled configuration with a mongo content repository bean",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(TestConfig.class);
-							context.refresh();
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						It("should have a mongo content repository bean", () -> {
-							assertThat(context.getBean(TestEntityContentRepository.class),
-									is(not(nullValue())));
-						});
-						It("should have a mongo store converter", () -> {
-							assertThat(context.getBean("mongoStorePlacementService"),
-									is(not(nullValue())));
-						});
-					});
 
-			Context("given a context with a custom converter", () -> {
-				BeforeEach(() -> {
-					context = new AnnotationConfigApplicationContext();
-					context.register(ConverterConfig.class);
-					context.refresh();
-				});
-				AfterEach(() -> {
-					context.close();
-				});
-				It("should use that converter", () -> {
-					ConversionService converters = (ConversionService) context
-							.getBean("mongoStorePlacementService");
-					assertThat(
-							converters.convert(
-									UUID.fromString(
-											"e49d5464-26ce-11e7-93ae-92361f002671"),
-									String.class),
-							is("/e49d5464/26ce/11e7/93ae/92361f002671"));
-				});
-			});
+	@Nested
+	@DisplayName("EnableMongoStores")
+	class EnableMongoStoresTests {
 
-			Context("given an enabled configuration with no mongo content repository beans",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(EmptyConfig.class);
-							context.refresh();
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						It("should load the context but have no mongo repository beans",
-								() -> {
-									try {
-										context.getBean(
-												TestEntityContentRepository.class);
-										fail("expected no such bean");
-									}
-									catch (NoSuchBeanDefinitionException e) {
-										assertThat(true, is(true));
-									}
-								});
-					});
-		});
+		@Nested
+		@DisplayName("given an enabled configuration with a mongo content repository bean")
+		class GivenAnEnabledConfigWithContentRepo {
 
-		Describe("EnableMongoContentRepositories", () -> {
-			Context("given an enabled configuration with a mongo content repository bean",
-					() -> {
-						BeforeEach(() -> {
-							context = new AnnotationConfigApplicationContext();
-							context.register(EnableMongoContentRepositoriesConfig.class);
-							context.refresh();
-						});
-						AfterEach(() -> {
-							context.close();
-						});
-						It("should have a mongo content repository bean", () -> {
-							assertThat(context.getBean(TestEntityContentRepository.class),
-									is(not(nullValue())));
-						});
-						It("should have a mongo store converter", () -> {
-							assertThat(context.getBean("mongoStorePlacementService"),
-									is(not(nullValue())));
-						});
-					});
-		});
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(TestConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should have a mongo content repository bean")
+			void shouldHaveContentRepositoryBean() throws Exception {
+				assertThat(context.getBean(TestEntityContentRepository.class),
+						is(not(nullValue())));
+			}
+
+			@Test
+			@DisplayName("should have a mongo store converter")
+			void shouldHaveMongoStoreConverter() throws Exception {
+				assertThat(context.getBean("mongoStorePlacementService"),
+						is(not(nullValue())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a context with a custom converter")
+		class GivenContextWithCustomConverter {
+
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(ConverterConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should use that converter")
+			void shouldUseConverter() throws Exception {
+				ConversionService converters = (ConversionService) context
+						.getBean("mongoStorePlacementService");
+				assertThat(
+						converters.convert(
+								UUID.fromString("e49d5464-26ce-11e7-93ae-92361f002671"),
+								String.class),
+						is("/e49d5464/26ce/11e7/93ae/92361f002671"));
+			}
+		}
+
+		@Nested
+		@DisplayName("given an enabled configuration with no mongo content repository beans")
+		class GivenEnabledConfigWithNoContentRepo {
+
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(EmptyConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should load the context but have no mongo repository beans")
+			void shouldLoadContextWithNoRepo() throws Exception {
+				try {
+					context.getBean(TestEntityContentRepository.class);
+					fail("expected no such bean");
+				} catch (NoSuchBeanDefinitionException e) {
+					assertThat(true, is(true));
+				}
+			}
+		}
 	}
 
-	@Test
-	public void noop() {
-		// noop
+	@Nested
+	@DisplayName("EnableMongoContentRepositories")
+	class EnableMongoContentRepositoriesTests {
+
+		@Nested
+		@DisplayName("given an enabled configuration with a mongo content repository bean")
+		class GivenEnabledConfigWithContentRepo {
+
+			@BeforeEach
+			void setUp() throws Exception {
+				context = new AnnotationConfigApplicationContext();
+				context.register(EnableMongoContentRepositoriesConfig.class);
+				context.refresh();
+			}
+
+			@AfterEach
+			void tearDown() throws Exception {
+				context.close();
+			}
+
+			@Test
+			@DisplayName("should have a mongo content repository bean")
+			void shouldHaveContentRepositoryBean() throws Exception {
+				assertThat(context.getBean(TestEntityContentRepository.class),
+						is(not(nullValue())));
+			}
+
+			@Test
+			@DisplayName("should have a mongo store converter")
+			void shouldHaveMongoStoreConverter() throws Exception {
+				assertThat(context.getBean("mongoStorePlacementService"),
+						is(not(nullValue())));
+			}
+		}
 	}
 
 	@Configuration
 	@EnableMongoStores(basePackages = "contains.no.mongo.repositores")
 	@Import(InfrastructureConfig.class)
 	public static class EmptyConfig {
-		//
 	}
 
 	@Configuration
 	@EnableMongoStores
 	@Import(InfrastructureConfig.class)
 	public static class TestConfig {
-		//
 	}
 
 	@Configuration
 	@EnableMongoContentRepositories
 	@Import(InfrastructureConfig.class)
 	public static class EnableMongoContentRepositoriesConfig {
-		//
 	}
 
 	@Configuration

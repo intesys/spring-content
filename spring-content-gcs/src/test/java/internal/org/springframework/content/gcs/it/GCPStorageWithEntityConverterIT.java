@@ -1,10 +1,5 @@
 package internal.org.springframework.content.gcs.it;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.AfterEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,8 +15,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
 import org.springframework.content.commons.annotations.MimeType;
@@ -47,8 +45,6 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Blob.BlobSourceOption;
 import com.google.cloud.storage.BlobId;
@@ -61,108 +57,121 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads=1)
 public class GCPStorageWithEntityConverterIT {
 
     private static final String BUCKET = "test-bucket";
     private static final String OTHER_BUCKET = "other-bucket";
     private static final String OTHER_OTHER_BUCKET = "other-other-bucket";
 
-    private static TestData[] testDataSets = null;
-
     static {
         System.setProperty("spring.content.gcp.storage.bucket", BUCKET);
-
-        testDataSets = new TestData[] {
-                new TestData("Default Converter", new Class[] {TestConfig.class}, OTHER_BUCKET),
-                new TestData("Custom Converter", new Class[] {CustomConverterConfig.class, TestConfig.class}, OTHER_OTHER_BUCKET),
-
-        };
     }
 
-    @Data
-    @AllArgsConstructor
-    private static class TestData {
-        private String name;
-        private Class[] config;
-        private String bucket;
-    }
+    public abstract static class Base {
 
-    private TestEntity entity;
+        protected TestEntity entity;
+        protected Exception e;
+        protected AnnotationConfigApplicationContext context;
+        protected TestEntityRepository repo;
+        protected TestEntityStore store;
+        protected Storage storage;
+        protected String resourceLocation;
 
-    private Exception e;
+        protected abstract Class<?>[] getConfigClasses();
+        protected abstract String getBucket();
 
-    private AnnotationConfigApplicationContext context;
+        @BeforeEach
+        public void setUp() {
+            context = new AnnotationConfigApplicationContext();
+            context.register(getConfigClasses());
+            context.refresh();
 
-    private TestEntityRepository repo;
-    private TestEntityStore store;
-    private Storage storage;
+            repo = context.getBean(TestEntityRepository.class);
+            store = context.getBean(TestEntityStore.class);
+            storage = context.getBean(Storage.class);
+        }
 
-    private String resourceLocation;
+        @AfterEach
+        public void tearDown() {
+            context.close();
+        }
 
-    {
-        for (TestData testDataSet : testDataSets) {
+        @Nested
+        @DisplayName("given an entity with content")
+        class GivenAnEntityWithContent {
 
-            Describe(testDataSet.getName(), () -> {
+            @BeforeEach
+            public void setUp() {
+                entity = new TestEntity();
+                entity.setContentType("text/plain");
+                entity = repo.save(entity);
 
-                BeforeEach(() -> {
-                    context = new AnnotationConfigApplicationContext();
-                    context.register(testDataSet.getConfig());
-                    context.refresh();
+                store.setContent(entity, PropertyPath.from("content"), new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
+            }
 
-                    repo = context.getBean(TestEntityRepository.class);
-                    store = context.getBean(TestEntityStore.class);
-                    storage = context.getBean(Storage.class);
-                });
+            @Test
+            @DisplayName("should store new content in bucket")
+            public void shouldStoreNewContentInBucket() {
+                Blob blob = storage.get(BlobId.of(getBucket(), entity.getContentId()));
+                assertThat(blob.exists(new BlobSourceOption[] {}), is(true));
+            }
 
-                AfterEach(() -> {
-                    context.close();
-                });
+            @Test
+            @DisplayName("should have content metadata")
+            public void shouldHaveContentMetadata() {
+                assertThat(entity.getContentId(), is(notNullValue()));
+                assertThat(entity.getContentId().toString().trim().length(), greaterThan(0));
+                assertThat(entity.getContentLen(), is(27L));
+            }
 
-                Describe("given an entity with content", () -> {
+            @Nested
+            @DisplayName("when content is deleted")
+            class WhenContentIsDeleted {
 
-                    BeforeEach(() -> {
-                        entity = new TestEntity();
-                        entity.setContentType("text/plain");
-                        entity = repo.save(entity);
+                @BeforeEach
+                public void setUp() {
+                    resourceLocation = entity.getContentId().toString();
+                    entity = store.unsetContent(entity, PropertyPath.from("content"));
+                    entity = repo.save(entity);
+                }
 
-                        store.setContent(entity, PropertyPath.from("content"), new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
-                    });
-
-                    It("should store new content in bucket '" + testDataSet.getBucket() + "'", () -> {
-                        Blob blob = storage.get(BlobId.of(testDataSet.getBucket(), entity.getContentId()));
-                        assertThat(blob.exists(new BlobSourceOption[] {}), is(true));
-                    });
-
-                    It("should have content metadata", () -> {
-                        // content
-                        assertThat(entity.getContentId(), is(notNullValue()));
-                        assertThat(entity.getContentId().toString().trim().length(), greaterThan(0));
-                        assertThat(entity.getContentLen(), is(27L));
-                    });
-
-                    Context("when content is deleted", () -> {
-                        BeforeEach(() -> {
-                            resourceLocation = entity.getContentId().toString();
-                            entity = store.unsetContent(entity, PropertyPath.from("content"));
-                            entity = repo.save(entity);
-                        });
-
-                        It("should delete content from bucket '" + testDataSet.getBucket() + "'", () -> {
-                            Blob blob = storage.get(BlobId.of(testDataSet.getBucket(), resourceLocation));
-                            System.out.println(resourceLocation);
-                            assertThat(blob, is(nullValue()));
-                        });
-                    });
-                });
-            });
+                @Test
+                @DisplayName("should delete content from bucket")
+                public void shouldDeleteContentFromBucket() {
+                    Blob blob = storage.get(BlobId.of(getBucket(), resourceLocation));
+                    System.out.println(resourceLocation);
+                    assertThat(blob, is(nullValue()));
+                }
+            }
         }
     }
 
-    @Test
-    public void test() {
-        // noop
+    @Nested
+    @DisplayName("Default Converter")
+    class DefaultConverter extends Base {
+        @Override
+        protected Class<?>[] getConfigClasses() {
+            return new Class[] {TestConfig.class};
+        }
+
+        @Override
+        protected String getBucket() {
+            return OTHER_BUCKET;
+        }
+    }
+
+    @Nested
+    @DisplayName("Custom Converter")
+    class CustomConverter extends Base {
+        @Override
+        protected Class<?>[] getConfigClasses() {
+            return new Class[] {CustomConverterConfig.class, TestConfig.class};
+        }
+
+        @Override
+        protected String getBucket() {
+            return OTHER_OTHER_BUCKET;
+        }
     }
 
     @Configuration
