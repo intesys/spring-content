@@ -2,7 +2,10 @@ name: Main Build
 
 on:
   push:
-    branches: [ main ]
+    # main = Spring Boot 3.x line; spring-boot-4 = Spring Boot 4.x line, kept
+    # alive alongside main. Both deploy artifacts to Maven Central; docs are
+    # published from the 3.x line only (see the doc steps' `if:` guards below).
+    branches: [ main, spring-boot-4 ]
     tags:
     - '*'
     paths-ignore:
@@ -72,11 +75,16 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
     - name: Set up Python
+      # Docs are published only from the 3.x line (main branch or 3.x tags).
+      # The 4.x line (spring-boot-4 branch / 4.x tags) skips docs so it can't
+      # clobber the 3.x documentation site on gh-pages / GitHub Pages.
+      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
     - name: Publish Docs
+      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       run: |
         #!/bin/bash
 
@@ -173,15 +181,20 @@ jobs:
         CI_PRIVATE_KEY: ${{ secrets.CI_PRIVATE_KEY }}
 
     - name: Configure Pages
+      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       uses: actions/configure-pages@v5
 
     - name: Upload Pages artifact
+      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       uses: actions/upload-pages-artifact@v3
       with:
         path: /tmp/site-public
 
   deploy-docs:
     needs: build
+    # Only the 3.x line publishes docs; skip the Pages deployment for the 4.x
+    # line (no Pages artifact is produced there, so this would otherwise fail).
+    if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
