@@ -440,84 +440,11 @@ public class FileContentController {
 <h2 id="create-web-client">Create Web Client</h2>
 <p>Now let's create a really simple angular web front-end for our document list.  </p>
 <p><code>src/main/resources/static/index.html</code></p>
-<pre><code>&lt;!doctype html&gt;
-&lt;html ng-app=&quot;filesApp&quot;&gt;
-  &lt;head&gt;
-    &lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;files.js&quot;&gt;&lt;/script&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;div ng-controller=&quot;FilesListController as filesList&quot;&gt;
-	    &lt;h1&gt;Files&lt;/h1&gt;
-	    
-	    &lt;section style=&quot;display: table; width: 80%&quot;&gt;
-		  &lt;header style=&quot;display: table-row;&quot;&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;Name&lt;/div&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;Length&lt;/div&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;Created&lt;/div&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;Summary&lt;/div&gt;
-		  &lt;/header&gt;
-		  &lt;div style=&quot;display: table-row;&quot; ng-repeat=&quot;file in filesList.files&quot;&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;a href=&quot;{{filesList.getHref(file)}}&quot; type={{file.mimeType}} download={{file.name}}&gt;{{file.name}}&lt;/a&gt;&lt;/div&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;label&gt;{{file.contentLength}}&lt;/label&gt;&lt;/div&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;label&gt;{{file.created}}&lt;/label&gt;&lt;/div&gt;
-		    &lt;div style=&quot;display: table-cell;&quot;&gt;&lt;label&gt;{{file.summary}}&lt;/label&gt;&lt;/div&gt;
-		  &lt;/div&gt;
-		&lt;/section&gt;
-	    
-	    &lt;h2&gt;New File&lt;/h2&gt;
-	    &lt;input type=&quot;file&quot; id=&quot;file&quot; name=&quot;file&quot;/&gt;
-	    &lt;input type=&quot;summary&quot; id=&quot;summary&quot; name=&quot;summary&quot; ng-model=&quot;filesList.summary&quot; placeholder=&quot;Summary&quot;/&gt;
-		&lt;button ng-click=&quot;filesList.upload()&quot;&gt;Upload&lt;/button&gt;
-    &lt;/div&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
+<pre><code>{snippet: https://raw.githubusercontent.com/intesys/spring-content-gettingstarted/main/spring-content-fs/complete/src/main/resources/static/index.html 1-}
 </code></pre>
 <p>This HTML presents a simple list of files using an <code>ng-repeat</code> directive and contains a simple form allowing new files to be uploaded.</p>
 <p>All the interesting code is in the code-behind file so add the following code behind to <code>src/main/resources/static/files.js</code></p>
-<pre><code>angular.module(&#x27;filesApp&#x27;, [])
-  .controller(&#x27;FilesListController&#x27;, function($http) {
-    var filesList = this;
-    filesList.files = []; 
-    
-    filesList.getFilesList = function() {
-        $http.get(&#x27;/files/&#x27;).
-            success(function(data, status, headers, config) {
-                if (data._embedded != undefined) {
-        			filesList.files = [];
-                    angular.forEach(data._embedded.files, function(file) {
-                        filesList.files.push(file);
-	                });
-	            }
-	        });
-	    };
-    filesList.getFilesList(); 
-    
-    filesList.getHref = function(file) {
-    	return file._links[&quot;self&quot;].href
-    };
-
-    filesList.upload = function() {
-    	var f = document.getElementById(&#x27;file&#x27;).files[0];
-    	var file = {name: f.name, summary: filesList.summary};
-    	
-    	$http.post(&#x27;/files/&#x27;, file).
-    		then(function(response) {
-	    		var fd = new FormData();
-	            fd.append(&#x27;file&#x27;, f);
-	            return $http.put(response.headers(&quot;Location&quot;), fd, {
-	                transformRequest: angular.identity,
-	                headers: {&#x27;Content-Type&#x27;: undefined}
-	            });
-	        })
-	        .then(function(response) {
-    			filesList.title = &quot;&quot;;
-    			filesList.keywords = &quot;&quot;;
-    			filesList.getFilesList();
-    			document.getElementById(&#x27;file&#x27;).files[0] = undefined;
-	        });
-    }
-  });
+<pre><code>{snippet: https://raw.githubusercontent.com/intesys/spring-content-gettingstarted/main/spring-content-fs/complete/src/main/resources/static/files.js 1-}
 </code></pre>
 <p>This angular controller has the following functions:-</p>
 <ul>

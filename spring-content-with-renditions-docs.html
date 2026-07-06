@@ -150,113 +150,7 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
 <h2 id="update-dependencies">Update dependencies</h2>
 <p>Add the <code>it.intesys:spring-content-renditions-boot-starter</code> dependency.</p>
 <p><code>pom.xml</code></p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
-         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
-    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-
-    &lt;artifactId&gt;spring-content-with-renditions&lt;/artifactId&gt;
-
-    &lt;parent&gt;
-        &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-        &lt;artifactId&gt;gettingstarted-spring-content&lt;/artifactId&gt;
-        &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
-        &lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;
-    &lt;/parent&gt;
-
-    &lt;dependencyManagement&gt;
-        &lt;dependencies&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-                &lt;version&gt;3.5.7&lt;/version&gt;
-                &lt;type&gt;pom&lt;/type&gt;
-                &lt;scope&gt;import&lt;/scope&gt;
-            &lt;/dependency&gt;
-        &lt;/dependencies&gt;
-    &lt;/dependencyManagement&gt;
-
-    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
-            &lt;artifactId&gt;h2&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-data-rest&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-content-commons&lt;/artifactId&gt;
-            &lt;version&gt;${spring.content.version}&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-content-fs-boot-starter&lt;/artifactId&gt;
-            &lt;version&gt;${spring.content.version}&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-content-rest-boot-starter&lt;/artifactId&gt;
-            &lt;version&gt;${spring.content.version}&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;it.intesys&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-content-renditions-boot-starter&lt;/artifactId&gt;
-            &lt;version&gt;${spring.content.version}&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-          &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
-          &lt;artifactId&gt;lombok&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-
-        &lt;!-- Test dependencies --&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-            &lt;exclusions&gt;
-                &lt;exclusion&gt;
-                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
-                    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
-                &lt;/exclusion&gt;
-                &lt;exclusion&gt;
-                    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
-                    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;
-                &lt;/exclusion&gt;
-            &lt;/exclusions&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-mock-mvc&lt;/artifactId&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.github.paulcwarren&lt;/groupId&gt;
-            &lt;artifactId&gt;ginkgo4j&lt;/artifactId&gt;
-            &lt;version&gt;${ginkgo.version}&lt;/version&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-        &lt;/dependency&gt;
-    &lt;/dependencies&gt;
-
-    &lt;build&gt;
-        &lt;plugins&gt;
-            &lt;plugin&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-            &lt;/plugin&gt;
-        &lt;/plugins&gt;
-    &lt;/build&gt;
-&lt;/project&gt;
+<pre><code>{snippet: https://raw.githubusercontent.com/intesys/spring-content-gettingstarted/main/spring-content-with-renditions/complete/pom.xml 1-}
 </code></pre>
 <h2 id="update-file">Update File</h2>
 <p>To be able to return renditions we need to know the mime-type of the existing
@@ -463,25 +357,7 @@ public class StoredRenditionsEventHandler {
 </code></pre>
 <p>and register it.</p>
 <p><code>src/main/java/gettingstarted/SpringContentApplication.java</code></p>
-<pre><code>package gettingstarted;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-@SpringBootApplication
-public class SpringContentApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(SpringContentApplication.class, args);
-    }
-
-    @Bean
-    public StoredRenditionsEventHandler storedRenditionsEventHandler() {
-        return new StoredRenditionsEventHandler();
-    }
-}
-
+<pre><code>{snippet: https://raw.githubusercontent.com/intesys/spring-content-gettingstarted/main/spring-content-with-renditions/complete/src/main/java/gettingstarted/SpringContentApplication.java 1-}
 </code></pre>
 <h2 id="test-store-renditions">Test Store Renditions</h2>
 <p>Rebuild and restart your application and let's replay the operations we performed earlier.</p>
