@@ -2,9 +2,6 @@ name: Main Build
 
 on:
   push:
-    # main = Spring Boot 3.x line; spring-boot-4 = Spring Boot 4.x line, kept
-    # alive alongside main. Both deploy artifacts to Maven Central; docs are
-    # published from the 3.x line only (see the doc steps' `if:` guards below).
     branches: [ main, spring-boot-4 ]
     tags:
     - '*'
@@ -29,9 +26,12 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    # JDK 21 covers both lines: main targets Java 17, the spring-boot-4 branch
+    # targets Java 21, and a 21 toolchain compiles/runs the 17 target too.
     - name: Set up JDK 21
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v4
       with:
+        distribution: temurin
         java-version: 21
         server-id: central
         server-username: MAVEN_USERNAME
@@ -75,16 +75,11 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
     - name: Set up Python
-      # Docs are published only from the 3.x line (main branch or 3.x tags).
-      # The 4.x line (spring-boot-4 branch / 4.x tags) skips docs so it can't
-      # clobber the 3.x documentation site on gh-pages / GitHub Pages.
-      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
     - name: Publish Docs
-      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       run: |
         #!/bin/bash
 
@@ -93,37 +88,47 @@ jobs:
         # Install MkDocs and plugins
         pip install mkdocs mkdocs-git-committers-plugin-2 mkdocs-theme-bootstrap4 mkdocs-macros-plugin
 
-        # Version calculation
-        POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        # Highest version tag across the whole repo, regardless of whether it is
-        # reachable from the current branch. 'git describe' only sees tags that are
-        # ancestors of HEAD, so a release tag placed on a commit outside main's
-        # history would be missed and the GA version would fall back to a stale value.
-        LATEST_TAG=$(git tag --sort=-v:refname | head -n1)
-
+        # Where the reference documentation for THIS build is published. Tag builds
+        # go under refs/release/<tag>, branch builds under refs/snapshot/<branch>
+        # (e.g. refs/snapshot/main, refs/snapshot/spring-boot-4). These accumulate
+        # in gh-pages so every published SNAPSHOT/GA link keeps resolving.
         if [[ "${GITHUB_REF}" == *"tags"* ]]; then
             TAG="${GITHUB_REF#refs/tags/}"
             export BUILD_TYPE=release/"${TAG}"
             mvn org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion="${TAG}"
-            
-            export SPRING_CONTENT_GA_VERSION="${TAG}"
-            
-            # Retrieve the version from the pom.xml in the main branch.
-            # On a tag build the checkout is detached, so 'main' is not a local
-            # ref: fetch it explicitly and read it via FETCH_HEAD.
-            git fetch --depth=1 origin main
-            git show FETCH_HEAD:pom.xml > /tmp/main-pom.xml
-            # -N (non-recursive): the extracted pom.xml is the multi-module
-            # aggregator, but its child modules aren't present next to it in
-            # /tmp. Without -N Maven fails reactor construction ("Child module
-            # ... does not exist") and that error text leaks into the captured
-            # value. -N evaluates only the aggregator, returning a clean version.
-            export SPRING_CONTENT_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/main-pom.xml)
         else
             export BUILD_TYPE=snapshot/"${GITHUB_REF#refs/heads/}"
-            export SPRING_CONTENT_GA_VERSION="${LATEST_TAG}"
-            export SPRING_CONTENT_SNAPSHOT_VERSION="${POM_VERSION}"
         fi
+
+        # Version calculation for the docs landing-page table. All four values are
+        # computed on every build (main, spring-boot-4 or a tag) so the regenerated
+        # index always shows a consistent 3.x/4.x matrix regardless of the trigger.
+        #
+        # SNAPSHOT versions are read from each line's branch pom.xml; GA versions
+        # from the highest release tag of the matching major line. Branches other
+        # than the checked-out one aren't local refs (tag builds are detached), so
+        # fetch them explicitly and read the pom via FETCH_HEAD. -N (non-recursive)
+        # evaluates only the aggregator pom, whose child modules aren't present in
+        # /tmp, avoiding a reactor-construction error leaking into the captured value.
+
+        # 3.x SNAPSHOT: version declared in main's pom.xml
+        git fetch --depth=1 origin main
+        git show FETCH_HEAD:pom.xml > /tmp/main-pom.xml
+        export SPRING_CONTENT_3X_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/main-pom.xml)
+
+        # 4.x SNAPSHOT: version declared in the spring-boot-4 branch pom.xml
+        git fetch --depth=1 origin spring-boot-4
+        git show FETCH_HEAD:pom.xml > /tmp/spring-boot-4-pom.xml
+        export SPRING_CONTENT_4X_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/spring-boot-4-pom.xml)
+
+        # GA versions: highest release tag of each major line. fetch-depth:0 in the
+        # checkout step already made every tag available. Leave the env var unset
+        # when no matching tag exists yet (e.g. 4.x before its first release) so
+        # mkdocs falls back to its configured default instead of an empty link.
+        GA_3X=$(git tag --sort=-v:refname | grep -E '^3\.' | head -n1 || true)
+        GA_4X=$(git tag --sort=-v:refname | grep -E '^4\.' | head -n1 || true)
+        if [ -n "${GA_3X}" ]; then export SPRING_CONTENT_3X_GA_VERSION="${GA_3X}"; fi
+        if [ -n "${GA_4X}" ]; then export SPRING_CONTENT_4X_GA_VERSION="${GA_4X}"; fi
 
         # Build reference documentation (AS IS)
         mvn -B -U -P docs generate-resources -DskipTests=true -Dmaven.javadoc.skip=true
@@ -181,20 +186,15 @@ jobs:
         CI_PRIVATE_KEY: ${{ secrets.CI_PRIVATE_KEY }}
 
     - name: Configure Pages
-      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       uses: actions/configure-pages@v5
 
     - name: Upload Pages artifact
-      if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
       uses: actions/upload-pages-artifact@v3
       with:
         path: /tmp/site-public
 
   deploy-docs:
     needs: build
-    # Only the 3.x line publishes docs; skip the Pages deployment for the 4.x
-    # line (no Pages artifact is produced there, so this would otherwise fail).
-    if: ${{ !(github.ref == 'refs/heads/spring-boot-4' || startsWith(github.ref, 'refs/tags/4')) }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
