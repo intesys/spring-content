@@ -53,8 +53,10 @@ Key module families:
 
 ## CI / Release Notes
 
-- PRs run `CLAAssistant` (sign the CLA) + build with `-P tests` + validation against the `spring-content-gettingstarted` repo.
-- Tags trigger release build (`-P ci,docs deploy`), GPG signing, Maven Central publish, and docs publish to GitHub Pages via the official `actions/upload-pages-artifact` + `actions/deploy-pages` flow (Pages Source must be set to "GitHub Actions"). The `gh-pages` branch is still pushed, but only as persistent storage so historical `refs/` accumulate across releases — it is no longer the deployment source.
+- **Two active lines.** `main` = Spring Boot 3.x; `spring-boot-4` = Spring Boot 4.x, kept alive alongside `main` as a snapshot. CI (Dependabot, Main Build, PR Validation) runs on both branches; the two lines must use **distinct artifact versions** (e.g. `3.x-SNAPSHOT` vs `4.x-SNAPSHOT`) or their snapshots collide on Maven Central. Dependabot config for **both** lines lives in this branch's (`main`'s) `.github/dependabot.yml` — Dependabot only reads it from the default branch.
+- PRs run `CLAAssistant` (sign the CLA) + build with `-P tests` + validation against the `spring-content-gettingstarted` repo. Validation follows the target line: PRs to `main` use the getting-started default branch; PRs to `spring-boot-4` use that repo's `spring-boot-4` branch.
+- Tags trigger release build (`-P ci,docs deploy`), GPG signing, and Maven Central publish. Pushes to `main`/`spring-boot-4` publish snapshots the same way.
+- **Docs are published from the 3.x line only** (`main` branch / `3.x` tags), via the official `actions/upload-pages-artifact` + `actions/deploy-pages` flow (Pages Source must be set to "GitHub Actions"). The `gh-pages` branch is still pushed, but only as persistent storage so historical `refs/` accumulate across releases — it is no longer the deployment source. The 4.x line (`spring-boot-4` branch / `4.x` tags) skips docs so it can't clobber the 3.x site.
 - Docs output path: `target/generated-docs/refs/dev/`
 
 ## Local Dev Tips

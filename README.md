@@ -12,6 +12,17 @@ Cloud-Native Content Services for Spring.
 
 Spring Content provides modules for managing content in JPA, MongoDB's GridFS, S3 or Filesystem storage.  When combined with Spring Data/REST it allows content to be associated with Spring Data Entities.  The Solr module provides an integration with Apache Solr for fulltext indexing and search capabilities.  The Renditions module provides a pluggable renditions framework and several out-of-the-box renderers that can render stored content in several different formats.   
 
+## Branches & versions
+
+Two release lines are maintained in parallel, each on its own branch with its own artifact version:
+
+| Branch | Spring Boot | Version line |
+|--------|-------------|--------------|
+| `main` | 3.x | `3.x` releases / `3.x-SNAPSHOT` |
+| `spring-boot-4` | 4.x | `4.x` releases / `4.x-SNAPSHOT` |
+
+Pick the coordinate that matches your Spring Boot version. Both lines publish to Maven Central independently; reference documentation is published from the `main` (3.x) line only.
+
 ## AI Agent Skill
 
 This repository includes a `SKILL.md` file at the root. It contains structured guidelines, conventions, and implementation patterns for AI coding assistants working on the Spring Content codebase. Load it when generating or reviewing code in any module.
