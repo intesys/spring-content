@@ -10,9 +10,9 @@ Two detailed guides already exist and are the source of truth — read them befo
 
 ## What this is
 
-Spring Content is a multi-module Java 17 / Maven library (group `it.intesys`, Spring Boot 3.5.0) for managing binary content and associating it with Spring Data entities across pluggable storage backends. It is a **fork** of `paulcwarren/spring-content`, maintained by Intesys.
+Spring Content is a multi-module Java 21 / Maven library (group `it.intesys`, Spring Boot 4.x) for managing binary content and associating it with Spring Data entities across pluggable storage backends. It is a **fork** of `paulcwarren/spring-content`, maintained by Intesys.
 
-**Two parallel release lines.** `main` targets Spring Boot 3.x (`3.x`/`3.x-SNAPSHOT`); `spring-boot-4` targets Spring Boot 4.x (`4.x`/`4.x-SNAPSHOT`). The two lines must keep **distinct artifact versions** or their snapshots collide on Maven Central. When changing anything version- or CI-related, remember both lines exist. Docs are published from both lines: the landing-page version table is computed deterministically (3.x GA/SNAPSHOT from `main`, 4.x GA/SNAPSHOT from `spring-boot-4`) so neither line clobbers the other, and each line publishes its own reference docs under `refs/snapshot/<branch>`. See `AGENTS.md` → *CI / Release Notes* for details.
+**Two parallel release lines.** `main` targets Spring Boot 4.x (`4.x`/`4.x-SNAPSHOT`); `support/spring-boot-3` targets Spring Boot 3.x (`3.x`/`3.x-SNAPSHOT`). The two lines must keep **distinct artifact versions** or their snapshots collide on Maven Central. When changing anything version- or CI-related, remember both lines exist. Docs are published from both lines: the landing-page version table is computed deterministically (4.x GA/SNAPSHOT from `main`, 3.x GA/SNAPSHOT from `support/spring-boot-3`) so neither line clobbers the other, and each line publishes its own reference docs under `refs/snapshot/<branch>`. See `AGENTS.md` → *CI / Release Notes* for details.
 
 ## Build & test essentials
 

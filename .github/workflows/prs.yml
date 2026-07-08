@@ -2,7 +2,7 @@ name: PR Validation
 
 on:
   pull_request:
-    branches: [ main, spring-boot-4 ]
+    branches: [ main, support/spring-boot-3 ]
   pull_request_target:
     types: [opened, closed, synchronize]
   issue_comment:
@@ -105,10 +105,10 @@ jobs:
         repository: intesys/spring-content-gettingstarted
         path: spring-content-gettingstarted
         # Match the getting-started guides to the target line:
-        # PRs to main (3.x) -> default branch; PRs to spring-boot-4 (4.x) ->
-        # the 'spring-boot-4' branch of the getting-started repo.
+        # PRs to main (4.x) -> default branch; PRs to support/spring-boot-3 (3.x)
+        # -> the 'support/spring-boot-3' branch of the getting-started repo.
         # An empty ref falls back to the repository's default branch.
-        ref: ${{ github.base_ref == 'spring-boot-4' && 'spring-boot-4' || '' }}
+        ref: ${{ github.base_ref == 'support/spring-boot-3' && 'support/spring-boot-3' || '' }}
 
     - name: Validate against Getting Started Guides
       run: |

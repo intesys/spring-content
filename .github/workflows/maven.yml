@@ -2,7 +2,7 @@ name: Main Build
 
 on:
   push:
-    branches: [ main, spring-boot-4 ]
+    branches: [ main, support/spring-boot-3 ]
     tags:
     - '*'
     paths-ignore:
@@ -26,8 +26,9 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    # JDK 21 covers both lines: main targets Java 17, the spring-boot-4 branch
-    # targets Java 21, and a 21 toolchain compiles/runs the 17 target too.
+    # JDK 21 covers both lines: main targets Java 21 (Spring Boot 4), the
+    # support/spring-boot-3 branch targets Java 17 (Spring Boot 3), and a 21
+    # toolchain compiles/runs the 17 target too.
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
@@ -90,7 +91,7 @@ jobs:
 
         # Where the reference documentation for THIS build is published. Tag builds
         # go under refs/release/<tag>, branch builds under refs/snapshot/<branch>
-        # (e.g. refs/snapshot/main, refs/snapshot/spring-boot-4). These accumulate
+        # (e.g. refs/snapshot/main, refs/snapshot/support/spring-boot-3). These accumulate
         # in gh-pages so every published SNAPSHOT/GA link keeps resolving.
         if [[ "${GITHUB_REF}" == *"tags"* ]]; then
             TAG="${GITHUB_REF#refs/tags/}"
@@ -101,7 +102,7 @@ jobs:
         fi
 
         # Version calculation for the docs landing-page table. All four values are
-        # computed on every build (main, spring-boot-4 or a tag) so the regenerated
+        # computed on every build (main, support/spring-boot-3 or a tag) so the regenerated
         # index always shows a consistent 3.x/4.x matrix regardless of the trigger.
         #
         # SNAPSHOT versions are read from each line's branch pom.xml; GA versions
@@ -111,15 +112,15 @@ jobs:
         # evaluates only the aggregator pom, whose child modules aren't present in
         # /tmp, avoiding a reactor-construction error leaking into the captured value.
 
-        # 3.x SNAPSHOT: version declared in main's pom.xml
+        # 4.x SNAPSHOT: version declared in main's pom.xml
         git fetch --depth=1 origin main
         git show FETCH_HEAD:pom.xml > /tmp/main-pom.xml
-        export SPRING_CONTENT_3X_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/main-pom.xml)
+        export SPRING_CONTENT_4X_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/main-pom.xml)
 
-        # 4.x SNAPSHOT: version declared in the spring-boot-4 branch pom.xml
-        git fetch --depth=1 origin spring-boot-4
-        git show FETCH_HEAD:pom.xml > /tmp/spring-boot-4-pom.xml
-        export SPRING_CONTENT_4X_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/spring-boot-4-pom.xml)
+        # 3.x SNAPSHOT: version declared in the support/spring-boot-3 branch pom.xml
+        git fetch --depth=1 origin support/spring-boot-3
+        git show FETCH_HEAD:pom.xml > /tmp/support-spring-boot-3-pom.xml
+        export SPRING_CONTENT_3X_SNAPSHOT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -N -f /tmp/support-spring-boot-3-pom.xml)
 
         # GA versions: highest release tag of each major line. fetch-depth:0 in the
         # checkout step already made every tag available. Leave the env var unset

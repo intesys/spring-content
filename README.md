@@ -18,8 +18,8 @@ Two release lines are maintained in parallel, each on its own branch with its ow
 
 | Branch | Spring Boot | Version line |
 |--------|-------------|--------------|
-| `main` | 3.x | `3.x` releases / `3.x-SNAPSHOT` |
-| `spring-boot-4` | 4.x | `4.x` releases / `4.x-SNAPSHOT` |
+| `main` | 4.x | `4.x` releases / `4.x-SNAPSHOT` |
+| `support/spring-boot-3` | 3.x | `3.x` releases / `3.x-SNAPSHOT` |
 
 Pick the coordinate that matches your Spring Boot version. Both lines publish to Maven Central independently, and the reference documentation site covers both lines side by side — the landing-page version table shows the 3.x and 4.x GA/SNAPSHOT coordinates, and each line publishes its own reference docs.
 
