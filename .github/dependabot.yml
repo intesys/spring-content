@@ -2,7 +2,7 @@ version: 2
 # Dependabot reads this file from the DEFAULT branch (main) only, even for
 # updates targeting other branches. Both release lines must be configured here.
 updates:
-# Spring Boot 3.x line (default/GA branch)
+# Spring Boot 4.x line (default/GA branch)
 - package-ecosystem: maven
   directory: "/"
   schedule:
@@ -31,17 +31,16 @@ updates:
   - dependency-name: jakarta.persistence:jakarta.persistence-api
     versions:
       - ">=3.2.0, <3.3.0"
-# Spring Boot 4.x line (spring-boot-4 branch, kept alive alongside main as a
-# snapshot). Same configuration as the main entry. NOTE: the ignore rules below
-# are tuned for Boot 3 / Jakarta EE 10 and may need to diverge once that branch
-# actually moves to Boot 4 / Jakarta EE 11 (e.g. the jakarta.persistence >=3.2.0
-# ignore).
+# Spring Boot 3.x line (support/spring-boot-3 branch, maintained alongside main).
+# Same configuration as the main entry. NOTE: main now tracks Boot 4 / Jakarta EE
+# 11 while this line stays on Boot 3 / Jakarta EE 10, so some ignore rules (e.g.
+# the jakarta.persistence >=3.2.0 ignore) may need to diverge per line.
 - package-ecosystem: maven
   directory: "/"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  target-branch: spring-boot-4
+  target-branch: support/spring-boot-3
   ignore:
   - dependency-name: org.docx4j:docx4j-core
     versions:
