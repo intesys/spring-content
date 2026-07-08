@@ -1,4 +1,6 @@
 version: 2
+# Dependabot reads this file from the DEFAULT branch (main) only, even for
+# updates targeting other branches. Both release lines must be configured here.
 updates:
 # Spring Boot 3.x line (default/GA branch)
 - package-ecosystem: maven
