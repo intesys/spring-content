@@ -50,7 +50,11 @@ public class PostgresBlobResourceOutputStream extends BlobResourceOutputStream {
 			LargeObjectManager lobj = con.unwrap(org.postgresql.PGConnection.class).getLargeObjectAPI();
 			long oid = lobj.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
 			lo = lobj.open(oid);
-			return lo.getOutputStream();
+			// Keep a reference to the large object's (buffered) output stream so
+			// close() can flush it before lo.close(); otherwise buffered bytes
+			// are never written and pg_largeobject stays empty.
+			os = lo.getOutputStream();
+			return os;
 			
 		} catch (SQLException e) {
 			logger.error(String.format("initializing postgres blob output stream for resource: %s", rid), e);
