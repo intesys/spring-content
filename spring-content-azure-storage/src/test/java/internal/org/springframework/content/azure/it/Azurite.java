@@ -35,6 +35,13 @@ public class Azurite extends GenericContainer<Azurite> implements Serializable {
     private Azurite() {
         super(DOCKER_IMAGE_NAME);
         this.addExposedPort(10000);
+        // Accept the (newer) x-ms-version sent by the Azure SDK bundled with
+        // Spring Boot 4; without --skipApiVersionCheck Azurite rejects unknown
+        // API versions with HTTP 400 InvalidHeaderValue. Replicates the image's
+        // default CMD and appends the flag.
+        this.withCommand("azurite", "-l", "/data",
+                "--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0",
+                "--skipApiVersionCheck");
         this.start();
     }
 
