@@ -1,13 +1,10 @@
 package internal.org.springframework.content.s3.it;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.net.URIBuilder;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -31,9 +28,10 @@ public class LocalStack extends LocalStackContainer implements Serializable {
 
     public static S3Client getAmazonS3Client() throws URISyntaxException {
         return S3Client.builder()
-                .endpointOverride(new URI(Singleton.INSTANCE.getEndpointConfiguration(LocalStackContainer.Service.S3).getServiceEndpoint()))
+                .endpointOverride(Singleton.INSTANCE.getEndpointOverride(Service.S3))
                 .region(Region.US_EAST_1) // Set a region, so it does not need to be configured externally
-                .credentialsProvider(new CrossAwsCredentialsProvider(Singleton.INSTANCE.getDefaultCredentialsProvider()))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
+                        Singleton.INSTANCE.getAccessKey(), Singleton.INSTANCE.getSecretKey())))
                 .serviceConfiguration((bldr) -> bldr.pathStyleAccessEnabled(true).build())
                 .build();
     }
@@ -52,19 +50,5 @@ public class LocalStack extends LocalStackContainer implements Serializable {
     @SuppressWarnings("unused") // Serializable safe singleton usage
     protected LocalStack readResolve() {
         return Singleton.INSTANCE;
-    }
-
-
-    private static class CrossAwsCredentialsProvider implements AwsCredentialsProvider {
-      private final AWSCredentials credentials;
-
-      public CrossAwsCredentialsProvider(AWSCredentialsProvider provider) {
-        this.credentials = provider.getCredentials();
-      }
-
-      @Override
-      public AwsCredentials resolveCredentials() {
-        return AwsBasicCredentials.create(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
-      }
     }
 }
