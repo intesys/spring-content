@@ -4,17 +4,9 @@ on: pull_request_target
 permissions:
   contents: write
   pull-requests: write
+  checks: read
 
 jobs:
-  autoapprove:
-    name: Auto Approve a PR by dependabot 
-    runs-on: ubuntu-latest 
-    steps:
-      - name: Auto approve
-        uses: hmarr/auto-approve-action@v2.0.0 
-        if: ${{ github.actor == 'dependabot[bot]' }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
   automerge:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
@@ -24,9 +16,41 @@ jobs:
         uses: dependabot/fetch-metadata@v1.1.1
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Enable auto-merge for Dependabot PRs
-        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor' }}
+
+      # Only patch updates are eligible for auto-approve / auto-merge.
+      # Minor and major updates are left open for manual review.
+      - name: Auto approve patch PRs
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
+        uses: hmarr/auto-approve-action@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Wait for the PR Validation build to finish (green) before merging, so a
+      # patch is only auto-merged on a passing build. Waiting for `build` first
+      # fails fast if it goes red (the validation job below is skipped when the
+      # build fails, so its check would otherwise never conclude).
+      - name: Wait for build to pass
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: build
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+
+      # Also require the getting-started validation to be green.
+      - name: Wait for getting-started validation to pass
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: validate-with-gettingstarteds
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+
+      - name: Enable auto-merge for Dependabot patch PRs
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
         run: gh pr merge --auto --squash "$PR_URL"
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
+          PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
