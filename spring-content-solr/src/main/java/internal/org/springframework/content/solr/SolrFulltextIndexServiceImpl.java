@@ -125,5 +125,12 @@ public class SolrFulltextIndexServiceImpl implements IndexService {
         public InputStream getStream() throws IOException {
             return stream;
         }
+
+        @Override
+        public String getContentType() {
+            // Declare a binary content type so Solr Cell streams the bytes to Tika
+            // (auto-detect) instead of trying to URL-decode the body as form params.
+            return "application/octet-stream";
+        }
     }
 }
