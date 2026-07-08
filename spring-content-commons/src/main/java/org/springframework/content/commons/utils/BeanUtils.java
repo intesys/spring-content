@@ -230,23 +230,24 @@ public final class BeanUtils {
 			Class<? extends Annotation> annotationClass, Object value,
 			Condition condition) {
 
-		Field field = findFieldWithAnnotation(domainObj, annotationClass);
-		if (field != null && field.getAnnotation(annotationClass) != null
-				&& condition.matches(field)) {
-			try {
-				PropertyDescriptor descriptor = org.springframework.beans.BeanUtils
-						.getPropertyDescriptor(domainObj.getClass(), field.getName());
-				if (descriptor != null) {
-					BeanWrapper wrapper = new BeanWrapperImpl(domainObj);
-					wrapper.setPropertyValue(field.getName(), value);
-					return;
+		BeanWrapper wrapper = new BeanWrapperImpl(domainObj);
+		Field[] fields = findFieldsWithAnnotation(domainObj.getClass(), annotationClass, wrapper);
+		for (Field field : fields) {
+			if (condition.matches(field)) {
+				try {
+					PropertyDescriptor descriptor = org.springframework.beans.BeanUtils
+							.getPropertyDescriptor(domainObj.getClass(), field.getName());
+					if (descriptor != null && descriptor.getWriteMethod() != null) {
+						wrapper.setPropertyValue(field.getName(), value);
+						return;
+					}
+					else {
+						ReflectionUtils.setField(field, domainObj, value);
+						return;
+					}
 				}
-				else {
-					ReflectionUtils.setField(field, domainObj, value);
+				catch (IllegalArgumentException iae) {
 				}
-				return;
-			}
-			catch (IllegalArgumentException iae) {
 			}
 		}
 	}

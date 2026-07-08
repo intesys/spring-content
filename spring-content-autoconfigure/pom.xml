@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>it.intesys</groupId>
 		<artifactId>spring-content</artifactId>
-		<version>3.2.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<name>Spring Content Autoconfigure</name>
@@ -16,32 +16,32 @@
 			<artifactId>spring-boot-autoconfigure</artifactId>
 		</dependency>
 	  	<dependency>
-	  		<groupId>org.springframework.data</groupId>
-	  		<artifactId>spring-data-rest-webmvc</artifactId>
+	  		<groupId>org.springframework.boot</groupId>
+	  		<artifactId>spring-boot-starter-webmvc</artifactId>
 	  		<optional>true</optional>
 	  	</dependency>
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-commons</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-fs</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-jpa</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-mongo</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -57,13 +57,13 @@
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-renditions</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-metadata-extraction</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 <!--		<dependency>-->
@@ -75,13 +75,13 @@
 		<dependency>
 	      	<groupId>it.intesys</groupId>
 	  		<artifactId>spring-content-rest</artifactId>
-	  		<version>3.2.0-SNAPSHOT</version>
+	  		<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
   		</dependency>
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-s3</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 			<exclusions>
 				<exclusion>
@@ -93,7 +93,7 @@
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-solr</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -115,7 +115,7 @@
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-elasticsearch</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -127,7 +127,7 @@
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-versions-jpa</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 
@@ -145,25 +145,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.paulcwarren</groupId>
-			<artifactId>ginkgo4j</artifactId>
-			<version>${ginkgo4j-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                </exclusion>
-            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -181,9 +165,37 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mongodb</artifactId>
+			<artifactId>testcontainers-mongodb</artifactId>
 			<version>${test-containers.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-sql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-elasticsearch</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-data-rest</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-hibernate</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-jackson</artifactId>
 		</dependency>
 	</dependencies>
 

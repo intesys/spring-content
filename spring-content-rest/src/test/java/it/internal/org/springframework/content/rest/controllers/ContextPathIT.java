@@ -1,17 +1,15 @@
 package it.internal.org.springframework.content.rest.controllers;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.renditions.RenditionProvider;
 import org.springframework.content.fs.config.EnableFilesystemStores;
@@ -27,22 +25,19 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
-
-import internal.org.springframework.content.rest.support.BaseUriConfig;
 import internal.org.springframework.content.rest.support.TestEntity3;
 import internal.org.springframework.content.rest.support.TestEntity3ContentRepository;
 import internal.org.springframework.content.rest.support.TestEntity3Repository;
 import internal.org.springframework.content.rest.support.config.JpaInfrastructureConfig;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-//@Ginkgo4jConfiguration(threads=1)
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
 		ContextPathIT.ContextPathConfig.class,
 		DelegatingWebMvcConfiguration.class,
@@ -61,38 +56,45 @@ public class ContextPathIT {
 	@Autowired
 	private WebApplicationContext context;
 
-	private MockMvc mvc;
+	@Nested
+	@DisplayName("ContextPath Content Tests")
+	class ContextPathContentTests {
 
-	private TestEntity3 testEntity3;
+		private MockMvc mvc;
+		private TestEntity3 testEntity3;
+		private Content contentTests;
 
-	private Content contentTests;
-	
-	{
-		Describe("ContextPath Content Tests", () -> {
-			BeforeEach(() -> {
-				mvc = MockMvcBuilders.webAppContextSetup(context).build();
-			});
-			Context("given an entity is the subject of a repository and storage", () -> {
-				Context("given the repository and storage are exported to the same URI", () -> {
-					BeforeEach(() -> {
-						testEntity3 = repo3.save(new TestEntity3());
-						testEntity3.name = "tests";
-						testEntity3 = repo3.save(testEntity3);
+		@BeforeEach
+		void setup() {
+			mvc = MockMvcBuilders.webAppContextSetup(context).build();
+		}
 
-						contentTests.setMvc(mvc);
-						contentTests.setUrl("/contextPath/testEntity3s/" + testEntity3.getId());
-						contentTests.setEntity(testEntity3);
-						contentTests.setRepository(repo3);
-						contentTests.setStore(store3);
-						contentTests.setContextPath("/contextPath");
+		@Nested
+		@DisplayName("given an entity is the subject of a repository and storage")
+		class GivenEntity {
 
-					});
-					contentTests = Content.tests();
-				});
-			});
-		});
+			@Nested
+			@DisplayName("given the repository and storage are exported to the same URI")
+			class SameUri {
+
+				@BeforeEach
+				void init() {
+					testEntity3 = repo3.save(new TestEntity3());
+					testEntity3.name = "tests";
+					testEntity3 = repo3.save(testEntity3);
+
+					contentTests = new Content();
+					contentTests.setMvc(mvc);
+					contentTests.setUrl("/contextPath/testEntity3s/" + testEntity3.getId());
+					contentTests.setEntity(testEntity3);
+					contentTests.setRepository(repo3);
+					contentTests.setStore(store3);
+					contentTests.setContextPath("/contextPath");
+				}
+			}
+		}
 	}
-	
+
 	@Configuration
 	@EnableJpaRepositories(basePackages = "internal.org.springframework.content.rest.support")
 	@EnableTransactionManagement
@@ -169,7 +171,4 @@ public class ContextPathIT {
 			};
 		}
 	}
-	
-	@Test
-	public void noop() {}
 }

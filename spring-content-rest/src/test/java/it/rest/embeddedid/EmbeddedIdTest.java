@@ -1,8 +1,5 @@
 package it.rest.embeddedid;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -20,14 +17,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.hateoas.autoconfigure.HypermediaAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -49,18 +48,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 @SpringBootTest(classes = {EmbeddedIdTest.Application.class},
                 webEnvironment=WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration(exclude = { HypermediaAutoConfiguration.class, SecurityAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { HypermediaAutoConfiguration.class })
 public class EmbeddedIdTest {
 
     @LocalServerPort
@@ -75,43 +69,36 @@ public class EmbeddedIdTest {
     @Autowired
     private WebApplicationContext context;
 
-    private MockMvc mvc;
+    @Nested
+    @DisplayName("EmbeddedId")
+    class EmbeddedIdTests {
 
-    {
-        Describe("EmbeddedId", () -> {
+        private MockMvc mvc;
 
-            BeforeEach(() -> {
-                mvc = MockMvcBuilders.webAppContextSetup(context).build();
-            });
+        @BeforeEach
+        void init() {
+            mvc = MockMvcBuilders.webAppContextSetup(context).build();
+        }
 
-            It("should have a content handler mapping bean", () -> {
+        @Test
+        @DisplayName("should have a content handler mapping bean")
+        void shouldHaveContentHandlerMapping() throws Exception {
+            String content = "this is some content";
 
-                String content = "this is some content";
+            TestEntity entity = repo.save(new TestEntity());
+            entity = store.setContent(entity, new ByteArrayInputStream(content.getBytes()));
+            entity = repo.save(entity);
 
-                TestEntity entity = repo.save(new TestEntity());
-                entity = store.setContent(entity, new ByteArrayInputStream(content.getBytes()));
-                entity = repo.save(entity);
+            MockHttpServletResponse response =
+                    mvc.perform(
+                        get("/testEntities/" + entity.getId()).
+                            accept("text/plain")).
+                        andExpect(status().isOk()).
+                        andReturn().getResponse();
 
-//                String command = "curl -H 'Accept: text/plain' http://localhost:" + serverPort + "/testEntities/" + entity.getId().toString();
-//                Process process = Runtime.getRuntime().exec(command);
-//                while (process.isAlive() == true) {
-//                    Thread.sleep(1000);
-//                }
-//                assertThat(process.exitValue(), is(0));
-//                assertThat(IOUtils.toString(process.getInputStream()), is(content));
-
-                MockHttpServletResponse response =
-                        mvc.perform(
-                            get("/testEntities/" + entity.getId()).
-                                accept("text/plain")).
-                            andExpect(status().isOk()).
-                            andReturn().getResponse();
-
-                    assertThat(response, is(not(nullValue())));
-                    assertThat(response.getContentAsString(), is(content));
-
-            });
-       });
+                assertThat(response, is(not(nullValue())));
+                assertThat(response.getContentAsString(), is(content));
+        }
     }
 
     @SpringBootApplication
@@ -199,7 +186,4 @@ public class EmbeddedIdTest {
 
     public interface TestEntityContentRepository extends FilesystemContentStore<TestEntity, TestEntityId> {
     }
-
-    @Test
-    public void noop() {}
 }

@@ -48,7 +48,7 @@ added after the original pull request but before a merge.
 * Add yourself as an `@author` to the `.java` files that you modify substantially (more
   than cosmetic changes).
 * Add some Javadocs.
-* A few unit tests would help a lot as well -- someone has to do it.  Spring Content uses the [ginkgo4j](https://github.com/paulcwarren/ginkgo4j) BDD framework.
+* A few unit tests would help a lot as well -- someone has to do it.
 * If no-one else is using your branch, please rebase it against the current master (or
   other target branch in the main project).
 * When writing a commit message please follow [these conventions](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html),

@@ -18,7 +18,8 @@
  */
 package org.springframework.content.metadataextraction.extractors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.content.metadataextraction.MetadataExtractionException;
 
 import java.io.File;
@@ -27,9 +28,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test class for the {@link DefaultMetadataExtractor}.
@@ -46,11 +47,13 @@ import static org.junit.Assert.assertTrue;
  *
  * @author marcobelligoli
  */
+@DisplayName("DefaultMetadataExtractor")
 public class DefaultMetadataExtractorTest {
 
     private final DefaultMetadataExtractor metadataExtractor = new DefaultMetadataExtractor();
 
     @Test
+    @DisplayName("should extract metadata from a valid file")
     public void testExtractMetadataWithValidFile()
         throws URISyntaxException {
 
@@ -69,6 +72,7 @@ public class DefaultMetadataExtractorTest {
     }
 
     @Test
+    @DisplayName("should return empty metadata when file is null")
     public void testExtractMetadataWithNullFile() {
 
         Map<String, Object> metadata = metadataExtractor.extractMetadata(null);
@@ -76,6 +80,7 @@ public class DefaultMetadataExtractorTest {
     }
 
     @Test
+    @DisplayName("should throw MetadataExtractionException when an IOException occurs")
     public void testExtractMetadataWithIOException() {
 
         File nonExistentFile = new File("/path/to/nonexistent/file");

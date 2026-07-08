@@ -1,9 +1,9 @@
 package internal.org.springframework.content.commons.repository.events;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.content.commons.repository.ContentStore;
 import org.springframework.content.commons.repository.StoreEvent;
@@ -12,7 +12,6 @@ import org.springframework.content.commons.repository.events.*;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -20,8 +19,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 @SuppressWarnings("unchecked")
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 public class DeprecatedAbstractStoreEventListenerTest {
 
 	private AbstractStoreEventListener<Object> listener;
@@ -30,240 +27,308 @@ public class DeprecatedAbstractStoreEventListenerTest {
 	// mocks
 	private TestContentEventConsumer consumer;
 	private ContentStore<Object, Serializable> store;
-	{
-		Describe("#onApplicationEvent", () -> {
-			Context("given a content event listener", () -> {
-				BeforeEach(() -> {
-					consumer = mock(TestContentEventConsumer.class);
-					store = (ContentStore<Object, Serializable>) mock(ContentStore.class);
 
-					listener = new TestContentEventListener(consumer);
-				});
-				JustBeforeEach(() -> {
-					listener.onApplicationEvent(event);
-				});
-				Context("given a before get resource event", () -> {
-					BeforeEach(() -> {
-						event = new BeforeGetResourceEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<BeforeGetResourceEvent> argumentCaptor = ArgumentCaptor
-								.forClass(BeforeGetResourceEvent.class);
-						verify(consumer).onBeforeGetResource(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onBeforeGetResource(argThat(is(event.getSource())));
-					});
-				});
-				Context("given an after get resource event", () -> {
-					BeforeEach(() -> {
-						event = new AfterGetResourceEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<AfterGetResourceEvent> argumentCaptor = ArgumentCaptor
-								.forClass(AfterGetResourceEvent.class);
-						verify(consumer).onAfterGetResource(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onAfterGetResource(argThat(is(event.getSource())));
-					});
-				});
-				Context("given a before associate event", () -> {
-					BeforeEach(() -> {
-						event = new BeforeAssociateEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<BeforeAssociateEvent> argumentCaptor = ArgumentCaptor
-								.forClass(BeforeAssociateEvent.class);
-						verify(consumer).onBeforeAssociate(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onBeforeAssociate(argThat(is(event.getSource())));
-					});
-				});
-				Context("given an after associate event", () -> {
-					BeforeEach(() -> {
-						event = new AfterAssociateEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<AfterAssociateEvent> argumentCaptor = ArgumentCaptor
-								.forClass(AfterAssociateEvent.class);
-						verify(consumer).onAfterAssociate(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onAfterAssociate(argThat(is(event.getSource())));
-					});
-				});
-				Context("given a before unassociate event", () -> {
-					BeforeEach(() -> {
-						event = new BeforeUnassociateEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<BeforeUnassociateEvent> argumentCaptor = ArgumentCaptor
-								.forClass(BeforeUnassociateEvent.class);
-						verify(consumer).onBeforeUnassociate(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onBeforeUnassociate(argThat(is(event.getSource())));
-					});
-				});
-				Context("given an after unassociate event", () -> {
-					BeforeEach(() -> {
-						event = new AfterUnassociateEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<AfterUnassociateEvent> argumentCaptor = ArgumentCaptor
-								.forClass(AfterUnassociateEvent.class);
-						verify(consumer).onAfterUnassociate(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onAfterUnassociate(argThat(is(event.getSource())));
-					});
-				});
-				Context("given a before get content event", () -> {
-					BeforeEach(() -> {
-						event = new BeforeGetContentEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<BeforeGetContentEvent> argumentCaptor = ArgumentCaptor
-								.forClass(BeforeGetContentEvent.class);
-						verify(consumer).onBeforeGetContent(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onBeforeGetContent(argThat(is(event.getSource())));
-					});
-				});
-				Context("given an after get content event", () -> {
-					BeforeEach(() -> {
-						event = new AfterGetContentEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<AfterGetContentEvent> argumentCaptor = ArgumentCaptor
-								.forClass(AfterGetContentEvent.class);
-						verify(consumer).onAfterGetContent(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onAfterGetContent(argThat(is(event.getSource())));
-					});
-				});
-				Context("given a before set content event", () -> {
-					BeforeEach(() -> {
-						event = new BeforeSetContentEvent(new EventSource(), store, (InputStream)null);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<BeforeSetContentEvent> argumentCaptor = ArgumentCaptor
-								.forClass(BeforeSetContentEvent.class);
-						verify(consumer).onBeforeSetContent(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onBeforeSetContent(argThat(is(event.getSource())));
-					});
-				});
-				Context("given a after set content event", () -> {
-					BeforeEach(() -> {
-						event = new AfterSetContentEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<AfterSetContentEvent> argumentCaptor = ArgumentCaptor
-								.forClass(AfterSetContentEvent.class);
-						verify(consumer).onAfterSetContent(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onAfterSetContent(argThat(is(event.getSource())));
-					});
-				});
-				Context("given a before unset content event", () -> {
-					BeforeEach(() -> {
-						event = new BeforeUnsetContentEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<BeforeUnsetContentEvent> argumentCaptor = ArgumentCaptor
-								.forClass(BeforeUnsetContentEvent.class);
-						verify(consumer).onBeforeUnsetContent(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onBeforeUnsetContent(argThat(is(event.getSource())));
-					});
-				});
-				Context("given a after unset content event", () -> {
-					BeforeEach(() -> {
-						event = new AfterUnsetContentEvent(new EventSource(), store);
-					});
-					It("should call the event consumer", () -> {
-						ArgumentCaptor<AfterUnsetContentEvent> argumentCaptor = ArgumentCaptor
-								.forClass(AfterUnsetContentEvent.class);
-						verify(consumer).onAfterUnsetContent(argumentCaptor.capture());
-						assertThat(argumentCaptor.getValue(), is(event));
-						assertThat(argumentCaptor.getValue().getSource(),
-								is(event.getSource()));
-						assertThat(argumentCaptor.getValue().getStore(), is(store));
-					});
-					It("should call the event source consumer", () -> {
-						verify(consumer)
-								.onAfterUnsetContent(argThat(is(event.getSource())));
-					});
-				});
-			});
-		});
-	}
+	@Nested
+	@DisplayName("#onApplicationEvent")
+	class OnApplicationEvent {
+		@BeforeEach
+		void setUp() {
+			consumer = mock(TestContentEventConsumer.class);
+			store = (ContentStore<Object, Serializable>) mock(ContentStore.class);
+			listener = new TestContentEventListener(consumer);
+		}
 
-	@Test
-	public void noop() {
+		private void fireEvent() {
+			listener.onApplicationEvent(event);
+		}
+
+		@Nested
+		@DisplayName("given a before get resource event")
+		class BeforeGetResource {
+			@BeforeEach
+			void setUp() {
+				event = new BeforeGetResourceEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<BeforeGetResourceEvent> argumentCaptor = ArgumentCaptor.forClass(BeforeGetResourceEvent.class);
+				verify(consumer).onBeforeGetResource(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onBeforeGetResource(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given an after get resource event")
+		class AfterGetResource {
+			@BeforeEach
+			void setUp() {
+				event = new AfterGetResourceEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<AfterGetResourceEvent> argumentCaptor = ArgumentCaptor.forClass(AfterGetResourceEvent.class);
+				verify(consumer).onAfterGetResource(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onAfterGetResource(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a before associate event")
+		class BeforeAssociate {
+			@BeforeEach
+			void setUp() {
+				event = new BeforeAssociateEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<BeforeAssociateEvent> argumentCaptor = ArgumentCaptor.forClass(BeforeAssociateEvent.class);
+				verify(consumer).onBeforeAssociate(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onBeforeAssociate(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given an after associate event")
+		class AfterAssociate {
+			@BeforeEach
+			void setUp() {
+				event = new AfterAssociateEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<AfterAssociateEvent> argumentCaptor = ArgumentCaptor.forClass(AfterAssociateEvent.class);
+				verify(consumer).onAfterAssociate(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onAfterAssociate(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a before unassociate event")
+		class BeforeUnassociate {
+			@BeforeEach
+			void setUp() {
+				event = new BeforeUnassociateEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<BeforeUnassociateEvent> argumentCaptor = ArgumentCaptor.forClass(BeforeUnassociateEvent.class);
+				verify(consumer).onBeforeUnassociate(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onBeforeUnassociate(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given an after unassociate event")
+		class AfterUnassociate {
+			@BeforeEach
+			void setUp() {
+				event = new AfterUnassociateEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<AfterUnassociateEvent> argumentCaptor = ArgumentCaptor.forClass(AfterUnassociateEvent.class);
+				verify(consumer).onAfterUnassociate(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onAfterUnassociate(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a before get content event")
+		class BeforeGetContent {
+			@BeforeEach
+			void setUp() {
+				event = new BeforeGetContentEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<BeforeGetContentEvent> argumentCaptor = ArgumentCaptor.forClass(BeforeGetContentEvent.class);
+				verify(consumer).onBeforeGetContent(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onBeforeGetContent(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given an after get content event")
+		class AfterGetContent {
+			@BeforeEach
+			void setUp() {
+				event = new AfterGetContentEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<AfterGetContentEvent> argumentCaptor = ArgumentCaptor.forClass(AfterGetContentEvent.class);
+				verify(consumer).onAfterGetContent(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onAfterGetContent(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a before set content event")
+		class BeforeSetContent {
+			@BeforeEach
+			void setUp() {
+				event = new BeforeSetContentEvent(new EventSource(), store, (InputStream)null);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<BeforeSetContentEvent> argumentCaptor = ArgumentCaptor.forClass(BeforeSetContentEvent.class);
+				verify(consumer).onBeforeSetContent(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onBeforeSetContent(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a after set content event")
+		class AfterSetContent {
+			@BeforeEach
+			void setUp() {
+				event = new AfterSetContentEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<AfterSetContentEvent> argumentCaptor = ArgumentCaptor.forClass(AfterSetContentEvent.class);
+				verify(consumer).onAfterSetContent(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onAfterSetContent(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a before unset content event")
+		class BeforeUnsetContent {
+			@BeforeEach
+			void setUp() {
+				event = new BeforeUnsetContentEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<BeforeUnsetContentEvent> argumentCaptor = ArgumentCaptor.forClass(BeforeUnsetContentEvent.class);
+				verify(consumer).onBeforeUnsetContent(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onBeforeUnsetContent(argThat(is(event.getSource())));
+			}
+		}
+
+		@Nested
+		@DisplayName("given a after unset content event")
+		class AfterUnsetContent {
+			@BeforeEach
+			void setUp() {
+				event = new AfterUnsetContentEvent(new EventSource(), store);
+				fireEvent();
+			}
+			@Test
+			@DisplayName("should call the event consumer")
+			void callConsumer() {
+				ArgumentCaptor<AfterUnsetContentEvent> argumentCaptor = ArgumentCaptor.forClass(AfterUnsetContentEvent.class);
+				verify(consumer).onAfterUnsetContent(argumentCaptor.capture());
+				assertThat(argumentCaptor.getValue(), is(event));
+				assertThat(argumentCaptor.getValue().getSource(), is(event.getSource()));
+				assertThat(argumentCaptor.getValue().getStore(), is(store));
+			}
+			@Test
+			@DisplayName("should call the event source consumer")
+			void callSourceConsumer() {
+				verify(consumer).onAfterUnsetContent(argThat(is(event.getSource())));
+			}
+		}
 	}
 
 	public static class TestContentEventListener
@@ -398,51 +463,28 @@ public class DeprecatedAbstractStoreEventListenerTest {
 
 	public interface TestContentEventConsumer {
 		void onBeforeGetResource(BeforeGetResourceEvent event);
-
 		void onBeforeGetResource(Object entity);
-
 		void onAfterGetResource(AfterGetResourceEvent event);
-
 		void onAfterGetResource(Object entity);
-
 		void onBeforeAssociate(BeforeAssociateEvent event);
-
 		void onBeforeAssociate(Object entity);
-
 		void onAfterAssociate(AfterAssociateEvent event);
-
 		void onAfterAssociate(Object entity);
-
 		void onBeforeUnassociate(BeforeUnassociateEvent event);
-
 		void onBeforeUnassociate(Object entity);
-
 		void onAfterUnassociate(AfterUnassociateEvent event);
-
 		void onAfterUnassociate(Object entity);
-
 		void onBeforeGetContent(BeforeGetContentEvent event);
-
 		void onBeforeGetContent(Object entity);
-
 		void onAfterGetContent(AfterGetContentEvent event);
-
 		void onAfterGetContent(Object entity);
-
 		void onBeforeSetContent(BeforeSetContentEvent event);
-
 		void onBeforeSetContent(Object argThat);
-
 		void onAfterSetContent(AfterSetContentEvent event);
-
 		void onAfterSetContent(Object argThat);
-
 		void onBeforeUnsetContent(BeforeUnsetContentEvent event);
-
 		void onBeforeUnsetContent(Object argThat);
-
 		void onAfterUnsetContent(AfterUnsetContentEvent event);
-
 		void onAfterUnsetContent(Object argThat);
 	}
 

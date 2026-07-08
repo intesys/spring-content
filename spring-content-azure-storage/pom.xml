@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>it.intesys</groupId>
 		<artifactId>spring-content</artifactId>
-		<version>3.2.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 	<name>Spring Content Azure Storage</name>
 	<description>Spring Content Azure Storage module of Spring Content.</description>
@@ -19,7 +19,7 @@
 		<dependency>
 		<groupId>it.intesys</groupId>
 			<artifactId>spring-content-commons</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
  		<dependency>
  			<groupId>com.azure.spring</groupId>
@@ -44,36 +44,14 @@
 
 		<!-- Test Dependencies -->
 		<dependency>
-		  <groupId>junit</groupId>
-		  <artifactId>junit</artifactId>
-		  <scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.paulcwarren</groupId>
-			<artifactId>ginkgo4j</artifactId>
-			<version>${ginkgo4j-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -93,13 +71,11 @@
 		<dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
-			<version>${jakarta-persistence-api.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate-orm.version}</version>
 			<scope>test</scope>
 		</dependency>
 

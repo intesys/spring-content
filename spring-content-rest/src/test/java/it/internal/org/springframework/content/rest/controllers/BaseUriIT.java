@@ -1,14 +1,13 @@
 package it.internal.org.springframework.content.rest.controllers;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
 import static java.lang.String.format;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.rest.config.HypermediaConfiguration;
 import org.springframework.content.rest.config.RestConfiguration;
@@ -18,11 +17,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
-
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 
 import internal.org.springframework.content.rest.support.BaseUriConfig;
 import internal.org.springframework.content.rest.support.EntityConfig;
@@ -37,9 +35,8 @@ import internal.org.springframework.content.rest.support.TestEntityContentReposi
 import internal.org.springframework.content.rest.support.TestEntityRepository;
 import internal.org.springframework.content.rest.support.TestStore;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-// @Ginkgo4jConfiguration(threads=1)
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
 		BaseUriConfig.class,
 		EntityConfig.class,
@@ -51,19 +48,16 @@ import internal.org.springframework.content.rest.support.TestStore;
 @ActiveProfiles("store")
 public class BaseUriIT {
 
-	// different exported URI
 	@Autowired
 	private TestEntityRepository repository;
 	@Autowired
 	private TestEntityContentRepository contentRepository;
 
-	// same exported URI
 	@Autowired
 	private TestEntity3Repository repo3;
 	@Autowired
 	private TestEntity3ContentRepository store3;
 
-	// same exported URI
 	@Autowired
 	private TestEntity4Repository repo4;
 	@Autowired
@@ -75,107 +69,122 @@ public class BaseUriIT {
 	@Autowired
 	private WebApplicationContext context;
 
-	private MockMvc mvc;
+	@Nested
+	@DisplayName("BaseUri Content Tests")
+	class BaseUriContentTests {
 
-	private TestEntity testEntity;
-	private TestEntity3 testEntity3;
-	private TestEntity4 testEntity4;
+		private MockMvc mvc;
+		private TestEntity testEntity;
+		private TestEntity3 testEntity3;
+		private TestEntity4 testEntity4;
+		private Version version;
+		private LastModifiedDate lastModifiedDate;
+		private Entity entityTests;
+		private Content contentTests;
+		private Cors corsTests;
 
-	private Version version;
-	private LastModifiedDate lastModifiedDate;
+		@BeforeEach
+		void setup() {
+			mvc = MockMvcBuilders.webAppContextSetup(context).build();
+		}
 
-	private Entity entityTests;
-	private Content contentTests;
-	private Cors corsTests;
+		@Nested
+		@DisplayName("given an entity is the subject of a repository and storage")
+		class GivenEntity {
 
-	{
-		Describe("BaseUri Content Tests", () -> {
-			BeforeEach(() -> {
-				mvc = MockMvcBuilders.webAppContextSetup(context).build();
-			});
-			Context("given an entity is the subject of a repository and storage", () -> {
-				Context("given the repository and storage are exported to the same URI", () -> {
-					BeforeEach(() -> {
-						testEntity3 = repo3.save(new TestEntity3());
-						testEntity3.name = "tests";
-						testEntity3 = repo3.save(testEntity3);
+			@Nested
+			@DisplayName("given the repository and storage are exported to the same URI")
+			class SameUri {
 
-						entityTests.setMvc(mvc);
-						entityTests.setUrl("/api/testEntity3s/" + testEntity3.id);
-						entityTests.setEntity(testEntity3);
-						entityTests.setRepository(repo3);
-						entityTests.setLinkRel("testEntity3");
+				@BeforeEach
+				void init() {
+					testEntity3 = repo3.save(new TestEntity3());
+					testEntity3.name = "tests";
+					testEntity3 = repo3.save(testEntity3);
 
-						contentTests.setMvc(mvc);
-						contentTests.setUrl("/contentApi/testEntity3s/" + testEntity3.getId());
-						contentTests.setEntity(testEntity3);
-						contentTests.setRepository(repo3);
-						contentTests.setStore(store3);
+					entityTests = new Entity();
+					entityTests.setMvc(mvc);
+					entityTests.setUrl("/api/testEntity3s/" + testEntity3.id);
+					entityTests.setEntity(testEntity3);
+					entityTests.setRepository(repo3);
+					entityTests.setLinkRel("testEntity3");
 
-					});
-					entityTests = Entity.tests();
-					contentTests = Content.tests();
-				});
-				Context("given the repository and storage are exported to different URIs", () -> {
-					BeforeEach(() -> {
-						testEntity = repository.save(new TestEntity());
+					contentTests = new Content();
+					contentTests.setMvc(mvc);
+					contentTests.setUrl("/contentApi/testEntity3s/" + testEntity3.getId());
+					contentTests.setEntity(testEntity3);
+					contentTests.setRepository(repo3);
+					contentTests.setStore(store3);
+				}
+			}
 
-						contentTests.setMvc(mvc);
-						contentTests.setUrl("/contentApi/testEntitiesContent/" + testEntity.getId());
-						contentTests.setEntity(testEntity);
-						contentTests.setRepository(repository);
-						contentTests.setStore(contentRepository);
+			@Nested
+			@DisplayName("given the repository and storage are exported to different URIs")
+			class DifferentUris {
 
-						corsTests.setMvc(mvc);
-						corsTests.setUrl("/contentApi/testEntitiesContent/" + testEntity.getId());
-					});
-					contentTests = Content.tests();
-					corsTests = Cors.tests();
-				});
+				@BeforeEach
+				void init() {
+					testEntity = repository.save(new TestEntity());
 
-				Context("given an entity with @Version", () -> {
-					BeforeEach(() -> {
-						testEntity4 = new TestEntity4();
-						testEntity4 = store4.setContent(testEntity4, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
-						testEntity4.mimeType = "text/plain";
-						testEntity4 = repo4.save(testEntity4);
-						String url = "/contentApi/testEntity4s/" + testEntity4.getId();
+					contentTests = new Content();
+					contentTests.setMvc(mvc);
+					contentTests.setUrl("/contentApi/testEntitiesContent/" + testEntity.getId());
+					contentTests.setEntity(testEntity);
+					contentTests.setRepository(repository);
+					contentTests.setStore(contentRepository);
 
-						version.setEntity(testEntity4);
-						version.setMvc(mvc);
-						version.setUrl(url);
-						version.setCollectionUrl("/api/testEntity4s");
-						version.setContentLinkRel("content");
-						version.setRepo(repo4);
-						version.setStore(store4);
-						version.setEtag(format("\"%s\"", testEntity4.getVersion()));
-					});
-					version = Version.tests();
-				});
+					corsTests = new Cors();
+					corsTests.setMvc(mvc);
+					corsTests.setUrl("/contentApi/testEntitiesContent/" + testEntity.getId());
+				}
+			}
 
-				Context("given an entity with @LastModifiedDate", () -> {
-					BeforeEach(() -> {
-						String content = "Hello Spring Content LastModifiedDate World!";
+			@Nested
+			@DisplayName("given an entity with @Version")
+			class WithVersion {
 
-						testEntity4 = new TestEntity4();
-						testEntity4 = store4.setContent(testEntity4, new ByteArrayInputStream(content.getBytes()));
-						testEntity4.mimeType = "text/plain";
-						testEntity4 = repo4.save(testEntity4);
-						String url = "/contentApi/testEntity4s/" + testEntity4.getId();
+				@BeforeEach
+				void init() {
+					testEntity4 = new TestEntity4();
+					testEntity4 = store4.setContent(testEntity4, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
+					testEntity4.mimeType = "text/plain";
+					testEntity4 = repo4.save(testEntity4);
+					String url = "/contentApi/testEntity4s/" + testEntity4.getId();
 
-						lastModifiedDate.setMvc(mvc);
-						lastModifiedDate.setUrl(url);
-						lastModifiedDate.setLastModifiedDate(testEntity4.getModifiedDate());
-						lastModifiedDate.setEtag(testEntity4.getVersion().toString());
-						lastModifiedDate.setContent(content);
-					});
-					lastModifiedDate = LastModifiedDate.tests();
-				});
-			});
-		});
-	}
+					version = new Version();
+					version.setEntity(testEntity4);
+					version.setMvc(mvc);
+					version.setUrl(url);
+					version.setCollectionUrl("/api/testEntity4s");
+					version.setContentLinkRel("content");
+					version.setRepo(repo4);
+					version.setStore(store4);
+					version.setEtag(format("\"%s\"", testEntity4.getVersion()));
+				}
+			}
 
-	@Test
-	public void noop() {
+			@Nested
+			@DisplayName("given an entity with @LastModifiedDate")
+			class WithLastModifiedDate {
+
+				@BeforeEach
+				void init() {
+					String content = "Hello Spring Content LastModifiedDate World!";
+
+					testEntity4 = new TestEntity4();
+					testEntity4 = store4.setContent(testEntity4, new ByteArrayInputStream(content.getBytes()));
+					testEntity4.mimeType = "text/plain";
+					testEntity4 = repo4.save(testEntity4);
+					String url = "/contentApi/testEntity4s/" + testEntity4.getId();
+
+					lastModifiedDate = new LastModifiedDate();
+					lastModifiedDate.setMvc(mvc);
+					lastModifiedDate.setUrl(url);
+					lastModifiedDate.setLastModifiedDate(testEntity4.getModifiedDate());
+					lastModifiedDate.setEtag(testEntity4.getVersion().toString());
+					lastModifiedDate.setContent(content);
+				}
+			}
+		}
 	}
 }

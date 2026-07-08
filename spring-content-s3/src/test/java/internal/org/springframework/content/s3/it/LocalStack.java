@@ -1,7 +1,7 @@
 package internal.org.springframework.content.s3.it;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.net.URIBuilder;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -31,9 +31,9 @@ public class LocalStack extends LocalStackContainer implements Serializable {
 
     public static S3Client getAmazonS3Client() throws URISyntaxException {
         return S3Client.builder()
-                .endpointOverride(new URI(Singleton.INSTANCE.getEndpointConfiguration(LocalStackContainer.Service.S3).getServiceEndpoint()))
+                .endpointOverride(new URI(Singleton.INSTANCE.getEndpointOverride(LocalStackContainer.Service.S3).toString()))
                 .region(Region.US_EAST_1) // Set a region, so it does not need to be configured externally
-                .credentialsProvider(new CrossAwsCredentialsProvider(Singleton.INSTANCE.getDefaultCredentialsProvider()))
+                .credentialsProvider(new CrossAwsCredentialsProvider(new BasicAWSCredentials(Singleton.INSTANCE.getAccessKey(), Singleton.INSTANCE.getSecretKey())))
                 .serviceConfiguration((bldr) -> bldr.pathStyleAccessEnabled(true).build())
                 .build();
     }
@@ -58,8 +58,8 @@ public class LocalStack extends LocalStackContainer implements Serializable {
     private static class CrossAwsCredentialsProvider implements AwsCredentialsProvider {
       private final AWSCredentials credentials;
 
-      public CrossAwsCredentialsProvider(AWSCredentialsProvider provider) {
-        this.credentials = provider.getCredentials();
+      public CrossAwsCredentialsProvider(BasicAWSCredentials basicAWSCredentials) {
+        this.credentials = basicAWSCredentials;
       }
 
       @Override

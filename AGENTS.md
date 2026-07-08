@@ -4,8 +4,8 @@ High-signal facts to avoid guessing wrong in this multi-module Java/Maven repo.
 
 ## Project Basics
 
-- **Group**: `it.intesys` | **Java**: 17 | **Maven**: wrapper (`./mvnw`) uses 3.6.3
-- **Boot**: 3.5.0 | **Spring Cloud**: 2024.0.1 | **Jakarta Persistence**: 3.1.0
+- **Group**: `it.intesys` | **Java**: 21 | **Maven**: wrapper (`./mvnw`) uses 3.6.3
+- **Boot**: 4.0.5 | **Spring Cloud**: 2025.1.1
 - **Maintained by Intesys**; forked from `paulcwarren/spring-content`.
 
 ## Build Commands
@@ -34,8 +34,6 @@ Key module families:
 
 ## Testing
 
-- **Framework**: [ginkgo4j](https://github.com/paulcwarren/ginkgo4j) BDD (not plain JUnit).  
-  Tests run via a custom `JUnitRunListener` (`com.github.paulcwarren.ginkgo4j.maven.JUnitRunListener`).
 - **Unit tests**: `*Test.java` — run by default.
 - **Integration tests**: `*IT.java` and `*Tests.java` — **only run with `-P tests`**.
 - Many ITs use Testcontainers / LocalStack / embedded DBs; Docker availability matters for a full `-P tests` pass.
@@ -53,11 +51,11 @@ Key module families:
 
 ## CI / Release Notes
 
-- **Two active lines.** `main` = Spring Boot 3.x; `spring-boot-4` = Spring Boot 4.x, kept alive alongside `main` as a snapshot. CI (Dependabot, Main Build, PR Validation) runs on both branches; the two lines must use **distinct artifact versions** (e.g. `3.x-SNAPSHOT` vs `4.x-SNAPSHOT`) or their snapshots collide on Maven Central. Dependabot config for **both** lines lives in this branch's (`main`'s) `.github/dependabot.yml` — Dependabot only reads it from the default branch.
-- PRs run `CLAAssistant` (sign the CLA) + build with `-P tests` + validation against the `spring-content-gettingstarted` repo. Validation follows the target line: PRs to `main` use the getting-started default branch; PRs to `spring-boot-4` use that repo's `spring-boot-4` branch. PR Validation runs for PRs to **both** `main` and `spring-boot-4` (`prs.yml` → `pull_request.branches`), so every Dependabot update proposal is built.
+- **Two active lines.** `main` = Spring Boot 4.x; `support/spring-boot-3` = Spring Boot 3.x, maintained alongside `main`. CI (Dependabot, Main Build, PR Validation) runs on both branches; the two lines must use **distinct artifact versions** (e.g. `4.x-SNAPSHOT` vs `3.x-SNAPSHOT`) or their snapshots collide on Maven Central. Dependabot config for **both** lines lives in this branch's (`main`'s) `.github/dependabot.yml` — Dependabot only reads it from the default branch.
+- PRs run `CLAAssistant` (sign the CLA) + build with `-P tests` + validation against the `spring-content-gettingstarted` repo. Validation follows the target line: PRs to `main` (4.x) use the getting-started default branch; PRs to `support/spring-boot-3` (3.x) use that repo's `support/spring-boot-3` branch. PR Validation runs for PRs to **both** `main` and `support/spring-boot-3` (`prs.yml` → `pull_request.branches`), so every Dependabot update proposal is built.
 - **Dependabot auto-merge (`dependabot-auto-merge.yaml`).** Only **patch** updates (`version-update:semver-patch`) are auto-approved and auto-merged (squash); minor/major PRs are built but left open for manual review. A patch is merged only after **both** PR Validation checks are green — the `build` check (`-P tests`) and the `validate-with-gettingstarteds` check — which the workflow waits for (build first, fail-fast) before enabling auto-merge.
-- Tags trigger release build (`-P ci,docs deploy`), GPG signing, and Maven Central publish. Pushes to `main`/`spring-boot-4` publish snapshots the same way.
-- **Docs are published from both lines** — the Main Build runs on `main`, `spring-boot-4` and tags, via the official `actions/upload-pages-artifact` + `actions/deploy-pages` flow (Pages Source must be set to "GitHub Actions"). The landing-page version table is **deterministic**: every build computes all four coordinates from fixed sources — 3.x GA = latest `3.x` tag, 3.x SNAPSHOT = `main` pom, 4.x GA = latest `4.x` tag, 4.x SNAPSHOT = `spring-boot-4` pom — so either line regenerates an identical landing page and can't clobber the other. Reference docs are published per line — `main` → `refs/snapshot/main`, `spring-boot-4` → `refs/snapshot/spring-boot-4`, tags → `refs/release/<tag>` — and accumulate on the `gh-pages` branch (kept as persistent storage; no longer the deployment source). The job builds on JDK 21 to cover the `spring-boot-4` Java 21 baseline (a 21 toolchain also builds `main`'s Java 17 target).
+- Tags trigger release build (`-P ci,docs deploy`), GPG signing, and Maven Central publish. Pushes to `main`/`support/spring-boot-3` publish snapshots the same way.
+- **Docs are published from both lines** — the Main Build runs on `main`, `support/spring-boot-3` and tags, via the official `actions/upload-pages-artifact` + `actions/deploy-pages` flow (Pages Source must be set to "GitHub Actions"). The landing-page version table is **deterministic**: every build computes all four coordinates from fixed sources — 4.x GA = latest `4.x` tag, 4.x SNAPSHOT = `main` pom, 3.x GA = latest `3.x` tag, 3.x SNAPSHOT = `support/spring-boot-3` pom — so either line regenerates an identical landing page and can't clobber the other. Reference docs are published per line — `main` → `refs/snapshot/main`, `support/spring-boot-3` → `refs/snapshot/support/spring-boot-3`, tags → `refs/release/<tag>` — and accumulate on the `gh-pages` branch (kept as persistent storage; no longer the deployment source). The job builds on JDK 21 to cover `main`'s Java 21 (Spring Boot 4) baseline (a 21 toolchain also builds the `support/spring-boot-3` Java 17 target).
 - Docs output path: `target/generated-docs/refs/dev/`
 
 ## Local Dev Tips

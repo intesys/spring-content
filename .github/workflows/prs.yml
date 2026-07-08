@@ -2,7 +2,7 @@ name: PR Validation
 
 on:
   pull_request:
-    branches: [ main, spring-boot-4 ]
+    branches: [ main, support/spring-boot-3 ]
   pull_request_target:
     types: [opened, closed, synchronize]
   issue_comment:
@@ -55,10 +55,10 @@ jobs:
     - uses: actions/checkout@v2
       with:
         path: spring-content
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v1
       with:
-        java-version: 17
+        java-version: 21
         server-id: central
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
@@ -86,10 +86,10 @@ jobs:
     needs: build
     if: github.event_name == 'pull_request'
     steps:
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v1
       with:
-        java-version: 17
+        java-version: 21
         server-id: central
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
@@ -104,7 +104,12 @@ jobs:
       with:
         repository: intesys/spring-content-gettingstarted
         path: spring-content-gettingstarted
-    
+        # Match the getting-started guides to the target line:
+        # PRs to main (4.x) -> default branch; PRs to support/spring-boot-3 (3.x)
+        # -> the 'support/spring-boot-3' branch of the getting-started repo.
+        # An empty ref falls back to the repository's default branch.
+        ref: ${{ github.base_ref == 'support/spring-boot-3' && 'support/spring-boot-3' || '' }}
+
     - name: Validate against Getting Started Guides
       run: |
         pushd spring-content-gettingstarted

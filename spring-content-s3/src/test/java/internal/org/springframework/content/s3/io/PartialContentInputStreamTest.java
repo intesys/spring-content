@@ -1,20 +1,19 @@
 package internal.org.springframework.content.s3.io;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
-
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-@RunWith(Ginkgo4jSpringRunner.class)
 public class PartialContentInputStreamTest {
 
     private static final byte[] FULL_DATA = "This is a test string".getBytes(StandardCharsets.UTF_8);
@@ -22,224 +21,265 @@ public class PartialContentInputStreamTest {
 
     private InputStream inputStream;
 
+    @Nested
+    @DisplayName("PartialContentInputStream")
+    class Partialcontentinputstream {
 
-    {
-        Describe("PartialContentInputStream", () -> {
-            Context("with a range from the start", () -> {
-                BeforeEach(() -> {
-                    inputStream = PartialContentInputStream.fromContentRange(
-                            new ByteArrayInputStream(FULL_DATA, 0, 4),
-                            "bytes 0-3/"+FULL_DATA.length // bytes in the range description are *inclusive*
-                    );
-                });
-                AfterEach(() -> {
-                    inputStream.close();
-                });
-                It("reads fully from start to finish", () -> {
-                    var readData = new byte[FULL_DATA.length];
-                    Arrays.fill(readData, (byte)0xba); // Fill array to detect that it is properly filled with NUL bytes by the read function
-                    IOUtils.readFully(inputStream, readData);
+        @Nested
+        @DisplayName("with a range from the start")
+        class WithARangeFromTheStart {
 
-                    assertThat(readData[0], is(equalTo(FULL_DATA[0])));
-                    assertThat(readData[1], is(equalTo(FULL_DATA[1])));
-                    assertThat(readData[2], is(equalTo(FULL_DATA[2])));
-                    assertThat(readData[3], is(equalTo(FULL_DATA[3])));
-                    for(int i = 4; i < FULL_DATA.length; i++) {
-                        assertThat(readData[i], is(equalTo(NUL)));
-                    }
+            @BeforeEach
+            void init() throws Exception {
+                inputStream = PartialContentInputStream.fromContentRange(
+                        new ByteArrayInputStream(FULL_DATA, 0, 4),
+                        "bytes 0-3/"+FULL_DATA.length
+                );
+            }
 
-                    // Stream is at EOF after reading all the bytes
-                    assertThat(inputStream.read(), is(equalTo(-1)));
-                });
+            @AfterEach
+            void cleanup() throws Exception {
+                inputStream.close();
+            }
 
-                It("skips bytes into the range", () -> {
-                    inputStream.skipNBytes(2);
+            @Test
+            @DisplayName("reads fully from start to finish")
+            void readsFullyFromStartToFinish() throws Exception {
+                var readData = new byte[FULL_DATA.length];
+                Arrays.fill(readData, (byte)0xba);
+                IOUtils.readFully(inputStream, readData);
 
-                    var readData = new byte[6];
-                    Arrays.fill(readData, (byte)0xba); // Fill array to detect that it is properly filled with NUL bytes by the read function
-                    IOUtils.readFully(inputStream, readData);
-                    assertThat(readData[0], is(equalTo(FULL_DATA[2])));
-                    assertThat(readData[1], is(equalTo(FULL_DATA[3])));
-                    assertThat(readData[2], is(equalTo(NUL)));
+                assertThat(readData[0], is(equalTo(FULL_DATA[0])));
+                assertThat(readData[1], is(equalTo(FULL_DATA[1])));
+                assertThat(readData[2], is(equalTo(FULL_DATA[2])));
+                assertThat(readData[3], is(equalTo(FULL_DATA[3])));
+                for(int i = 4; i < FULL_DATA.length; i++) {
+                    assertThat(readData[i], is(equalTo(NUL)));
+                }
 
-                });
+                assertThat(inputStream.read(), is(equalTo(-1)));
+            }
 
-                It("skips bytes inside the range", () -> {
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[0] & 0xff)));
-                    inputStream.skipNBytes(2); // Bytes 1 & 2 are skipped
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[3] & 0xff)));
-                    assertThat(inputStream.read(), is(equalTo(NUL & 0xff)));
-                });
+            @Test
+            @DisplayName("skips bytes into the range")
+            void skipsBytesIntoTheRange() throws Exception {
+                inputStream.skipNBytes(2);
 
-                It("skips bytes out of the range", () -> {
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[0] & 0xff)));
-                    inputStream.skipNBytes(FULL_DATA.length - 1); // Skip until past the end of the range; right up until the end of the data
+                var readData = new byte[6];
+                Arrays.fill(readData, (byte)0xba);
+                IOUtils.readFully(inputStream, readData);
+                assertThat(readData[0], is(equalTo(FULL_DATA[2])));
+                assertThat(readData[1], is(equalTo(FULL_DATA[3])));
+                assertThat(readData[2], is(equalTo(NUL)));
+            }
 
-                    assertThat(inputStream.read(), is(equalTo(-1))); // EOF
-                });
+            @Test
+            @DisplayName("skips bytes inside the range")
+            void skipsBytesInsideTheRange() throws Exception {
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[0] & 0xff)));
+                inputStream.skipNBytes(2);
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[3] & 0xff)));
+                assertThat(inputStream.read(), is(equalTo(NUL & 0xff)));
+            }
 
-                It("skips bytes after the end of the range", () -> {
-                    inputStream.skipNBytes(4); // Skip right up to the end of the range
+            @Test
+            @DisplayName("skips bytes out of the range")
+            void skipsBytesOutOfTheRange() throws Exception {
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[0] & 0xff)));
+                inputStream.skipNBytes(FULL_DATA.length - 1);
 
-                    assertThat(inputStream.skip(Long.MAX_VALUE), is(equalTo((long)FULL_DATA.length - 4))); // All the rest of the bytes can be skipped at once
-                });
+                assertThat(inputStream.read(), is(equalTo(-1)));
+            }
 
-            });
-            Context("with a range to the end", () -> {
-                BeforeEach(() -> {
-                    inputStream = PartialContentInputStream.fromContentRange(
-                            new ByteArrayInputStream(FULL_DATA, 10, FULL_DATA.length-10),
-                            "bytes 10-"+FULL_DATA.length+"/*"
-                    );
-                });
-                AfterEach(() -> {
-                    inputStream.close();
-                });
+            @Test
+            @DisplayName("skips bytes after the end of the range")
+            void skipsBytesAfterTheEndOfTheRange() throws Exception {
+                inputStream.skipNBytes(4);
 
-                It("reads fully from start to finish", () -> {
-                    var readData = new byte[FULL_DATA.length];
-                    Arrays.fill(readData, (byte)0xba); // Fill array to detect that it is properly filled with NUL bytes by the read function
-                    IOUtils.readFully(inputStream, readData);
+                assertThat(inputStream.skip(Long.MAX_VALUE), is(equalTo((long)FULL_DATA.length - 4)));
+            }
+        }
 
-                    for(int i = 0; i < 10; i++) {
-                        assertThat(readData[i], is(equalTo(NUL)));
-                    }
-                    for(int i = 10; i < FULL_DATA.length; i++) {
-                        assertThat(readData[i], is(equalTo(FULL_DATA[i])));
-                    }
-                    // Stream is at EOF after reading all the bytes
-                    assertThat(inputStream.read(), is(equalTo(-1)));
-                });
+        @Nested
+        @DisplayName("with a range to the end")
+        class WithARangeToTheEnd {
 
-                It("skips bytes before start of the range", () -> {
-                    assertThat(inputStream.skip(5), is(equalTo(5L))); // Can skip bytes before start of range
+            @BeforeEach
+            void init() throws Exception {
+                inputStream = PartialContentInputStream.fromContentRange(
+                        new ByteArrayInputStream(FULL_DATA, 10, FULL_DATA.length-10),
+                        "bytes 10-"+FULL_DATA.length+"/*"
+                );
+            }
 
-                    // Check that read data skips the 5 bytes that were skipped
-                    var readData = new byte[FULL_DATA.length-5];
-                    Arrays.fill(readData, (byte)0xba); // Fill array to detect that it is properly filled with NUL bytes by the read function
-                    IOUtils.readFully(inputStream, readData);
-                    assertThat(readData[0], is(equalTo(NUL)));
-                    assertThat(readData[4], is(equalTo(NUL)));
-                    for(int i = 5; i < readData.length; i++) {
-                        assertThat(readData[i], is(equalTo(FULL_DATA[5+i])));
-                    }
+            @AfterEach
+            void cleanup() throws Exception {
+                inputStream.close();
+            }
 
-                    assertThat(inputStream.read(), is(equalTo(-1))); // EOF
-                });
+            @Test
+            @DisplayName("reads fully from start to finish")
+            void readsFullyFromStartToFinish() throws Exception {
+                var readData = new byte[FULL_DATA.length];
+                Arrays.fill(readData, (byte)0xba);
+                IOUtils.readFully(inputStream, readData);
 
-                It("skips bytes into the range", () -> {
-                    inputStream.skipNBytes(15);
+                for(int i = 0; i < 10; i++) {
+                    assertThat(readData[i], is(equalTo(NUL)));
+                }
+                for(int i = 10; i < FULL_DATA.length; i++) {
+                    assertThat(readData[i], is(equalTo(FULL_DATA[i])));
+                }
+                assertThat(inputStream.read(), is(equalTo(-1)));
+            }
 
-                    var readData = new byte[6];
-                    IOUtils.readFully(inputStream, readData);
-                    for(int i = 0; i < 6; i++) {
-                        assertThat(readData[i], is(equalTo(FULL_DATA[15+i])));
-                    }
-                });
+            @Test
+            @DisplayName("skips bytes before start of the range")
+            void skipsBytesBeforeStartOfTheRange() throws Exception {
+                assertThat(inputStream.skip(5), is(equalTo(5L)));
 
-                It("skips bytes inside the range", () -> {
-                    inputStream.skipNBytes(10); // Skip right up to the start of the range
+                var readData = new byte[FULL_DATA.length-5];
+                Arrays.fill(readData, (byte)0xba);
+                IOUtils.readFully(inputStream, readData);
+                assertThat(readData[0], is(equalTo(NUL)));
+                assertThat(readData[4], is(equalTo(NUL)));
+                for(int i = 5; i < readData.length; i++) {
+                    assertThat(readData[i], is(equalTo(FULL_DATA[5+i])));
+                }
 
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[10] & 0xff)));
-                    inputStream.skipNBytes(2); // bytes 11 & 12 are skipped
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[13] & 0xff)));
-                });
+                assertThat(inputStream.read(), is(equalTo(-1)));
+            }
 
-                It("skips bytes out of the range", () -> {
-                    inputStream.skipNBytes(10); // Skip right up to the start of the range
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[10] & 0xff)));
-                    inputStream.skipNBytes(FULL_DATA.length - 11); // Skip until the end of the range
+            @Test
+            @DisplayName("skips bytes into the range")
+            void skipsBytesIntoTheRange() throws Exception {
+                inputStream.skipNBytes(15);
 
-                    assertThat(inputStream.read(), is(equalTo(-1))); // EOF
-                });
-            });
-            Context("with a range in the middle", () -> {
-                BeforeEach(() -> {
-                    inputStream = PartialContentInputStream.fromContentRange(
-                            new ByteArrayInputStream(FULL_DATA, 3, 4),
-                            "bytes 3-6/"+FULL_DATA.length // bytes in the range description are *inclusive*
-                    );
-                });
-                AfterEach(() -> {
-                    inputStream.close();
-                });
-                It("reads fully from start to finish", () -> {
-                    var readData = new byte[FULL_DATA.length];
-                    Arrays.fill(readData, (byte)0xba); // Fill array to detect that it is properly filled with NUL bytes by the read function
-                    IOUtils.readFully(inputStream, readData);
+                var readData = new byte[6];
+                IOUtils.readFully(inputStream, readData);
+                for(int i = 0; i < 6; i++) {
+                    assertThat(readData[i], is(equalTo(FULL_DATA[15+i])));
+                }
+            }
 
-                    for(int i = 0; i < 3; i++) {
-                        assertThat(readData[i], is(equalTo(NUL)));
-                    }
-                    assertThat(readData[3], is(equalTo(FULL_DATA[3])));
-                    assertThat(readData[4], is(equalTo(FULL_DATA[4])));
-                    assertThat(readData[5], is(equalTo(FULL_DATA[5])));
-                    assertThat(readData[6], is(equalTo(FULL_DATA[6])));
-                    for(int i = 7; i < FULL_DATA.length; i++) {
-                        assertThat(readData[i], is(equalTo(NUL)));
-                    }
+            @Test
+            @DisplayName("skips bytes inside the range")
+            void skipsBytesInsideTheRange() throws Exception {
+                inputStream.skipNBytes(10);
 
-                    // Stream is at EOF after reading all the bytes
-                    assertThat(inputStream.read(), is(equalTo(-1)));
-                });
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[10] & 0xff)));
+                inputStream.skipNBytes(2);
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[13] & 0xff)));
+            }
 
-                It("skips bytes before start of the range", () -> {
-                    assertThat(inputStream.skip(2), is(equalTo(2L))); // Can skip bytes before start of range
+            @Test
+            @DisplayName("skips bytes out of the range")
+            void skipsBytesOutOfTheRange() throws Exception {
+                inputStream.skipNBytes(10);
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[10] & 0xff)));
+                inputStream.skipNBytes(FULL_DATA.length - 11);
 
-                    // Check that read data skips the 2 bytes that were skipped
-                    var readData = new byte[6];
-                    Arrays.fill(readData, (byte)0xba); // Fill array to detect that it is properly filled with NUL bytes by the read function
-                    IOUtils.readFully(inputStream, readData);
-                    assertThat(readData[0], is(equalTo(NUL)));
-                    assertThat(readData[1], is(equalTo(FULL_DATA[3])));
-                    assertThat(readData[2], is(equalTo(FULL_DATA[4])));
-                    assertThat(readData[3], is(equalTo(FULL_DATA[5])));
-                    assertThat(readData[4], is(equalTo(FULL_DATA[6])));
-                    assertThat(readData[5], is(equalTo(NUL)));
-                });
+                assertThat(inputStream.read(), is(equalTo(-1)));
+            }
+        }
 
-                It("skips bytes into the range", () -> {
-                    inputStream.skipNBytes(4);
+        @Nested
+        @DisplayName("with a range in the middle")
+        class WithARangeInTheMiddle {
 
-                    var readData = new byte[6];
-                    Arrays.fill(readData, (byte)0xba); // Fill array to detect that it is properly filled with NUL bytes by the read function
-                    IOUtils.readFully(inputStream, readData);
-                    assertThat(readData[0], is(equalTo(FULL_DATA[4])));
-                    assertThat(readData[1], is(equalTo(FULL_DATA[5])));
-                    assertThat(readData[2], is(equalTo(FULL_DATA[6])));
-                    assertThat(readData[3], is(equalTo(NUL)));
+            @BeforeEach
+            void init() throws Exception {
+                inputStream = PartialContentInputStream.fromContentRange(
+                        new ByteArrayInputStream(FULL_DATA, 3, 4),
+                        "bytes 3-6/"+FULL_DATA.length
+                );
+            }
 
-                });
+            @AfterEach
+            void cleanup() throws Exception {
+                inputStream.close();
+            }
 
-                It("skips bytes inside the range", () -> {
-                    inputStream.skipNBytes(3); // Skip right up to the start of the range
+            @Test
+            @DisplayName("reads fully from start to finish")
+            void readsFullyFromStartToFinish() throws Exception {
+                var readData = new byte[FULL_DATA.length];
+                Arrays.fill(readData, (byte)0xba);
+                IOUtils.readFully(inputStream, readData);
 
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[3] & 0xff)));
-                    inputStream.skipNBytes(2); // Bytes 4 & 5 are skipped
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[6] & 0xff)));
-                    assertThat(inputStream.read(), is(equalTo(NUL & 0xff)));
-                });
+                for(int i = 0; i < 3; i++) {
+                    assertThat(readData[i], is(equalTo(NUL)));
+                }
+                assertThat(readData[3], is(equalTo(FULL_DATA[3])));
+                assertThat(readData[4], is(equalTo(FULL_DATA[4])));
+                assertThat(readData[5], is(equalTo(FULL_DATA[5])));
+                assertThat(readData[6], is(equalTo(FULL_DATA[6])));
+                for(int i = 7; i < FULL_DATA.length; i++) {
+                    assertThat(readData[i], is(equalTo(NUL)));
+                }
 
-                It("skips bytes out of the range", () -> {
-                    inputStream.skipNBytes(3); // Skip right up to the start of the range
-                    assertThat(inputStream.read(), is(equalTo(FULL_DATA[3] & 0xff)));
-                    inputStream.skipNBytes(FULL_DATA.length - 4); // Skip until past the end of the range; right up until the end of the data
+                assertThat(inputStream.read(), is(equalTo(-1)));
+            }
 
-                    assertThat(inputStream.read(), is(equalTo(-1))); // EOF
-                });
+            @Test
+            @DisplayName("skips bytes before start of the range")
+            void skipsBytesBeforeStartOfTheRange() throws Exception {
+                assertThat(inputStream.skip(2), is(equalTo(2L)));
 
-                It("skips bytes after the end of the range", () -> {
-                    inputStream.skipNBytes(7); // Skip right up to the end of the range
+                var readData = new byte[6];
+                Arrays.fill(readData, (byte)0xba);
+                IOUtils.readFully(inputStream, readData);
+                assertThat(readData[0], is(equalTo(NUL)));
+                assertThat(readData[1], is(equalTo(FULL_DATA[3])));
+                assertThat(readData[2], is(equalTo(FULL_DATA[4])));
+                assertThat(readData[3], is(equalTo(FULL_DATA[5])));
+                assertThat(readData[4], is(equalTo(FULL_DATA[6])));
+                assertThat(readData[5], is(equalTo(NUL)));
+            }
 
-                    assertThat(inputStream.skip(Long.MAX_VALUE), is(equalTo((long)FULL_DATA.length - 7))); // All the rest of the bytes can be skipped at once
-                });
+            @Test
+            @DisplayName("skips bytes into the range")
+            void skipsBytesIntoTheRange() throws Exception {
+                inputStream.skipNBytes(4);
 
-            });
+                var readData = new byte[6];
+                Arrays.fill(readData, (byte)0xba);
+                IOUtils.readFully(inputStream, readData);
+                assertThat(readData[0], is(equalTo(FULL_DATA[4])));
+                assertThat(readData[1], is(equalTo(FULL_DATA[5])));
+                assertThat(readData[2], is(equalTo(FULL_DATA[6])));
+                assertThat(readData[3], is(equalTo(NUL)));
+            }
 
-        });
+            @Test
+            @DisplayName("skips bytes inside the range")
+            void skipsBytesInsideTheRange() throws Exception {
+                inputStream.skipNBytes(3);
+
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[3] & 0xff)));
+                inputStream.skipNBytes(2);
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[6] & 0xff)));
+                assertThat(inputStream.read(), is(equalTo(NUL & 0xff)));
+            }
+
+            @Test
+            @DisplayName("skips bytes out of the range")
+            void skipsBytesOutOfTheRange() throws Exception {
+                inputStream.skipNBytes(3);
+                assertThat(inputStream.read(), is(equalTo(FULL_DATA[3] & 0xff)));
+                inputStream.skipNBytes(FULL_DATA.length - 4);
+
+                assertThat(inputStream.read(), is(equalTo(-1)));
+            }
+
+            @Test
+            @DisplayName("skips bytes after the end of the range")
+            void skipsBytesAfterTheEndOfTheRange() throws Exception {
+                inputStream.skipNBytes(7);
+
+                assertThat(inputStream.skip(Long.MAX_VALUE), is(equalTo((long)FULL_DATA.length - 7)));
+            }
+        }
     }
 
-
-    @Test
-    public void noop() {}
 }

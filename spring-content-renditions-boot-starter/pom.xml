@@ -5,7 +5,7 @@
     <parent>
         <artifactId>spring-content</artifactId>
         <groupId>it.intesys</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <name>Spring Content Renditions Boot Starter</name>
     <description>Spring Content Renditions Boot Starter module of Spring Content.</description>
@@ -17,12 +17,12 @@
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-renditions</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>it.intesys</groupId>
             <artifactId>spring-content-autoconfigure</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

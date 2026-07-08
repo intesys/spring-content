@@ -1,27 +1,27 @@
 package it.typesupport;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
 import it.typesupport.model.*;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads=1)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { FsTypeSupportConfig.class })
 public class FsTypeSupportTest {
 
@@ -33,107 +33,175 @@ public class FsTypeSupportTest {
     Object entity;
     Object id;
 
-    {
-        Describe("java.util.UUID", () -> {
-            Context("given a content entity", () -> {
-                BeforeEach(() -> {
-                    entity = new UUIDBasedContentEntity();
-                });
-                Context("given the Application sets the ID", () -> {
-                    BeforeEach(() -> {
-                        id = UUID.randomUUID();
-                        ((UUIDBasedContentEntity)entity).setContentId((UUID)id);
+    @Nested
+    @DisplayName("java.util.UUID")
+    class JavaUtilUUID {
 
-                        uuidStore.setContent((UUIDBasedContentEntity)entity, new ByteArrayInputStream("uuid".getBytes()));
-                    });
-                    It("should store the content successfully", () -> {
-                        Assert.assertThat(IOUtils.contentEquals(uuidStore.getContent((UUIDBasedContentEntity)entity), IOUtils.toInputStream("uuid")), is(true));
-                    });
-                });
-                Context("given Spring Content generates the ID", () -> {
-                    BeforeEach(() -> {
-                        uuidStore.setContent((UUIDBasedContentEntity)entity, new ByteArrayInputStream("uuid".getBytes()));
-                    });
-                    It("should store the content successfully", () -> {
-                        Assert.assertThat(IOUtils.contentEquals(uuidStore.getContent((UUIDBasedContentEntity)entity), IOUtils.toInputStream("uuid")), is(true));
-                    });
-                });
-            });
-            AfterEach(() -> {
-                uuidStore.unsetContent((UUIDBasedContentEntity)entity);
-                Assert.assertThat(((UUIDBasedContentEntity) entity).getContentId(), is(nullValue()));
-            });
-        });
-        Describe("java.net.URI", () -> {
-            Context("given a content entity", () -> {
-                BeforeEach(() -> {
-                    entity = new URIBasedContentEntity();
-                });
-                Context("given the Application sets the ID", () -> {
-                    BeforeEach(() -> {
-                        id = new URI("/some/deep/location");
-                        ((URIBasedContentEntity)entity).setContentId((URI)id);
+        @AfterEach
+        void cleanUp() {
+            uuidStore.unsetContent((UUIDBasedContentEntity)entity);
+            assertThat(((UUIDBasedContentEntity) entity).getContentId(), is(nullValue()));
+        }
 
-                        uriStore.setContent((URIBasedContentEntity)entity, new ByteArrayInputStream("uri".getBytes()));
-                    });
-                    It("should store the content successfully", () -> {
-                        Assert.assertThat(IOUtils.contentEquals(uriStore.getContent((URIBasedContentEntity)entity), IOUtils.toInputStream("uri")), is(true));
-                    });
-                });
-            });
-            AfterEach(() -> {
-                uriStore.unsetContent((URIBasedContentEntity)entity);
-                Assert.assertThat(((URIBasedContentEntity) entity).getContentId(), is(nullValue()));
-            });
-        });
-        Describe("java.lang.Long", () -> {
-            Context("given a content entity", () -> {
-                BeforeEach(() -> {
-                    entity = new LongBasedContentEntity();
-                });
-                Context("given the Application sets the ID", () -> {
-                    BeforeEach(() -> {
-                        id = Long.MAX_VALUE;
-                        ((LongBasedContentEntity)entity).setContentId((Long)id);
+        @Nested
+        @DisplayName("given a content entity")
+        class GivenAContentEntity {
 
-                        longStore.setContent((LongBasedContentEntity)entity, new ByteArrayInputStream("long".getBytes()));
-                    });
-                    It("should store the content successfully", () -> {
-                        Assert.assertThat(IOUtils.contentEquals(longStore.getContent((LongBasedContentEntity)entity), IOUtils.toInputStream("long")), is(true));
-                    });
-                });
-            });
-            AfterEach(() -> {
-                longStore.unsetContent((LongBasedContentEntity)entity);
-                Assert.assertThat(((LongBasedContentEntity) entity).getContentId(), is(nullValue()));
-            });
-        });
-        Describe("java.math.BigInteger", () -> {
-            Context("given a content entity", () -> {
-                BeforeEach(() -> {
-                    entity = new BigIntegerBasedContentEntity();
-                });
-                Context("given the Application sets the ID", () -> {
-                    BeforeEach(() -> {
-                        id = BigInteger.valueOf(Long.MAX_VALUE);
-                        ((BigIntegerBasedContentEntity)entity).setContentId((BigInteger)id);
+            @BeforeEach
+            void setUp() {
+                entity = new UUIDBasedContentEntity();
+            }
 
-                        bigIntStore.setContent((BigIntegerBasedContentEntity)entity, new ByteArrayInputStream("big-int".getBytes()));
-                    });
-                    It("should store the content successfully", () -> {
-                        Assert.assertThat(IOUtils.contentEquals(bigIntStore.getContent((BigIntegerBasedContentEntity)entity), IOUtils.toInputStream("big-int")), is(true));
-                    });
-                });
-            });
-            AfterEach(() -> {
-                bigIntStore.unsetContent((BigIntegerBasedContentEntity)entity);
-                Assert.assertThat(((BigIntegerBasedContentEntity) entity).getContentId(), is(nullValue()));
-            });
-        });
+            @Nested
+            @DisplayName("given the Application sets the ID")
+            class GivenTheApplicationSetsTheID {
+
+                @BeforeEach
+                void setUp() {
+                    id = UUID.randomUUID();
+                    ((UUIDBasedContentEntity)entity).setContentId((UUID)id);
+                    uuidStore.setContent((UUIDBasedContentEntity)entity, new ByteArrayInputStream("uuid".getBytes()));
+                }
+
+                @Test
+                @DisplayName("should store the content successfully")
+                void shouldStoreTheContentSuccessfully() throws Exception {
+                    assertThat(IOUtils.contentEquals(uuidStore.getContent((UUIDBasedContentEntity)entity), IOUtils.toInputStream("uuid")), is(true));
+                }
+            }
+
+            @Nested
+            @DisplayName("given Spring Content generates the ID")
+            class GivenSpringContentGeneratesTheID {
+
+                @BeforeEach
+                void setUp() {
+                    uuidStore.setContent((UUIDBasedContentEntity)entity, new ByteArrayInputStream("uuid".getBytes()));
+                }
+
+                @Test
+                @DisplayName("should store the content successfully")
+                void shouldStoreTheContentSuccessfully() throws Exception {
+                    assertThat(IOUtils.contentEquals(uuidStore.getContent((UUIDBasedContentEntity)entity), IOUtils.toInputStream("uuid")), is(true));
+                }
+            }
+        }
     }
 
+    @Nested
+    @DisplayName("java.net.URI")
+    class JavaNetURI {
 
-    @Test
-    public void noop() throws IOException {
+        @AfterEach
+        void cleanUp() {
+            uriStore.unsetContent((URIBasedContentEntity)entity);
+            assertThat(((URIBasedContentEntity) entity).getContentId(), is(nullValue()));
+        }
+
+        @Nested
+        @DisplayName("given a content entity")
+        class GivenAContentEntity {
+
+            @BeforeEach
+            void setUp() {
+                entity = new URIBasedContentEntity();
+            }
+
+            @Nested
+            @DisplayName("given the Application sets the ID")
+            class GivenTheApplicationSetsTheID {
+
+                @BeforeEach
+                void setUp() throws Exception {
+                    id = new URI("/some/deep/location");
+                    ((URIBasedContentEntity)entity).setContentId((URI)id);
+                    uriStore.setContent((URIBasedContentEntity)entity, new ByteArrayInputStream("uri".getBytes()));
+                }
+
+                @Test
+                @DisplayName("should store the content successfully")
+                void shouldStoreTheContentSuccessfully() throws Exception {
+                    assertThat(IOUtils.contentEquals(uriStore.getContent((URIBasedContentEntity)entity), IOUtils.toInputStream("uri")), is(true));
+                }
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("java.lang.Long")
+    class JavaLangLong {
+
+        @AfterEach
+        void cleanUp() {
+            longStore.unsetContent((LongBasedContentEntity)entity);
+            assertThat(((LongBasedContentEntity) entity).getContentId(), is(nullValue()));
+        }
+
+        @Nested
+        @DisplayName("given a content entity")
+        class GivenAContentEntity {
+
+            @BeforeEach
+            void setUp() {
+                entity = new LongBasedContentEntity();
+            }
+
+            @Nested
+            @DisplayName("given the Application sets the ID")
+            class GivenTheApplicationSetsTheID {
+
+                @BeforeEach
+                void setUp() {
+                    id = Long.MAX_VALUE;
+                    ((LongBasedContentEntity)entity).setContentId((Long)id);
+                    longStore.setContent((LongBasedContentEntity)entity, new ByteArrayInputStream("long".getBytes()));
+                }
+
+                @Test
+                @DisplayName("should store the content successfully")
+                void shouldStoreTheContentSuccessfully() throws Exception {
+                    assertThat(IOUtils.contentEquals(longStore.getContent((LongBasedContentEntity)entity), IOUtils.toInputStream("long")), is(true));
+                }
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("java.math.BigInteger")
+    class JavaMathBigInteger {
+
+        @AfterEach
+        void cleanUp() {
+            bigIntStore.unsetContent((BigIntegerBasedContentEntity)entity);
+            assertThat(((BigIntegerBasedContentEntity) entity).getContentId(), is(nullValue()));
+        }
+
+        @Nested
+        @DisplayName("given a content entity")
+        class GivenAContentEntity {
+
+            @BeforeEach
+            void setUp() {
+                entity = new BigIntegerBasedContentEntity();
+            }
+
+            @Nested
+            @DisplayName("given the Application sets the ID")
+            class GivenTheApplicationSetsTheID {
+
+                @BeforeEach
+                void setUp() {
+                    id = BigInteger.valueOf(Long.MAX_VALUE);
+                    ((BigIntegerBasedContentEntity)entity).setContentId((BigInteger)id);
+                    bigIntStore.setContent((BigIntegerBasedContentEntity)entity, new ByteArrayInputStream("big-int".getBytes()));
+                }
+
+                @Test
+                @DisplayName("should store the content successfully")
+                void shouldStoreTheContentSuccessfully() throws Exception {
+                    assertThat(IOUtils.contentEquals(bigIntStore.getContent((BigIntegerBasedContentEntity)entity), IOUtils.toInputStream("big-int")), is(true));
+                }
+            }
+        }
     }
 }

@@ -1,9 +1,5 @@
 package internal.org.springframework.content.rest.links;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.BeforeEach;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Context;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.Describe;
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.It;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -24,8 +20,11 @@ import jakarta.persistence.Id;
 import javax.sql.DataSource;
 
 import org.hamcrest.beans.HasPropertyWithValue;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
@@ -53,14 +52,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import com.theoryinpractise.halbuilder.api.ReadableRepresentation;
 import com.theoryinpractise.halbuilder.api.RepresentationFactory;
 import com.theoryinpractise.halbuilder.standard.StandardRepresentationFactory;
@@ -69,9 +67,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
 @WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
         ContentLinksWithProjectionsIT.StoreConfig.class,
 		DelegatingWebMvcConfiguration.class,
@@ -91,42 +88,48 @@ public class ContentLinksWithProjectionsIT {
 	@Autowired
 	private WebApplicationContext context;
 
-	private MockMvc mvc;
+	@Nested
+	@DisplayName("Content Links with Entity Projection")
+	class ContentLinksWithProjectionTests {
 
-	private TEntity testEntity;
+		private MockMvc mvc;
+		private TEntity testEntity;
 
-	{
-		Describe("Content Links with Entity Projection", () -> {
-			BeforeEach(() -> {
-				mvc = MockMvcBuilders.webAppContextSetup(context).build();
-			});
+		@BeforeEach
+		void setup() {
+			mvc = MockMvcBuilders.webAppContextSetup(context).build();
+		}
 
-	        Context("given content is associated", () -> {
-	            BeforeEach(() -> {
-	                testEntity = new TEntity();
-	                testEntity.setName("foo");
-	                testEntity = store.setContent(testEntity, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
-	                testEntity = repository.save(testEntity);
-	            });
-	            Context("a GET to /{api}?/{repository}/{id}?projection=id", () -> {
-	                It("should provide a response with a content link", () -> {
-	                    MockHttpServletResponse response = mvc.perform(get("/tEntities/" + testEntity.getId() + "?projection=customTEntity")
-	                                    .accept("application/hal+json"))
-	                            .andExpect(status().isOk()).andReturn().getResponse();
-	                    assertThat(response, is(not(nullValue())));
+		@Nested
+		@DisplayName("given content is associated")
+		class GivenContentAssociated {
 
-	                    RepresentationFactory representationFactory = new StandardRepresentationFactory();
-	                    ReadableRepresentation halResponse = representationFactory
-	                            .readRepresentation("application/hal+json",
-	                                    new StringReader(response.getContentAsString()));
+			@BeforeEach
+			void init() {
+				testEntity = new TEntity();
+				testEntity.setName("foo");
+				testEntity = store.setContent(testEntity, new ByteArrayInputStream("Hello Spring Content World!".getBytes()));
+				testEntity = repository.save(testEntity);
+			}
 
-	                    assertThat(halResponse, is(not(nullValue())));
-	                    assertThat(halResponse.getLinksByRel("content"), is(not(nullValue())));
-	                    assertThat(halResponse.getLinksByRel("content"), hasItems(new HasPropertyWithValue("href", matchesPattern("http://localhost/tEntities/" + testEntity.getId() + "/content"))));
-	                });
-	            });
-	        });
-		});
+			@Test
+			@DisplayName("a GET to /{api}?/{repository}/{id}?projection=id should provide a response with a content link")
+			void getWithProjectionShouldProvideContentLink() throws Exception {
+				MockHttpServletResponse response = mvc.perform(get("/tEntities/" + testEntity.getId() + "?projection=customTEntity")
+						.accept("application/hal+json"))
+						.andExpect(status().isOk()).andReturn().getResponse();
+				assertThat(response, is(not(nullValue())));
+
+				RepresentationFactory representationFactory = new StandardRepresentationFactory();
+				ReadableRepresentation halResponse = representationFactory
+						.readRepresentation("application/hal+json",
+								new StringReader(response.getContentAsString()));
+
+				assertThat(halResponse, is(not(nullValue())));
+				assertThat(halResponse.getLinksByRel("content"), is(not(nullValue())));
+				assertThat(halResponse.getLinksByRel("content"), hasItems(new HasPropertyWithValue("href", matchesPattern("http://localhost/tEntities/" + testEntity.getId() + "/content"))));
+			}
+		}
 	}
 
 	@Entity
@@ -157,8 +160,7 @@ public class ContentLinksWithProjectionsIT {
     @EnableJpaRepositories(basePackages = "internal.org.springframework.content.rest.links", considerNestedRepositories=true)
     @EnableTransactionManagement
     @EnableFilesystemStores(basePackages = "internal.org.springframework.content.rest.links")
-//    @Profile("store")
-    public static class StoreConfig /*extends JpaInfrastructureConfig*/ {
+    public static class StoreConfig {
 
         @Bean
         public DataSource dataSource() {
@@ -194,32 +196,6 @@ public class ContentLinksWithProjectionsIT {
             return new JpaTransactionManager();
         }
 
-//        @Bean
-//        RepositoryRestConfigurer repositoryRestConfigurer() {
-//
-//            return RepositoryRestConfigurer.withConfig(config -> {
-//
-//                config.getCorsRegistry().addMapping("/**") //
-//                        .allowedMethods("GET", "PUT", "POST") //
-//                        .allowedOrigins("http://far.far.away");
-//
-//                config.withEntityLookup().forRepository(TestEntity7Repository.class, TestEntity7::getName, TestEntity7Repository::findByName);
-//            });
-//        }
-
-//        @Bean
-//        ContentRestConfigurer contentRestConfigurer() {
-//
-//            return new ContentRestConfigurer() {
-//                @Override
-//                public void configure(RestConfiguration config) {
-//                    config.getCorsRegistry().addMapping("/**") //
-//                            .allowedMethods("GET", "PUT", "POST") //
-//                            .allowedOrigins("http://far.far.away");
-//                }
-//            };
-//        }
-
         @Bean
         FileSystemResourceLoader fileSystemResourceLoader() {
             return new FileSystemResourceLoader(filesystemRoot().getAbsolutePath());
@@ -232,66 +208,5 @@ public class ContentLinksWithProjectionsIT {
             filesystemRoot.mkdirs();
             return filesystemRoot;
         }
-
-//        @Bean
-//        public RenditionProvider textToHtml() {
-//            return new RenditionProvider() {
-//
-//                @Override
-//                public String consumes() {
-//                    return "text/plain";
-//                }
-//
-//                @Override
-//                public String[] produces() {
-//                    return new String[] { "text/html" };
-//                }
-//
-//                @Override
-//                public InputStream convert(InputStream fromInputSource, String toMimeType) {
-//                    String input = null;
-//                    try {
-//                        input = IOUtils.toString(fromInputSource);
-//                    }
-//                    catch (IOException e) {
-//                    }
-//                    return new ByteArrayInputStream(
-//                            String.format("<html><body>%s</body></html>", input).getBytes());
-//                }
-//            };
-//        }
-
-//        @Bean
-//        public RenditionProvider htmlToHtml() {
-//            return new RenditionProvider() {
-//
-//                @Override
-//                public String consumes() {
-//                    return "text/html";
-//                }
-//
-//                @Override
-//                public String[] produces() {
-//                    return new String[] { "text/html" };
-//                }
-//
-//                @Override
-//                public InputStream convert(InputStream fromInputSource, String toMimeType) {
-//                    String input = null;
-//                    try {
-//                        input = IOUtils.toString(fromInputSource);
-//                    }
-//                    catch (IOException e) {
-//                    }
-//                    return new ByteArrayInputStream(
-//                            String.format("<html><body>Hello Spring Content World!</body></html>", input).getBytes());
-//                }
-//            };
-//        }
     }
-
-
-	@Test
-	public void noop() {
-	}
 }

@@ -1,7 +1,5 @@
 package internal.org.springframework.content.rest.it.config;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.rest.it.SecurityConfiguration;
 import internal.org.springframework.content.rest.support.TestEntity;
 import internal.org.springframework.content.rest.support.TestEntity2;
@@ -9,15 +7,17 @@ import internal.org.springframework.content.rest.support.mockstore.EnableMockSto
 import internal.org.springframework.content.rest.support.mockstore.MockContentStore;
 import internal.org.springframework.content.rest.support.mockstore.MockStoreFactoryBean;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoRepositoriesAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.content.commons.property.PropertyPath;
@@ -45,14 +45,11 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.sql.DataSource;
 import java.util.UUID;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads=1)
 @SpringBootTest(classes = PreferResourceForPutsAndPostsIT.Application.class, webEnvironment=WebEnvironment.RANDOM_PORT)
 public class PreferResourceForPutsAndPostsIT {
 
@@ -68,31 +65,31 @@ public class PreferResourceForPutsAndPostsIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private TestEntity2 existingClaim;
+    @Nested
+    @DisplayName("PreferResourceForPutsAndPosts")
+    class PreferResourceTests {
 
-    {
-        Describe("PreferResourceForPutsAndPosts", () -> {
+        @BeforeEach
+        void setup() {
+            RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+        }
 
-            BeforeEach(() -> {
-                RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
-            });
+        @Test
+        @DisplayName("should use the setContent(S, Resource) method")
+        void shouldUseResourceMethod() {
+            TestEntity tentity = new TestEntity();
+            tentity = repo.save(tentity);
 
-            It("should use the setContent(S, Resource) method", () -> {
+            given()
+                    .contentType("text/plain")
+                    .body("some content".getBytes())
+                    .when()
+                    .post("/testEntities/" + tentity.getId());
 
-                TestEntity tentity = new TestEntity();
-                tentity = repo.save(tentity);
+            MockStoreFactoryBean storeFactory = context.getBean(MockStoreFactoryBean.class);
 
-                given()
-                        .contentType("text/plain")
-                        .body("some content".getBytes())
-                        .when()
-                        .post("/testEntities/" + tentity.getId());
-
-                MockStoreFactoryBean storeFactory = context.getBean(MockStoreFactoryBean.class);
-
-                verify(storeFactory.getMock()).setContent(argThat(isA(TestEntity.class)), argThat(isA(PropertyPath.class)), (Resource)argThat(isA(Resource.class)));
-            });
-        });
+            verify(storeFactory.getMock()).setContent(argThat(isA(TestEntity.class)), argThat(isA(PropertyPath.class)), (Resource)argThat(isA(Resource.class)));
+        }
     }
 
     public interface PreferResourceForPutsAndPostsRepository extends CrudRepository<TestEntity, Long> {
@@ -102,9 +99,9 @@ public class PreferResourceForPutsAndPostsIT {
     }
 
     @SpringBootApplication(exclude = {
-            MongoAutoConfiguration.class,
-            MongoDataAutoConfiguration.class,
-            MongoRepositoriesAutoConfiguration.class
+        MongoAutoConfiguration.class,
+        DataMongoAutoConfiguration.class,
+        DataMongoRepositoriesAutoConfiguration.class
     })
     public static class Application {
 
@@ -176,9 +173,5 @@ public class PreferResourceForPutsAndPostsIT {
                };
            }
        }
-    }
-
-    @Test
-    public void noop() {
     }
 }

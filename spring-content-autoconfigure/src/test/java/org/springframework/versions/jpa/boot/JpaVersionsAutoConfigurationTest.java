@@ -1,19 +1,18 @@
 package org.springframework.versions.jpa.boot;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jRunner;
 import internal.org.springframework.content.s3.boot.autoconfigure.S3ContentAutoConfiguration;
 import internal.org.springframework.content.solr.boot.autoconfigure.SolrAutoConfiguration;
 import internal.org.springframework.content.solr.boot.autoconfigure.SolrExtensionAutoConfiguration;
 import internal.org.springframework.versions.jpa.boot.autoconfigure.JpaVersionsAutoConfiguration;
 import internal.org.springframework.versions.jpa.boot.autoconfigure.JpaVersionsDatabaseInitializer;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -30,40 +29,39 @@ import org.springframework.versions.LockingAndVersioningRepository;
 
 import javax.sql.DataSource;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
-
-@RunWith(Ginkgo4jRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
+@DisplayName("JpaVersionsAutoConfiguration")
 public class JpaVersionsAutoConfigurationTest {
 
-    private AnnotationConfigApplicationContext context;
     private ApplicationContextRunner contextRunner;
 
-    {
-        Describe("JpaVersionsAutoConfiguration", () -> {
-            BeforeEach(() -> {
-                contextRunner = new ApplicationContextRunner()
-                        .withConfiguration(AutoConfigurations.of(JpaVersionsAutoConfiguration.class));
-            });
-            Context("given an application context that relies on auto configuration", () -> {
-                It("should include the repository bean", () -> {
-                    contextRunner.withUserConfiguration(StarterConfig.class).run((context) -> {
-                        Assertions.assertThat(context).hasSingleBean(JpaVersionsDatabaseInitializer.class);
-                    });
-                });
-            });
-            Context("given an application context with a EnableJpaRepositories annotation", () -> {
-                It("should include the repository bean", () -> {
-                    contextRunner.withUserConfiguration(StarterWithAnnotationConfig.class).run((context) -> {
-                        Assertions.assertThat(context).hasSingleBean(NestedTestEntityRepository.class);
-                    });
-                });
-            });
-        });
+    @BeforeEach
+    void setUp() {
+        contextRunner = new ApplicationContextRunner()
+                .withConfiguration(AutoConfigurations.of(JpaVersionsAutoConfiguration.class));
     }
 
-    @Test
-    public void test() {
+    @Nested
+    @DisplayName("given an application context that relies on auto configuration")
+    class AutoConfiguration {
+        @Test
+        @DisplayName("should include the repository bean")
+        void shouldIncludeRepository() {
+            contextRunner.withUserConfiguration(StarterConfig.class).run((context) -> {
+                Assertions.assertThat(context).hasSingleBean(JpaVersionsDatabaseInitializer.class);
+            });
+        }
+    }
+
+    @Nested
+    @DisplayName("given an application context with a EnableJpaRepositories annotation")
+    class EnableJpaRepositoriesAnnotation {
+        @Test
+        @DisplayName("should include the repository bean")
+        void shouldIncludeRepository() {
+            contextRunner.withUserConfiguration(StarterWithAnnotationConfig.class).run((context) -> {
+                Assertions.assertThat(context).hasSingleBean(NestedTestEntityRepository.class);
+            });
+        }
     }
 
     @Configuration
@@ -98,14 +96,14 @@ public class JpaVersionsAutoConfigurationTest {
 
     @SpringBootApplication(exclude={SolrAutoConfiguration.class, SolrExtensionAutoConfiguration.class, S3ContentAutoConfiguration.class})
     @Import(JpaTestConfig.class)
-    public static class StarterConfig /*extends BaseConfig*/ {
+    public static class StarterConfig {
     }
 
     @SpringBootApplication(exclude={SolrAutoConfiguration.class, SolrExtensionAutoConfiguration.class, S3ContentAutoConfiguration.class})
     @EnableJpaRepositories(basePackages="org.springframework.versions",
                            considerNestedRepositories=true)
     @Import(JpaTestConfig.class)
-    public static class StarterWithAnnotationConfig /*extends BaseConfig*/ {
+    public static class StarterWithAnnotationConfig {
     }
 
     public interface NestedTestEntityRepository extends CrudRepository<TestEntityVersioned, Long>, LockingAndVersioningRepository<TestEntityVersioned, Long> {}

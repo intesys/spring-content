@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>it.intesys</groupId>
 		<artifactId>spring-content</artifactId>
-		<version>3.2.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 	<name>Spring Content FS</name>
 	<description>Spring Content FS module of Spring Content.</description>
@@ -24,18 +24,16 @@
 		<dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
-			<version>${jakarta-persistence-api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate-orm.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-versions-jpa</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<!-- Locking and Versioning -->
@@ -47,7 +45,7 @@
 		<dependency>
 			<groupId>it.intesys</groupId>
 			<artifactId>spring-content-commons</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Test Dependencies -->
@@ -55,27 +53,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                </exclusion>
-            </exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.github.paulcwarren</groupId>
-			<artifactId>ginkgo4j</artifactId>
-			<version>${ginkgo4j-version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -94,5 +75,15 @@
             <artifactId>hsqldb</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-persistence</artifactId>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-jpa</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

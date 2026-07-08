@@ -1,15 +1,15 @@
 package org.springframework.content.solr.boot;
 
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jConfiguration;
-import com.github.paulcwarren.ginkgo4j.Ginkgo4jSpringRunner;
 import internal.org.springframework.content.elasticsearch.boot.autoconfigure.ElasticsearchAutoConfiguration;
 import internal.org.springframework.content.s3.boot.autoconfigure.S3ContentAutoConfiguration;
 import internal.org.springframework.content.solr.SolrFulltextIndexServiceImpl;
 import internal.org.springframework.content.solr.boot.autoconfigure.SolrAutoConfiguration;
 import org.apache.solr.client.solrj.SolrClient;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,32 +20,28 @@ import org.springframework.content.solr.SolrIndexerStoreEventHandler;
 import org.springframework.content.solr.SolrProperties;
 import org.springframework.context.annotation.Bean;
 
-import static com.github.paulcwarren.ginkgo4j.Ginkgo4jDSL.*;
-
-@RunWith(Ginkgo4jSpringRunner.class)
-@Ginkgo4jConfiguration(threads = 1)
+@DisplayName("solr")
 public class SolrAutoConfigurationTest {
 
    private ApplicationContextRunner contextRunner;
 
-   {
-      Describe("solr", () -> {
-         Context("given an application context with a SolrClient bean and SolrAutoConfiguration", () -> {
-            BeforeEach(() -> {
-               contextRunner = new ApplicationContextRunner()
-                 .withConfiguration(AutoConfigurations.of(SolrAutoConfiguration.class));
-            });
-            It("should include the autoconfigured annotated event handler bean", () -> {
-               contextRunner.withUserConfiguration(TestConfig.class).run((context) -> {
-                  Assertions.assertThat(context).getBean("solrFulltextEventListener").isNotNull();
-               });
-            });
-         });
-      });
-   }
+   @Nested
+   @DisplayName("given an application context with a SolrClient bean and SolrAutoConfiguration")
+   class ContextWithSolrClient {
 
-   @Test
-   public void test() {
+      @BeforeEach
+      void setUp() {
+         contextRunner = new ApplicationContextRunner()
+           .withConfiguration(AutoConfigurations.of(SolrAutoConfiguration.class));
+      }
+
+      @Test
+      @DisplayName("should include the autoconfigured annotated event handler bean")
+      void shouldIncludeEventHandler() {
+         contextRunner.withUserConfiguration(TestConfig.class).run((context) -> {
+            Assertions.assertThat(context).getBean("solrFulltextEventListener").isNotNull();
+         });
+      }
    }
 
    @SpringBootApplication(exclude = {ElasticsearchAutoConfiguration.class, S3ContentAutoConfiguration.class})
@@ -72,5 +68,6 @@ public class SolrAutoConfigurationTest {
       @Bean
       public Object solrFulltextEventListener() {
          return new SolrIndexerStoreEventHandler(solrIndexService());
-      }   }
+      }
+   }
 }
