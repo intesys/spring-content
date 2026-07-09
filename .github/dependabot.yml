@@ -60,6 +60,19 @@ updates:
   - dependency-name: org.springframework.boot:spring-boot-dependencies
     versions:
     - 2.4.5
+  # This line stays on Spring Boot 3.x / Spring Framework 6.x / Jakarta EE 10 —
+  # never propose the Boot 4 / Framework 7 / Jakarta EE 11 generation here.
+  - dependency-name: org.springframework.boot:*
+    versions:
+    - ">= 4.a"
+  - dependency-name: org.springframework:*
+    versions:
+    - ">= 7.a"
+  # Jakarta EE 11 API bumps (only the artifacts whose version actually changes
+  # between EE 10 and EE 11 and are used here; transaction/activation are unchanged).
   - dependency-name: jakarta.persistence:jakarta.persistence-api
     versions:
-      - ">=3.2.0, <3.3.0"
+    - ">= 3.2.a"
+  - dependency-name: jakarta.servlet:jakarta.servlet-api
+    versions:
+    - ">= 6.1.a"
