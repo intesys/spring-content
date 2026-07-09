@@ -168,7 +168,7 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
             &lt;dependency&gt;
                 &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
                 &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-                &lt;version&gt;3.5.7&lt;/version&gt;
+                &lt;version&gt;${springboot.version}&lt;/version&gt;
                 &lt;type&gt;pom&lt;/type&gt;
                 &lt;scope&gt;import&lt;/scope&gt;
             &lt;/dependency&gt;
@@ -235,6 +235,7 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
         &lt;dependency&gt;
             &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
             &lt;artifactId&gt;spring-mock-mvc&lt;/artifactId&gt;
+			&lt;version&gt;${rest-assured.version}&lt;/version&gt;
             &lt;scope&gt;test&lt;/scope&gt;
         &lt;/dependency&gt;
         &lt;dependency&gt;
@@ -259,53 +260,44 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
 <p>Enable web security.</p>
 <pre><code>package gettingstarted;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.pathPattern;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.io.IOException;
-import java.io.PrintWriter;
 
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @EnableWebSecurity
-public class SpringSecurityConfig /*extends WebSecurityConfigurerAdapter*/ {
+public class SpringSecurityConfig {
 
-	@Autowired
-	public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().
-				withUser(User.withDefaultPasswordEncoder().username(&quot;paul&quot;).password(&quot;warren&quot;).roles(&quot;READER&quot;, &quot;AUTHOR&quot;)).
-				withUser(User.withDefaultPasswordEncoder().username(&quot;eric&quot;).password(&quot;wimp&quot;).roles(&quot;READER&quot;).
-						build());
+	@SuppressWarnings(&quot;deprecation&quot;)
+	@Bean
+	public UserDetailsService userDetailsService() {
+		return new InMemoryUserDetailsManager(
+				User.withDefaultPasswordEncoder().username(&quot;paul&quot;).password(&quot;warren&quot;).roles(&quot;READER&quot;, &quot;AUTHOR&quot;).build(),
+				User.withDefaultPasswordEncoder().username(&quot;eric&quot;).password(&quot;wimp&quot;).roles(&quot;READER&quot;).build());
 	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-				.authorizeRequests()
-				.requestMatchers(new AntPathRequestMatcher(&quot;/files/**/content&quot;,&quot;GET&quot;)).hasRole(&quot;READER&quot;)
-				.requestMatchers(new AntPathRequestMatcher(&quot;/files/**/content&quot;,&quot;PUT&quot;)).hasRole(&quot;AUTHOR&quot;)
-				.requestMatchers(new AntPathRequestMatcher(&quot;/files/**/content&quot;,&quot;DELETE&quot;)).hasRole(&quot;AUTHOR&quot;)
-				.anyRequest().permitAll()
-				.and().httpBasic()
-				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.csrf(csrf -&gt; csrf.disable())
+				.authorizeHttpRequests(auth -&gt; auth
+						.requestMatchers(pathPattern(HttpMethod.GET, &quot;/files/*/content&quot;)).hasRole(&quot;READER&quot;)
+						.requestMatchers(pathPattern(HttpMethod.PUT, &quot;/files/*/content&quot;)).hasRole(&quot;AUTHOR&quot;)
+						.requestMatchers(pathPattern(HttpMethod.DELETE, &quot;/files/*/content&quot;)).hasRole(&quot;AUTHOR&quot;)
+						.anyRequest().permitAll())
+				.httpBasic(Customizer.withDefaults())
+				.sessionManagement(sm -&gt; sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		return http.build();
 	}
 }

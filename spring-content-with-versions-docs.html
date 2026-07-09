@@ -168,7 +168,7 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
             &lt;dependency&gt;
                 &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
                 &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-                &lt;version&gt;3.5.7&lt;/version&gt;
+                &lt;version&gt;${springboot.version}&lt;/version&gt;
                 &lt;type&gt;pom&lt;/type&gt;
                 &lt;scope&gt;import&lt;/scope&gt;
             &lt;/dependency&gt;
@@ -241,6 +241,7 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
         &lt;dependency&gt;
             &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
             &lt;artifactId&gt;spring-mock-mvc&lt;/artifactId&gt;
+			&lt;version&gt;${rest-assured.version}&lt;/version&gt;
             &lt;scope&gt;test&lt;/scope&gt;
         &lt;/dependency&gt;
         &lt;dependency&gt;
@@ -393,15 +394,15 @@ public interface FileRepository extends JpaRepository&lt;File, Long&gt;, Locking
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             http
-                    .csrf().disable()
-                    .authorizeRequests()
-                    .requestMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
-                    .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
-                    .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    .csrf(csrf -&gt; csrf.disable())
+                    .authorizeHttpRequests(auth -&gt; auth
+                            .requestMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
+                            .anyRequest().permitAll())
+                    .httpBasic(basic -&gt; basic.realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint()))
+                    .sessionManagement(sm -&gt; sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
             return http.build();
         }
-//        @Override
 </code></pre>
 <h2 id="build-an-executable-jar">Build an executable JAR</h2>
 <p>If you are using Maven, you can run the application using <code>mvn spring-boot:run</code>.
