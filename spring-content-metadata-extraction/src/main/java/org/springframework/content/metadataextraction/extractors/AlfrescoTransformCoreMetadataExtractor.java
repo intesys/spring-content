@@ -18,8 +18,6 @@
  */
 package org.springframework.content.metadataextraction.extractors;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,7 +104,7 @@ public class AlfrescoTransformCoreMetadataExtractor implements MetadataExtractor
             });
             return map;
         }
-        catch (IOException e) {
+        catch (IOException | JacksonException e) {
             throw new MetadataExtractionException(e);
         }
     }
