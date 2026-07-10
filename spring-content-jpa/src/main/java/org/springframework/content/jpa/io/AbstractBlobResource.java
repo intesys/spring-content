@@ -155,6 +155,13 @@ public abstract class AbstractBlobResource implements BlobResource {
 
         DataSource ds = this.template.getDataSource();
         Connection conn = DataSourceUtils.getConnection(ds);
+        // When the connection is enlisted in an active transaction it is owned by the
+        // transaction manager and must not be closed here - the stream returned below can
+        // be consumed long after this method returns (e.g. streamed over HTTP by a full-text
+        // indexer), by which point the connection is no longer recognised as the transactional
+        // one and DataSourceUtils.releaseConnection would physically close it out from under
+        // the still-open transaction, breaking its commit.
+        boolean transactional = DataSourceUtils.isConnectionTransactional(conn, ds);
 
         InputStream is = null;
         Statement stmt = null;
@@ -166,7 +173,9 @@ public abstract class AbstractBlobResource implements BlobResource {
                 try {
                     rs.close();
                     stmt.close();
-                    DataSourceUtils.releaseConnection(conn, ds);
+                    if (!transactional) {
+                        DataSourceUtils.releaseConnection(conn, ds);
+                    }
                     return null;
                 } catch (SQLException sqle) {
                     logger.debug(format("failed to release database connection getting input stream for blob resource %s", id), sqle);
@@ -181,7 +190,7 @@ public abstract class AbstractBlobResource implements BlobResource {
             return null;
         }
 
-        return new ClosingInputStream(id, is, rs, stmt, null, getTransactionManager(), conn, ds);
+        return new ClosingInputStream(id, is, rs, stmt, null, getTransactionManager(), conn, ds, transactional);
     }
 
     @Override
@@ -205,8 +214,9 @@ public abstract class AbstractBlobResource implements BlobResource {
         private PlatformTransactionManager txnMgr;
         private Connection conn;
         private DataSource ds;
+        private boolean transactional;
 
-        public ClosingInputStream(Object id, InputStream actual, ResultSet rs, Statement stmt, TransactionStatus txnStatus, PlatformTransactionManager txnMgr, Connection conn, DataSource ds) {
+        public ClosingInputStream(Object id, InputStream actual, ResultSet rs, Statement stmt, TransactionStatus txnStatus, PlatformTransactionManager txnMgr, Connection conn, DataSource ds, boolean transactional) {
             this.id = id;
             this.actual = actual;
             this.rs = rs;
@@ -215,6 +225,7 @@ public abstract class AbstractBlobResource implements BlobResource {
             this.txnMgr = txnMgr;
             this.conn = conn;
             this.ds = ds;
+            this.transactional = transactional;
         }
 
         @Override
@@ -275,7 +286,12 @@ public abstract class AbstractBlobResource implements BlobResource {
                     }
                 }
                 finally {
-                    DataSourceUtils.releaseConnection(conn, ds);
+                    // Only release a connection we own. A transaction-enlisted connection is
+                    // managed (and closed) by the transaction manager; releasing it here would
+                    // physically close it while the surrounding transaction is still open.
+                    if (!transactional) {
+                        DataSourceUtils.releaseConnection(conn, ds);
+                    }
                 }
             }
             finally {

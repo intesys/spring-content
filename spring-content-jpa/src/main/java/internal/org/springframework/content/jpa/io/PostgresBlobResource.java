@@ -73,7 +73,7 @@ public class PostgresBlobResource extends AbstractBlobResource {
 			return null;
 		}
 
-		return new ClosingInputStream(id, is, rs, stmt, status, getTransactionManager(), conn, ds);
+		return new ClosingInputStream(id, is, rs, stmt, status, getTransactionManager(), conn, ds, false);
 	}
 
 	@Override

@@ -60,6 +60,6 @@ public class SQLServerBlobResource extends AbstractBlobResource {
 		catch (SQLException e) {
 			logger.error(format("getting content %s", id), e);
 		}
-		return new ClosingInputStream(id, is, rs, stmt, null, getTransactionManager(), conn, ds);
+		return new ClosingInputStream(id, is, rs, stmt, null, getTransactionManager(), conn, ds, false);
 	}
 }
