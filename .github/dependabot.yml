@@ -76,3 +76,8 @@ updates:
   - dependency-name: jakarta.servlet:jakarta.servlet-api
     versions:
     - ">= 6.1.a"
+  # azure-spring-boot 4.x targets the Boot 4 / Spring 6+ generation — keep this
+  # line on the 3.x-compatible releases.
+  - dependency-name: com.azure.spring:azure-spring-boot
+    versions:
+    - ">= 4.a"
