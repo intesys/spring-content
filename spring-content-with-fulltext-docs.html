@@ -214,6 +214,20 @@ using Git: <code>git clone https://github.com/intesys/spring-content-gettingstar
             &lt;artifactId&gt;elasticsearch-rest-high-level-client&lt;/artifactId&gt;
             &lt;version&gt;7.17.29&lt;/version&gt;
         &lt;/dependency&gt;
+        &lt;!--
+            Spring Content 4.0.0 still wires the legacy ES7 RestHighLevelClient, which drags in
+            Jackson 2 core + smile/cbor/yaml dataformats but NOT jackson-databind. Spring Boot 4
+            defaults to Jackson 3 and no longer manages Jackson 2, so databind is missing. Spring
+            Framework 7 detects the Jackson 2 dataformat factories and tries to build the matching
+            converters (SmileMapper extends the Jackson 2 ObjectMapper), failing at context startup
+            with NoClassDefFoundError on jackson-databind. Add it to complete the Jackson 2 stack.
+            Pinned to match the transitively-resolved jackson-core version.
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+            &lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+            &lt;version&gt;2.21.4&lt;/version&gt;
+        &lt;/dependency&gt;
         &lt;dependency&gt;
           &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
           &lt;artifactId&gt;lombok&lt;/artifactId&gt;
