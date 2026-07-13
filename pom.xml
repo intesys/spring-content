@@ -61,7 +61,7 @@ Integrates with Spring Data, Spring Data REST and Apache Solr</description>
 
         <!-- Test dependencies -->
         <test-containers.version>2.0.5</test-containers.version>
-        <spring-mock-mvc.version>6.0.0</spring-mock-mvc.version>
+        <spring-mock-mvc.version>6.0.1</spring-mock-mvc.version>
 
         <docs.output.dir>../target/generated-docs/refs/${env.BUILD_TYPE}/</docs.output.dir>
     </properties>
