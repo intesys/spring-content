@@ -81,3 +81,8 @@ updates:
   - dependency-name: com.azure.spring:azure-spring-boot
     versions:
     - ">= 4.a"
+  # Spring Cloud 2025.1 (Northfields) aligns with Spring Boot 4 / Spring Framework
+  # 7 — this line stays on the 2025.0 (Boot 3.x-compatible) release train.
+  - dependency-name: org.springframework.cloud:*
+    versions:
+    - ">= 2025.1.a"
