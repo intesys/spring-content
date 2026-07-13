@@ -152,7 +152,7 @@ When writing code in a module, reference these typical dependencies:
 
 ## Checks Before Submitting
 
-- Does the code compile with **Java 21**?
+- Does the code compile with **Java 25**?
 - Do unit tests pass (`./mvnw test -pl <module>`)?
 - Do integration tests pass (`./mvnw -P tests -pl <module> verify`)?
 - Is the code formatted with the Eclipse formatter?
