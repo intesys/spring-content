@@ -23,7 +23,7 @@ AWS_REGION=us-west-1 ./mvnw -P tests clean install   # + integration tests
 ```
 
 - **`AWS_REGION` is required** even for non-S3 builds — `spring-content-s3` LocalStack tests fail without it (the devcontainer sets it).
-- Tests use **ginkgo4j** (BDD), not plain JUnit, run through a custom `JUnitRunListener`.
+- Tests use **JUnit 5 / Mockito / Spring Boot Test** (BDD structured via `@Nested` / `@DisplayName`). The legacy ginkgo4j BDD framework was removed by the archived change `2026-05-15-migrate-tests-from-ginkgo4j-to-junit` — do not add ginkgo4j imports or runners.
 - **`*Test.java`** = unit (default). **`*IT.java` / `*Tests.java`** = integration, run **only with `-P tests`** and need Docker (Testcontainers / LocalStack / embedded DBs).
 
 ## Architecture (the part that spans multiple modules)

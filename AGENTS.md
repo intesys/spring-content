@@ -34,6 +34,7 @@ Key module families:
 
 ## Testing
 
+- **Framework**: JUnit 5 / Mockito / Spring Boot Test (ginkgo4j was removed by the archived change `2026-05-15-migrate-tests-from-ginkgo4j-to-junit`; write new tests in plain JUnit 5, using `@Nested` / `@DisplayName` for BDD-style grouping).
 - **Unit tests**: `*Test.java` — run by default.
 - **Integration tests**: `*IT.java` and `*Tests.java` — **only run with `-P tests`**.
 - Many ITs use Testcontainers / LocalStack / embedded DBs; Docker availability matters for a full `-P tests` pass.
