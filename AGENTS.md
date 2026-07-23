@@ -34,6 +34,7 @@ Key module families:
 
 ## Testing
 
+- **Framework**: JUnit 5 / Mockito / Spring Boot Test (ginkgo4j was removed by the archived change `2026-05-15-migrate-tests-from-ginkgo4j-to-junit`; write new tests in plain JUnit 5, using `@Nested` / `@DisplayName` for BDD-style grouping).
 - **Unit tests**: `*Test.java` — run by default.
 - **Integration tests**: `*IT.java` and `*Tests.java` — **only run with `-P tests`**.
 - Many ITs use Testcontainers / LocalStack / embedded DBs; Docker availability matters for a full `-P tests` pass.
@@ -42,12 +43,16 @@ Key module families:
 
 ## Style & Conventions
 
+**`CONTRIBUTING.md` → *Code Conventions and Housekeeping* is the authoritative checklist and must be satisfied on every change** (formatting, headers, Javadoc/`@author`, tests, rebasing, commit messages, CLA). The points below mirror it:
+
 - Use **Spring Framework code format** via `eclipse/eclipse-code-formatter.xml`.
 - New `.java` files need:
   - GPLv3 license header (copy from `HEADER.txt`); pre-existing ASF-headered files keep their original header
   - Javadoc class comment with at least `@author`
 - Add `@author` to files you modify substantially.
+- Add unit tests for new behavior; rebase your branch on the current target branch before merge.
 - Commit messages: follow [standard git conventions](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html); append `Fixes gh-XXXX` when applicable.
+- Non-trivial contributions require signing the [CLA](CLA.md).
 
 ## CI / Release Notes
 

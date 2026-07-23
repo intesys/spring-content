@@ -1,6 +1,5 @@
 package internal.org.springframework.content.fs.store;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.content.commons.annotations.ContentId;
@@ -31,10 +30,26 @@ import org.springframework.util.Assert;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
 import static java.lang.String.format;
 
+/**
+ * Filesystem-backed {@link ContentStore} implementation.
+ *
+ * <p>Writes are durable: {@link #setContent} copies the content through a {@link FileChannel}
+ * this store owns and {@code fsync}s the blob ({@link FileChannel#force(boolean) force(true)})
+ * before the call returns, then best-effort {@code fsync}s the containing directory. A
+ * successful {@code setContent} therefore implies the bytes have reached stable storage; any
+ * flush/{@code fsync}/close error surfaces as a {@link StoreAccessException} rather than a
+ * silent success (relevant on filesystems such as NFS that defer write errors to close).
+ *
+ * @author marcobelligoli
+ */
 @Transactional(readOnly = true)
 public class DefaultFilesystemStoreImpl<S, SID extends Serializable>
 		implements Store<SID>, AssociativeStore<S, SID>, ContentStore<S, SID>,
@@ -185,7 +200,6 @@ public class DefaultFilesystemStoreImpl<S, SID extends Serializable>
             return entity;
         }
 
-		OutputStream os = null;
 		try {
 			if (resource.exists() == false) {
 				File resourceFile = resource.getFile();
@@ -193,16 +207,12 @@ public class DefaultFilesystemStoreImpl<S, SID extends Serializable>
 				this.fileService.mkdirs(parent);
 			}
 			if (resource instanceof WritableResource) {
-				os = ((WritableResource) resource).getOutputStream();
-				IOUtils.copy(content, os);
+				writeDurably(resource, content);
 			}
 
 		} catch (IOException e) {
 			logger.error(format("Unexpected io error setting content for entity %s", entity), e);
 			throw new StoreAccessException(format("Setting content for entity %s", entity), e);
-		}
-		finally {
-			IOUtils.closeQuietly(os);
 		}
 
 		try {
@@ -268,7 +278,6 @@ public class DefaultFilesystemStoreImpl<S, SID extends Serializable>
 			return property;
 		}
 
-		OutputStream os = null;
 		try {
 			if (resource.exists() == false) {
 				File resourceFile = resource.getFile();
@@ -276,15 +285,11 @@ public class DefaultFilesystemStoreImpl<S, SID extends Serializable>
 				this.fileService.mkdirs(parent);
 			}
 			if (resource instanceof WritableResource) {
-				os = ((WritableResource) resource).getOutputStream();
-				IOUtils.copy(content, os);
+				writeDurably(resource, content);
 			}
 		} catch (IOException e) {
 			logger.error(format("Unexpected io error setting content for entity %s", property), e);
 			throw new StoreAccessException(format("Setting content for entity %s", property), e);
-		}
-		finally {
-			IOUtils.closeQuietly(os);
 		}
 
 		try {
@@ -437,6 +442,72 @@ public class DefaultFilesystemStoreImpl<S, SID extends Serializable>
 			property.setContentLength(entity, BeanUtils.getDefaultValueForType(property.getContentLengthType().getType()));
 		}
 		return entity;
+	}
+
+	/**
+	 * Durably copies {@code content} into the blob backing {@code resource}.
+	 *
+	 * <p>The store owns the write channel (opened deterministically from the resource's
+	 * {@link Resource#getFile() file}) rather than relying on the {@link WritableResource}'s
+	 * {@code OutputStream}, whose concrete type — and therefore whether an {@code fsync} handle
+	 * is even reachable — is not guaranteed across Spring/JDK versions. After the full copy the
+	 * blob is {@link FileChannel#force(boolean) fsync}'d and only then closed (via
+	 * {@code try}-with-resources) so flush/{@code fsync}/close {@link IOException}s propagate to
+	 * the caller instead of being swallowed. The containing directory is then {@code fsync}'d
+	 * best-effort (see {@link #syncDirectory(File)}).
+	 *
+	 * <p>The supplied {@code content} stream is <em>not</em> closed here — closing it remains the
+	 * caller's responsibility, unchanged from the previous behaviour.
+	 *
+	 * @throws IOException if opening, writing, {@code fsync}ing, or closing the blob fails; the
+	 *         caller maps this to {@link StoreAccessException}.
+	 */
+	private void writeDurably(Resource resource, InputStream content) throws IOException {
+		File file = resource.getFile();
+		try (FileChannel channel = openChannel(file.toPath())) {
+			copy(content, channel);
+			channel.force(true);
+		}
+		syncDirectory(file.getParentFile());
+	}
+
+	/**
+	 * Opens the blob write channel with {@code CREATE, WRITE, TRUNCATE_EXISTING}. Package-private
+	 * so tests can decorate/fault-inject the returned channel.
+	 */
+	FileChannel openChannel(Path path) throws IOException {
+		return FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+				StandardOpenOption.TRUNCATE_EXISTING);
+	}
+
+	private void copy(InputStream in, FileChannel out) throws IOException {
+		byte[] buffer = new byte[8192];
+		ByteBuffer bb = ByteBuffer.wrap(buffer);
+		int read;
+		while ((read = in.read(buffer)) != -1) {
+			bb.position(0).limit(read);
+			while (bb.hasRemaining()) {
+				out.write(bb);
+			}
+		}
+	}
+
+	/**
+	 * Best-effort {@code fsync} of the directory holding a newly-created blob so its directory
+	 * entry survives a crash. Some platforms/filesystems (notably Windows) reject opening or
+	 * {@code fsync}ing a directory; such a failure is logged and swallowed and MUST NOT by itself
+	 * fail an otherwise-durable blob write.
+	 */
+	private void syncDirectory(File directory) {
+		if (directory == null) {
+			return;
+		}
+		try (FileChannel dirChannel = FileChannel.open(directory.toPath(), StandardOpenOption.READ)) {
+			dirChannel.force(true);
+		}
+		catch (IOException e) {
+			logger.debug(format("Best-effort directory fsync failed for %s", directory), e);
+		}
 	}
 
 	private Object convertToExternalContentIdType(S property, Object contentId) {
