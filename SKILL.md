@@ -150,6 +150,10 @@ When writing code in a module, reference these typical dependencies:
 - `spring-content-fs` depends on `spring-content-commons`, `spring-data-commons`, `spring-tx`, `jakarta.persistence-api`.
 - `spring-content-autoconfigure` pulls in all other modules as `<optional>true</optional>`.
 
+## OpenSpec: maintainer workflow, not a contribution requirement
+
+`openspec/` (driven by the `.claude/`/`.opencode/` `opsx` commands) is a spec-driven workflow the **maintainers use internally** to plan larger architectural changes. It is an internal process, **not** a prerequisite for contributing. When working on behalf of an external contributor, do **not** require or auto-generate an OpenSpec change to open an issue or PR — lightweight changes go straight to a PR with no spec. For a substantial architectural change (new module/starter, public-contract change, breaking change), the only ask is to open an alignment issue first; whether a spec is written, and writing it, is a maintainer decision. See `CONTRIBUTING.md` → *Working with OpenSpec*.
+
 ## Checks Before Submitting
 
 - Does the code compile with **Java 25**?
