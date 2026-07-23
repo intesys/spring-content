@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Two detailed guides already exist and are the source of truth — read them before non-trivial work; keep this file for the big picture:
 - **`AGENTS.md`** — build commands, monorepo layout, CI/release, local dev tips.
 - **`SKILL.md`** — module-development playbook: core concepts (annotations, store interfaces, events), package conventions, step-by-step patterns for adding a backend, dependency cheat sheet, pre-submit checklist.
+- **`CONTRIBUTING.md`** — the contributor conventions (code format, license headers, `@author`, Javadoc, tests, rebasing, commit messages, CLA). **Every change must comply with it** — treat the *Code Conventions and Housekeeping* checklist as mandatory before considering any change done, not optional.
 
 ## What this is
 
@@ -23,7 +24,7 @@ AWS_REGION=us-west-1 ./mvnw -P tests clean install   # + integration tests
 ```
 
 - **`AWS_REGION` is required** even for non-S3 builds — `spring-content-s3` LocalStack tests fail without it (the devcontainer sets it).
-- Tests use **ginkgo4j** (BDD), not plain JUnit, run through a custom `JUnitRunListener`.
+- Tests use **JUnit 5 / Mockito / Spring Boot Test** (BDD structured via `@Nested` / `@DisplayName`). The legacy ginkgo4j BDD framework was removed by the archived change `2026-05-15-migrate-tests-from-ginkgo4j-to-junit` — do not add ginkgo4j imports or runners.
 - **`*Test.java`** = unit (default). **`*IT.java` / `*Tests.java`** = integration, run **only with `-P tests`** and need Docker (Testcontainers / LocalStack / embedded DBs).
 
 ## Architecture (the part that spans multiple modules)
@@ -50,7 +51,10 @@ The project is **GPL v3** (see `LICENSE`, `NOTICE`). New `.java` files must carr
 
 ## Conventions
 
+`CONTRIBUTING.md` → *Code Conventions and Housekeeping* is the authoritative checklist and **must be satisfied on every change**. In short:
+
 - Format with `eclipse/eclipse-code-formatter.xml`.
-- New/substantially-changed `.java` files get an `@author` Javadoc tag.
+- New `.java` files carry the GPLv3 header (`HEADER.txt`), a Javadoc class comment, and an `@author` tag; add `@author` to files you modify substantially.
+- Add unit tests for new behavior; rebase your branch on the current target branch before merge.
 - Commit messages follow standard git conventions; append `Fixes gh-XXXX` when applicable.
 - PRs require signing the CLA (`CLA.md`) and pass a build against the `spring-content-gettingstarted` repo.

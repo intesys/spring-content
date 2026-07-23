@@ -128,12 +128,16 @@ mvn -B -P tests -Dmaven.javadoc.skip=true install
 
 ## Code Style Requirements
 
+**`CONTRIBUTING.md` → *Code Conventions and Housekeeping* is the authoritative checklist and must be satisfied on every change.** The points below mirror it:
+
 - Format with `eclipse/eclipse-code-formatter.xml`.
 - **New `.java` files** must include:
   - GPLv3 license header (copy from `HEADER.txt`). Pre-existing files with the ASF header keep it unchanged.
   - Javadoc class comment with at least `@author`.
-- Add `@author` to files you modify substantially.
+- Add `@author` to files you modify substantially, and add some Javadocs.
+- Add unit tests for new behavior; rebase your branch on the current target branch before merge.
 - Commit messages: follow standard git conventions; append `Fixes gh-XXXX` when applicable.
+- Non-trivial contributions require signing the [CLA](CLA.md).
 
 ## Dependency Cheat Sheet
 
@@ -158,6 +162,8 @@ When writing code in a module, reference these typical dependencies:
 `openspec/` (driven by the `.claude/`/`.opencode/` `opsx` commands) is a spec-driven workflow the **maintainers use internally** to plan larger architectural changes. It is an internal process, **not** a prerequisite for contributing. When working on behalf of an external contributor, do **not** require or auto-generate an OpenSpec change to open an issue or PR — lightweight changes go straight to a PR with no spec. For a substantial architectural change (new module/starter, public-contract change, breaking change), the only ask is to open an alignment issue first; whether a spec is written, and writing it, is a maintainer decision. See `CONTRIBUTING.md` → *Working with OpenSpec*.
 
 ## Checks Before Submitting
+
+Run through **`CONTRIBUTING.md` → *Code Conventions and Housekeeping*** and confirm each item is met, then:
 
 - Does the code compile with **Java 21**?
 - Do unit tests pass (`./mvnw test -pl <module>`)?

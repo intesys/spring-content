@@ -44,12 +44,16 @@ Key module families:
 
 ## Style & Conventions
 
+**`CONTRIBUTING.md` → *Code Conventions and Housekeeping* is the authoritative checklist and must be satisfied on every change** (formatting, headers, Javadoc/`@author`, tests, rebasing, commit messages, CLA). The points below mirror it:
+
 - Use **Spring Framework code format** via `eclipse/eclipse-code-formatter.xml`.
 - New `.java` files need:
   - GPLv3 license header (copy from `HEADER.txt`); pre-existing ASF-headered files keep their original header
   - Javadoc class comment with at least `@author`
 - Add `@author` to files you modify substantially.
+- Add unit tests for new behavior; rebase your branch on the current target branch before merge.
 - Commit messages: follow [standard git conventions](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html); append `Fixes gh-XXXX` when applicable.
+- Non-trivial contributions require signing the [CLA](CLA.md).
 
 ## CI / Release Notes
 
