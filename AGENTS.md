@@ -60,6 +60,12 @@ Key module families:
 - **Docs are published from both lines** — the Main Build runs on `main`, `support/spring-boot-3` and tags, via the official `actions/upload-pages-artifact` + `actions/deploy-pages` flow (Pages Source must be set to "GitHub Actions"). The landing-page version table is **deterministic**: every build computes all four coordinates from fixed sources — 4.x GA = latest `4.x` tag, 4.x SNAPSHOT = `main` pom, 3.x GA = latest `3.x` tag, 3.x SNAPSHOT = `support/spring-boot-3` pom — so either line regenerates an identical landing page and can't clobber the other. Reference docs are published per line — `main` → `refs/snapshot/main`, `support/spring-boot-3` → `refs/snapshot/support/spring-boot-3`, tags → `refs/release/<tag>` — and accumulate on the `gh-pages` branch (kept as persistent storage; no longer the deployment source). The job builds on JDK 21 to cover `main`'s Java 21 (Spring Boot 4) baseline (a 21 toolchain also builds the `support/spring-boot-3` Java 17 target).
 - Docs output path: `target/generated-docs/refs/dev/`
 
+## OpenSpec (maintainer workflow — not a contribution requirement)
+
+- `openspec/` is a **spec-driven workflow the maintainers use internally** to plan and track larger architectural changes (proposals, design, tasks, specs). The `.claude/` and `.opencode/` `opsx` commands drive it.
+- **This is an internal maintainer process, not a gate for external contributions.** When acting on behalf of an external contributor, do **not** require or auto-generate an OpenSpec change to open an issue or a PR. Lightweight changes (bugfixes, small improvements, docs) go straight to a PR with no spec.
+- For a substantial architectural change (new module/starter, public-contract change, breaking change), point the contributor to opening an alignment issue first; **whether a spec is written — and writing it — is a maintainer decision**, not something to impose on the contributor. See `CONTRIBUTING.md` → *How Much Process Does My Change Need?* and *Working with OpenSpec*.
+
 ## Local Dev Tips
 
 - Devcontainer is configured with `AWS_REGION=us-west-1` and Docker-in-Docker.
