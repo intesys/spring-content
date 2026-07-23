@@ -15,6 +15,37 @@ If you are reporting a bug, please help to speed up problem diagnosis by providi
 information as possible. Ideally, that would include a small sample project that reproduces the
 problem.
 
+## How Much Process Does My Change Need?
+Almost none. We want to make contributing as easy as possible, so most changes need no
+ceremony at all. There are just two levels to be aware of — when in doubt, assume yours is
+the lightweight one:
+
+* **Lightweight contributions** — bug fixes, small improvements, documentation fixes,
+  test additions, small refactors: **just open a pull request.** No design doc, no spec,
+  and an issue is optional (open one only if you'd like feedback first).
+* **Structural contributions** — new modules/starters, changes to the public contract
+  (store interfaces, content annotations, events, REST API), or breaking changes: please
+  **open an issue or discussion first** so we can align on direction before you invest in
+  code. A maintainer takes it from there; the optional *Change / architecture proposal*
+  issue template is a handy starting point, but plain prose is fine.
+
+## Working with OpenSpec
+The [`openspec/`](openspec) directory is a spec-driven workflow tool the **maintainers use
+internally** to plan and track larger architectural changes; it records the *what* and *why*
+behind significant decisions, and we keep it public so the reasoning stays transparent.
+**It is not a requirement for contributing.** You never need OpenSpec to open an issue or a
+pull request, and small changes (bugfixes, minor improvements) never involve a spec at all.
+For a substantial architectural change we encourage you to open an alignment issue or
+discussion first — and if that change warrants a formal spec, **a maintainer decides that and
+writes the OpenSpec change; you are not expected to produce one yourself** (though you're
+welcome to pair on it if you'd like). If you're simply curious, browse [`openspec/`](openspec)
+at your leisure — treat it as optional background, not a gate.
+
+If you use an AI coding assistant, note that this repo ships assistant configuration under
+`.claude/` and `.opencode/` (including OpenSpec `opsx` commands) for the maintainers' internal
+workflow. If your assistant suggests generating an OpenSpec change for your contribution, that's
+the maintainer workflow leaking through — feel free to ignore it. A normal PR is all we ask.
+
 ## Reporting Security Vulnerabilities
 If you think you have found a security vulnerability in Spring Content please *DO NOT*
 disclose it publicly until we've had a chance to fix it. Please don't report security

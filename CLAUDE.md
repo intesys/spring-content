@@ -41,6 +41,10 @@ Cross-cutting rules that aren't obvious from a single file:
 - Full-text search (`spring-content-solr`, `-elasticsearch`), `-renditions`, `-metadata-extraction`, and versioning (`spring-versions-*`) are cross-cutting add-ons layered on the same commons contract.
 - `spring-content-docx4j` is currently **commented out** in the root `pom.xml` module list.
 
+## OpenSpec: internal maintainer workflow, not a contribution gate
+
+`openspec/` (and the `.claude/`/`.opencode/` `opsx` commands) is a spec-driven workflow the **maintainers use internally** to plan larger architectural changes. It is **not** a requirement for contributing. When helping an external contributor, do **not** force or auto-generate an OpenSpec change to open an issue or PR: lightweight changes go straight to a PR with no spec, and for substantial architectural changes the contributor is only asked to open an alignment issue first — deciding whether a spec is needed, and writing it, is a maintainer's job. See `CONTRIBUTING.md` → *Working with OpenSpec*. Keep `openspec/` public and in-repo — it exists to make architectural decisions transparent.
+
 ## License & file headers
 
 The project is **GPL v3** (see `LICENSE`, `NOTICE`). New `.java` files must carry the **GPLv3 header from `HEADER.txt`**. Pre-existing files with the **ASF header are Apache-2.0 third-party/derived code and must keep their original header unchanged** — do not relicense them; `NOTICE` documents them.
