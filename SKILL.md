@@ -125,12 +125,16 @@ mvn -B -P tests -Dmaven.javadoc.skip=true install
 
 ## Code Style Requirements
 
+**`CONTRIBUTING.md` → *Code Conventions and Housekeeping* is the authoritative checklist and must be satisfied on every change.** The points below mirror it:
+
 - Format with `eclipse/eclipse-code-formatter.xml`.
 - **New `.java` files** must include:
   - GPLv3 license header (copy from `HEADER.txt`). Pre-existing files with the ASF header keep it unchanged.
   - Javadoc class comment with at least `@author`.
-- Add `@author` to files you modify substantially.
+- Add `@author` to files you modify substantially, and add some Javadocs.
+- Add unit tests for new behavior; rebase your branch on the current target branch before merge.
 - Commit messages: follow standard git conventions; append `Fixes gh-XXXX` when applicable.
+- Non-trivial contributions require signing the [CLA](CLA.md).
 
 ## Dependency Cheat Sheet
 
@@ -151,6 +155,8 @@ When writing code in a module, reference these typical dependencies:
 - `spring-content-autoconfigure` pulls in all other modules as `<optional>true</optional>`.
 
 ## Checks Before Submitting
+
+Run through **`CONTRIBUTING.md` → *Code Conventions and Housekeeping*** and confirm each item is met, then:
 
 - Does the code compile with **Java 25**?
 - Do unit tests pass (`./mvnw test -pl <module>`)?
